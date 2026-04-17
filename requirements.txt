@@ -1,0 +1,12 @@
+alpaca-py==0.31.0
+APScheduler==3.10.4
+beautifulsoup4==4.12.3
+numpy==1.26.4
+pandas==2.2.2
+pandas-market-calendars==4.4.1
+pytest==8.3.2
+python-dotenv==1.0.1
+requests==2.32.3
+tenacity==9.0.0
+yfinance==0.2.54
+

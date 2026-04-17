@@ -1,0 +1,2 @@
+"""AI trading system package."""
+
