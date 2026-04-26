@@ -11,4 +11,6 @@ __pycache__/
 
 logs/
 runs/
-backtests/
+backtests/*
+!backtests/20260426T040610Z/
+!backtests/20260426T040610Z/**

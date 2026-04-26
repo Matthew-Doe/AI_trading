@@ -1,0 +1,1816 @@
+[
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 76.7 indicates severe overbought conditions with limited upside room",
+        "Premarket gap of -5.69% suggests immediate selling pressure",
+        "Price at 257.67 is near 20d high of 264.77, testing resistance",
+        "Volume ratio of 0.73x below average indicates lack of conviction in current move"
+      ],
+      "confidence": 0.76,
+      "key_levels": {
+        "resistance": 264.77,
+        "support": 228.19
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"VRT\",\n  \"position\": \"bear\",\n  \"confidence\": 0.76,\n  \"arguments\": [\n    \"RSI at 76.7 indicates severe overbought conditions with limited upside room\",\n    \"Premarket gap of -5.69% suggests immediate selling pressure\",\n    \"Price at 257.67 is near 20d high of 264.77, testing resistance\",\n    \"Volume ratio of 0.73x below average indicates lack of conviction in current move\"\n  ],\n  \"risks\": [\n    \"Mean reversion to SMA20 at 228.19\",\n    \"Potential for extended gap continuation if news emerges\"\n  ],\n  \"key_levels\": {\n    \"support\": 228.19,\n    \"resistance\": 264.77\n  }\n}",
+      "risks": [
+        "Mean reversion to SMA20 at 228.19",
+        "Potential for extended gap continuation if news emerges"
+      ],
+      "symbol": "VRT"
+    },
+    "bull_case": {
+      "arguments": [
+        "Strong 20d trend with 45.66% gain indicates sustained bullish momentum",
+        "RSI at 76.7 shows momentum is intact despite overbought conditions",
+        "Price remains above all major moving averages (SMA20/50/200) confirming trend strength",
+        "Premarket gap is a contrarian signal suggesting potential reversal",
+        "Volume ratio of 0.73x indicates accumulation phase rather than distribution"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 264.77,
+        "support": 228.19
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"VRT\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Strong 20d trend with 45.66% gain indicates sustained bullish momentum\",\n    \"RSI at 76.7 shows momentum is intact despite overbought conditions\",\n    \"Price remains above all major moving averages (SMA20/50/200) confirming trend strength\",\n    \"Premarket gap is a contrarian signal suggesting potential reversal\",\n    \"Volume ratio of 0.73x indicates accumulation phase rather than distribution\"\n  ],\n  \"risks\": [\n    \"RSI overbought at 76.7 creates short-term pullback risk\",\n    \"Premarket gap of -5.69% may extend downside if confirmed\",\n    \"Volume contraction at 0.73x may indicate lack of conviction\"\n  ],\n  \"key_levels\": {\n    \"support\": 228.19,\n    \"resistance\": 264.77\n  }\n}",
+      "risks": [
+        "RSI overbought at 76.7 creates short-term pullback risk",
+        "Premarket gap of -5.69% may extend downside if confirmed",
+        "Volume contraction at 0.73x may indicate lack of conviction"
+      ],
+      "symbol": "VRT"
+    },
+    "market_data": {
+      "close": 257.67,
+      "data_quality_flags": [],
+      "high_20d": 264.77,
+      "indicators": {
+        "atr14": 14.858214285714292,
+        "avg_volume20": 269064.2,
+        "rsi14": 76.69089683724064,
+        "sma20": 228.19299999999998,
+        "sma200": 156.861825,
+        "sma50": 194.7238,
+        "volatility20": 0.992707855553947
+      },
+      "is_tradeable": true,
+      "low_20d": 172.505,
+      "market_cap": 124240000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.05693328676213768,
+        "latest_price": 243.0,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 15936.25
+      },
+      "price_summary": "VRT last close 257.67; 5d return 4.99%; 20d return 45.66%; current volume vs 20d average 0.73x; 20d range position 0.92; ATR14 14.86; RSI14 76.7; SMA20/50/200 228.19/194.72/156.86; 20d annualized volatility 99.27%; premarket gap -5.69%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.05693328676213768,
+        "price_change_20d": 0.4566268125158992,
+        "price_change_5d": 0.049871653832049834,
+        "range_position": 0.92442386502741,
+        "recent_volatility": 0.8538505647469127,
+        "volume_ratio": 0.7262170143779811
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.09610622298362435,
+        "breakout_setup": 0.16389179958862152,
+        "gap_potential": 0.2846664338106884,
+        "overextension_penalty": -0.0,
+        "total": 1.2446644563829343,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.0
+      },
+      "symbol": "VRT",
+      "volume": 195399.0
+    },
+    "symbol": "VRT"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -6.42% indicates immediate downside pressure",
+        "Volume ratio of 0.51x suggests lack of buying conviction",
+        "RSI at 57.8 shows no overbought conditions for continuation",
+        "Price near 20d high but volume declining contradicts breakout validity",
+        "High volatility (71.96%) increases risk of mean reversion"
+      ],
+      "confidence": 0.95,
+      "key_levels": {
+        "resistance": 223.72,
+        "support": 203.25
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"SCCO\",\n  \"position\": \"bear\",\n  \"confidence\": 0.95,\n  \"arguments\": [\n    \"Premarket gap of -6.42% indicates immediate downside pressure\",\n    \"Volume ratio of 0.51x suggests lack of buying conviction\",\n    \"RSI at 57.8 shows no overbought conditions for continuation\",\n    \"Price near 20d high but volume declining contradicts breakout validity\",\n    \"High volatility (71.96%) increases risk of mean reversion\"\n  ],\n  \"risks\": [\n    \"Potential for short squeeze if gap fills quickly\",\n    \"Low volume may lead to slippage on exit\"\n  ],\n  \"key_levels\": {\n    \"support\": 203.25,\n    \"resistance\": 223.72\n  }\n}",
+      "risks": [
+        "Potential for short squeeze if gap fills quickly",
+        "Low volume may lead to slippage on exit"
+      ],
+      "symbol": "SCCO"
+    },
+    "bull_case": {
+      "arguments": [
+        "Strong 20-day momentum with 20.87% gain and 5.54% 5-day return confirms upward trend",
+        "Price trading above all major moving averages (SMA20/50/200) indicates bullish alignment",
+        "RSI at 57.8 shows room for upside before overbought territory",
+        "Premarket gap of -6.42% presents opportunity for mean reversion bounce",
+        "20-day range position at 0.90 suggests price near upper boundary of consolidation"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 223.72,
+        "support": 203.25
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"SCCO\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Strong 20-day momentum with 20.87% gain and 5.54% 5-day return confirms upward trend\",\n    \"Price trading above all major moving averages (SMA20/50/200) indicates bullish alignment\",\n    \"RSI at 57.8 shows room for upside before overbought territory\",\n    \"Premarket gap of -6.42% presents opportunity for mean reversion bounce\",\n    \"20-day range position at 0.90 suggests price near upper boundary of consolidation\"\n  ],\n  \"risks\": [\n    \"Low volume relative to 20-day average may indicate weak conviction\",\n    \"High volatility at 71.96% increases risk of sudden price reversal\",\n    \"Negative premarket gap could indicate broader market weakness\"\n  ],\n  \"key_levels\": {\n    \"support\": 203.25,\n    \"resistance\": 223.72\n  }\n}",
+      "risks": [
+        "Low volume relative to 20-day average may indicate weak conviction",
+        "High volatility at 71.96% increases risk of sudden price reversal",
+        "Negative premarket gap could indicate broader market weakness"
+      ],
+      "symbol": "SCCO"
+    },
+    "market_data": {
+      "close": 218.715,
+      "data_quality_flags": [],
+      "high_20d": 223.72,
+      "indicators": {
+        "atr14": 9.414642857142852,
+        "avg_volume20": 103290.85,
+        "rsi14": 57.78352419652753,
+        "sma20": 203.251,
+        "sma200": 129.00969999999998,
+        "sma50": 181.5535,
+        "volatility20": 0.7195753525916706
+      },
+      "is_tradeable": true,
+      "low_20d": 181.61,
+      "market_cap": 149040000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.0642388496445146,
+        "latest_price": 204.665,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 8687.800000000001
+      },
+      "price_summary": "SCCO last close 218.72; 5d return 5.54%; 20d return 20.87%; current volume vs 20d average 0.51x; 20d range position 0.90; ATR14 9.41; RSI14 57.8; SMA20/50/200 203.25/181.55/129.01; 20d annualized volatility 71.96%; premarket gap -6.42%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.0642388496445146,
+        "price_change_20d": 0.20870406189555135,
+        "price_change_5d": 0.055370584829183445,
+        "range_position": 0.8976796483696209,
+        "recent_volatility": 0.705506124138949,
+        "volume_ratio": 0.5082153937159003
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.07174209097945464,
+        "breakout_setup": 0.17848855816930717,
+        "gap_potential": 0.3,
+        "overextension_penalty": -0.0,
+        "total": 1.231364745934872,
+        "trend_quality": 0.18113409678611014,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.0
+      },
+      "symbol": "SCCO",
+      "volume": 52494.0
+    },
+    "symbol": "SCCO"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -6.47% signals immediate selling pressure and lack of support at current levels.",
+        "Price at 128.80 is significantly above the 200-day SMA at 83.74, indicating a potential mean reversion to the long-term average.",
+        "RSI at 60.7 suggests momentum is fading, with no immediate bullish divergence.",
+        "Volume ratio of 0.99x indicates lack of conviction to sustain the current price level."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 131.63,
+        "support": 121.78
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"NEM\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Premarket gap of -6.47% signals immediate selling pressure and lack of support at current levels.\",\n    \"Price at 128.80 is significantly above the 200-day SMA at 83.74, indicating a potential mean reversion to the long-term average.\",\n    \"RSI at 60.7 suggests momentum is fading, with no immediate bullish divergence.\",\n    \"Volume ratio of 0.99x indicates lack of conviction to sustain the current price level.\"\n  ],\n  \"risks\": [\n    \"Potential for a false breakout above 131.63 if volume increases.\",\n    \"Overextension penalty in score breakdown may indicate a correction is imminent.\"\n  ],\n  \"key_levels\": {\n    \"support\": 121.78,\n    \"resistance\": 131.63\n  }\n}",
+      "risks": [
+        "Potential for a false breakout above 131.63 if volume increases.",
+        "Overextension penalty in score breakdown may indicate a correction is imminent."
+      ],
+      "symbol": "NEM"
+    },
+    "bull_case": {
+      "arguments": [
+        "Price is trading above all major moving averages (SMA20, SMA50, SMA200) indicating strong bullish trend alignment.",
+        "RSI at 60.7 suggests momentum is healthy without being overbought, allowing room for further upside.",
+        "20-day range position of 0.78 indicates the asset is in the upper 78% of its recent range, favoring a breakout.",
+        "Volume is near average (0.99x), confirming sustained interest without the need for a spike.",
+        "The premarket gap of -6.47% is a potential catalyst for a strong recovery and upward move."
+      ],
+      "confidence": 0.78,
+      "key_levels": {
+        "resistance": 131.63,
+        "support": 115.48
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"NEM\",\n  \"position\": \"bull\",\n  \"confidence\": 0.78,\n  \"arguments\": [\n    \"Price is trading above all major moving averages (SMA20, SMA50, SMA200) indicating strong bullish trend alignment.\",\n    \"RSI at 60.7 suggests momentum is healthy without being overbought, allowing room for further upside.\",\n    \"20-day range position of 0.78 indicates the asset is in the upper 78% of its recent range, favoring a breakout.\",\n    \"Volume is near average (0.99x), confirming sustained interest without the need for a spike.\",\n    \"The premarket gap of -6.47% is a potential catalyst for a strong recovery and upward move.\"\n  ],\n  \"risks\": [\n    \"The premarket gap could lead to extended downside if buyers fail to absorb the sell pressure.\",\n    \"20-day range position at 0.78 implies proximity to resistance, increasing the risk of a pullback.\",\n    \"Low volatility expansion score (0.44) suggests the market may lack the momentum to sustain a breakout.\"\n  ],\n  \"key_levels\": {\n    \"support\": 115.48,\n    \"resistance\": 131.63\n  }\n}",
+      "risks": [
+        "The premarket gap could lead to extended downside if buyers fail to absorb the sell pressure.",
+        "20-day range position at 0.78 implies proximity to resistance, increasing the risk of a pullback.",
+        "Low volatility expansion score (0.44) suggests the market may lack the momentum to sustain a breakout."
+      ],
+      "symbol": "NEM"
+    },
+    "market_data": {
+      "close": 128.8,
+      "data_quality_flags": [],
+      "high_20d": 131.63,
+      "indicators": {
+        "atr14": 5.2689285714285745,
+        "avg_volume20": 285152.8,
+        "rsi14": 60.65942796610171,
+        "sma20": 121.78175000000002,
+        "sma200": 83.741375,
+        "sma50": 115.48010000000001,
+        "volatility20": 0.5472467255885786
+      },
+      "is_tradeable": true,
+      "low_20d": 108.045,
+      "market_cap": 130340000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.06467391304347835,
+        "latest_price": 120.47,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 29280.9
+      },
+      "price_summary": "NEM last close 128.80; 5d return 3.61%; 20d return 12.89%; current volume vs 20d average 0.99x; 20d range position 0.78; ATR14 5.27; RSI14 60.7; SMA20/50/200 121.78/115.48/83.74; 20d annualized volatility 54.72%; premarket gap -6.47%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.06467391304347835,
+        "price_change_20d": 0.12893329827329314,
+        "price_change_5d": 0.03611937897192519,
+        "range_position": 0.7774864206780298,
+        "recent_volatility": 0.615439499674442,
+        "volume_ratio": 0.9888522925252707
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.06817971753918962,
+        "breakout_setup": 0.18133734472049728,
+        "gap_potential": 0.3,
+        "overextension_penalty": -0.0,
+        "total": 1.181754416748695,
+        "trend_quality": 0.19263771186440684,
+        "volatility_expansion": 0.43959964262460144,
+        "volume_spike": 0.0
+      },
+      "symbol": "NEM",
+      "volume": 281974.0
+    },
+    "symbol": "NEM"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 31.3 indicates oversold conditions with potential for mean reversion",
+        "Price is trading below all major moving averages (SMA20/50/200)",
+        "20-day range position of 0.04 suggests price near bottom of recent range",
+        "Negative premarket gap indicates continued selling pressure"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 333.51,
+        "support": 290.16
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"ELV\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"RSI at 31.3 indicates oversold conditions with potential for mean reversion\",\n    \"Price is trading below all major moving averages (SMA20/50/200)\",\n    \"20-day range position of 0.04 suggests price near bottom of recent range\",\n    \"Negative premarket gap indicates continued selling pressure\"\n  ],\n  \"risks\": [\n    \"Oversold conditions may lead to short-term bounce\",\n    \"Volume spike could signal reversal attempt\"\n  ],\n  \"key_levels\": {\n    \"support\": 290.16,\n    \"resistance\": 333.51\n  }\n}",
+      "risks": [
+        "Oversold conditions may lead to short-term bounce",
+        "Volume spike could signal reversal attempt"
+      ],
+      "symbol": "ELV"
+    },
+    "bull_case": {
+      "arguments": [
+        "Current price 294.06 is near 20d low of 290.16, indicating oversold conditions ripe for reversal.",
+        "RSI at 31.32 signals deep oversold territory, historically a strong trigger for mean reversion.",
+        "Volume spike of 2.96x avg suggests institutional accumulation despite price decline.",
+        "Premarket gap of -1.74% creates immediate upside momentum potential upon open.",
+        "Support at 290.16 acts as a strong floor with high probability of bounce."
+      ],
+      "confidence": 0.0,
+      "key_levels": {
+        "resistance": 333.51,
+        "support": 290.16
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"ELV\",\n  \"position\": \"bull\",\n  \"confidence\": 0.0,\n  \"arguments\": [\n    \"Current price 294.06 is near 20d low of 290.16, indicating oversold conditions ripe for reversal.\",\n    \"RSI at 31.32 signals deep oversold territory, historically a strong trigger for mean reversion.\",\n    \"Volume spike of 2.96x avg suggests institutional accumulation despite price decline.\",\n    \"Premarket gap of -1.74% creates immediate upside momentum potential upon open.\",\n    \"Support at 290.16 acts as a strong floor with high probability of bounce.\"\n  ],\n  \"risks\": [\n    \"RSI oversold could indicate continued downside if trend is strong.\",\n    \"SMA200 at 338.81 remains above current price, requiring confirmation of trend reversal.\",\n    \"High volatility of 38.98% increases risk of continued price swings.\"\n  ],\n  \"key_levels\": {\n    \"support\": 290.16,\n    \"resistance\": 333.51\n  }\n}",
+      "risks": [
+        "RSI oversold could indicate continued downside if trend is strong.",
+        "SMA200 at 338.81 remains above current price, requiring confirmation of trend reversal.",
+        "High volatility of 38.98% increases risk of continued price swings."
+      ],
+      "symbol": "ELV"
+    },
+    "market_data": {
+      "close": 294.06,
+      "data_quality_flags": [],
+      "high_20d": 351.44,
+      "indicators": {
+        "atr14": 11.585714285714289,
+        "avg_volume20": 64637.25,
+        "rsi14": 31.321645313553603,
+        "sma20": 333.50825,
+        "sma200": 338.81065,
+        "sma50": 348.4707,
+        "volatility20": 0.3897736634912291
+      },
+      "is_tradeable": true,
+      "low_20d": 290.16,
+      "market_cap": 74860000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.017377405971570475,
+        "latest_price": 288.95,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 7501.450000000001
+      },
+      "price_summary": "ELV last close 294.06; 5d return -12.40%; 20d return -21.58%; current volume vs 20d average 2.96x; 20d range position 0.04; ATR14 11.59; RSI14 31.3; SMA20/50/200 333.51/348.47/338.81; 20d annualized volatility 38.98%; premarket gap -1.74%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.017377405971570475,
+        "price_change_20d": -0.21579817590271488,
+        "price_change_5d": -0.12397408207343419,
+        "range_position": 0.043167856549891845,
+        "recent_volatility": 0.5667380315484496,
+        "volume_ratio": 2.957365915165017
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.06566525134164393,
+        "breakout_setup": 0.20855437665782517,
+        "gap_potential": 0.08688702985785238,
+        "overextension_penalty": -0.0,
+        "total": 1.1616561290512872,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.40481287967746404,
+        "volume_spike": 0.1957365915165017
+      },
+      "symbol": "ELV",
+      "volume": 191156.0
+    },
+    "symbol": "ELV"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 72.7 indicates severe overbought conditions with high probability of mean reversion.",
+        "Price at 153.52 is at the absolute 20-day high, suggesting exhaustion of upward momentum.",
+        "Recent 28.78% gain in 5 days is unsustainable and likely to correct.",
+        "Negative premarket gap of -2.06% signals immediate selling pressure.",
+        "High volatility (95% annualized) increases risk of sharp downside moves."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 153.71,
+        "support": 129.08
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"DELL\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"RSI at 72.7 indicates severe overbought conditions with high probability of mean reversion.\",\n    \"Price at 153.52 is at the absolute 20-day high, suggesting exhaustion of upward momentum.\",\n    \"Recent 28.78% gain in 5 days is unsustainable and likely to correct.\",\n    \"Negative premarket gap of -2.06% signals immediate selling pressure.\",\n    \"High volatility (95% annualized) increases risk of sharp downside moves.\"\n  ],\n  \"risks\": [\n    \"Strong trend quality score (0.2) may delay immediate reversal.\",\n    \"Volume ratio near average limits explosive downside acceleration.\",\n    \"Lack of news headlines reduces catalyst for immediate breakdown.\"\n  ],\n  \"key_levels\": {\n    \"support\": 129.08,\n    \"resistance\": 153.71\n  }\n}",
+      "risks": [
+        "Strong trend quality score (0.2) may delay immediate reversal.",
+        "Volume ratio near average limits explosive downside acceleration.",
+        "Lack of news headlines reduces catalyst for immediate breakdown."
+      ],
+      "symbol": "DELL"
+    },
+    "bull_case": {
+      "arguments": [
+        "Price is at 20d high, indicating strong momentum and potential continuation.",
+        "RSI at 72.7 suggests bullish momentum despite overbought conditions.",
+        "Price is significantly above all moving averages (SMA20, 50, 200), confirming strong uptrend.",
+        "Volume is 1.08x average, indicating sustained buying interest.",
+        "20d return of 27.39% demonstrates exceptional short-term strength."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 154.0,
+        "support": 145.0
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"DELL\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Price is at 20d high, indicating strong momentum and potential continuation.\",\n    \"RSI at 72.7 suggests bullish momentum despite overbought conditions.\",\n    \"Price is significantly above all moving averages (SMA20, 50, 200), confirming strong uptrend.\",\n    \"Volume is 1.08x average, indicating sustained buying interest.\",\n    \"20d return of 27.39% demonstrates exceptional short-term strength.\"\n  ],\n  \"risks\": [\n    \"RSI at 72.7 indicates potential short-term pullback.\",\n    \"Premarket gap of -2.06% could trigger stop-losses.\",\n    \"High volatility (95.05%) increases risk of sudden price swings.\"\n  ],\n  \"key_levels\": {\n    \"support\": 145.0,\n    \"resistance\": 154.0\n  }\n}",
+      "risks": [
+        "RSI at 72.7 indicates potential short-term pullback.",
+        "Premarket gap of -2.06% could trigger stop-losses.",
+        "High volatility (95.05%) increases risk of sudden price swings."
+      ],
+      "symbol": "DELL"
+    },
+    "market_data": {
+      "close": 153.52,
+      "data_quality_flags": [],
+      "high_20d": 153.71,
+      "indicators": {
+        "atr14": 7.587142857142855,
+        "avg_volume20": 369593.2,
+        "rsi14": 72.70763656633221,
+        "sma20": 122.78500000000001,
+        "sma200": 129.081175,
+        "sma50": 121.9487,
+        "volatility20": 0.9505251748369075
+      },
+      "is_tradeable": true,
+      "low_20d": 111.25,
+      "market_cap": 140490000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.020551068264721216,
+        "latest_price": 150.365,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 33022.1
+      },
+      "price_summary": "DELL last close 153.52; 5d return 28.78%; 20d return 27.39%; current volume vs 20d average 1.08x; 20d range position 1.00; ATR14 7.59; RSI14 72.7; SMA20/50/200 122.79/121.95/129.08; 20d annualized volatility 95.05%; premarket gap -2.06%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.020551068264721216,
+        "price_change_20d": 0.2738663236941461,
+        "price_change_5d": 0.28781142521600556,
+        "range_position": 0.9956241363426993,
+        "recent_volatility": 0.8516086561206233,
+        "volume_ratio": 1.0771247955860659
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.08236866919774682,
+        "breakout_setup": 0.2461324257425743,
+        "gap_potential": 0.10275534132360609,
+        "overextension_penalty": -0.0,
+        "total": 1.1389689158225338,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.007712479558606589
+      },
+      "symbol": "DELL",
+      "volume": 398098.0
+    },
+    "symbol": "DELL"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 90.2 indicates extreme overbought conditions with high probability of mean reversion",
+        "Price at 313.00 is near 20-day high of 316.93, showing weak momentum continuation",
+        "Premarket gap of -2.78% signals immediate selling pressure before market open",
+        "Volatility expansion at 83.61% suggests explosive downside potential rather than continuation",
+        "Overextension penalty in scoring model confirms unsustainable price levels"
+      ],
+      "confidence": 0.95,
+      "key_levels": {
+        "resistance": 316.93,
+        "support": 251.44
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"KEYS\",\n  \"position\": \"bear\",\n  \"confidence\": 0.95,\n  \"arguments\": [\n    \"RSI at 90.2 indicates extreme overbought conditions with high probability of mean reversion\",\n    \"Price at 313.00 is near 20-day high of 316.93, showing weak momentum continuation\",\n    \"Premarket gap of -2.78% signals immediate selling pressure before market open\",\n    \"Volatility expansion at 83.61% suggests explosive downside potential rather than continuation\",\n    \"Overextension penalty in scoring model confirms unsustainable price levels\"\n  ],\n  \"risks\": [\n    \"Sudden reversal if major institutional buying occurs at premarket levels\",\n    \"Technical breakout above 316.93 could trigger short-term momentum continuation\",\n    \"Low volume in premarket (5584.8) may indicate lack of immediate liquidity\"\n  ],\n  \"key_levels\": {\n    \"support\": 251.44,\n    \"resistance\": 316.93\n  }\n}",
+      "risks": [
+        "Sudden reversal if major institutional buying occurs at premarket levels",
+        "Technical breakout above 316.93 could trigger short-term momentum continuation",
+        "Low volume in premarket (5584.8) may indicate lack of immediate liquidity"
+      ],
+      "symbol": "KEYS"
+    },
+    "bull_case": {
+      "arguments": [
+        "Price at 313.00 is near 20d high of 316.93, indicating imminent breakout potential.",
+        "RSI at 90.21 suggests strong momentum despite overextension, often followed by continuation in high-volatility assets.",
+        "Price remains 61.50 above SMA200, confirming long-term bullish trend structure.",
+        "Volume ratio of 1.20x average indicates accumulation phase before explosive move.",
+        "Premarket gap of -2.78% is a classic setup for morning session reversal and continuation."
+      ],
+      "confidence": 0.92,
+      "key_levels": {
+        "resistance": 316.93,
+        "support": 251.44
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"KEYS\",\n  \"position\": \"bull\",\n  \"confidence\": 0.92,\n  \"arguments\": [\n    \"Price at 313.00 is near 20d high of 316.93, indicating imminent breakout potential.\",\n    \"RSI at 90.21 suggests strong momentum despite overextension, often followed by continuation in high-volatility assets.\",\n    \"Price remains 61.50 above SMA200, confirming long-term bullish trend structure.\",\n    \"Volume ratio of 1.20x average indicates accumulation phase before explosive move.\",\n    \"Premarket gap of -2.78% is a classic setup for morning session reversal and continuation.\"\n  ],\n  \"risks\": [\n    \"RSI overbought condition may trigger short-term pullback.\",\n    \"High volatility (83.61%) increases slippage risk during entry.\",\n    \"Premarket gap suggests potential downside pressure before reversal.\"\n  ],\n  \"key_levels\": {\n    \"support\": 251.44,\n    \"resistance\": 316.93\n  }\n}",
+      "risks": [
+        "RSI overbought condition may trigger short-term pullback.",
+        "High volatility (83.61%) increases slippage risk during entry.",
+        "Premarket gap suggests potential downside pressure before reversal."
+      ],
+      "symbol": "KEYS"
+    },
+    "market_data": {
+      "close": 313.0,
+      "data_quality_flags": [],
+      "high_20d": 316.93,
+      "indicators": {
+        "atr14": 12.264642857142851,
+        "avg_volume20": 91873.45,
+        "rsi14": 90.21241149521035,
+        "sma20": 251.4395,
+        "sma200": 185.034675,
+        "sma50": 226.50280000000004,
+        "volatility20": 0.836056900043992
+      },
+      "is_tradeable": true,
+      "low_20d": 216.52,
+      "market_cap": 59500000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.02777955271565493,
+        "latest_price": 304.305,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 5584.8
+      },
+      "price_summary": "KEYS last close 313.00; 5d return 27.76%; 20d return 46.21%; current volume vs 20d average 1.20x; 20d range position 0.96; ATR14 12.26; RSI14 90.2; SMA20/50/200 251.44/226.50/185.03; 20d annualized volatility 83.61%; premarket gap -2.78%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.02777955271565493,
+        "price_change_20d": 0.4621385528098285,
+        "price_change_5d": 0.27755102040816326,
+        "range_position": 0.9633532264080567,
+        "recent_volatility": 0.7146827485830932,
+        "volume_ratio": 1.199486902908294
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.06530693747147419,
+        "breakout_setup": 0.21076277955271558,
+        "gap_potential": 0.13889776357827466,
+        "overextension_penalty": -0.007434402332362139,
+        "total": 1.1274817685609317,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.019948690290829397
+      },
+      "symbol": "KEYS",
+      "volume": 110201.0
+    },
+    "symbol": "KEYS"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -4.45% indicates immediate selling pressure",
+        "RSI at 68.9 suggests overbought conditions with mean reversion risk",
+        "Volume contraction to 0.61x average signals lack of conviction",
+        "Price near 20d high at 1576.45 with weak momentum"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 1576.45,
+        "support": 1457.68
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"KLAC\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Premarket gap of -4.45% indicates immediate selling pressure\",\n    \"RSI at 68.9 suggests overbought conditions with mean reversion risk\",\n    \"Volume contraction to 0.61x average signals lack of conviction\",\n    \"Price near 20d high at 1576.45 with weak momentum\"\n  ],\n  \"risks\": [\n    \"Potential rebound if volume expands above 1.5x average\",\n    \"Breakout above 1576.45 could invalidate bear thesis\"\n  ],\n  \"key_levels\": {\n    \"support\": 1457.68,\n    \"resistance\": 1576.45\n  }\n}",
+      "risks": [
+        "Potential rebound if volume expands above 1.5x average",
+        "Breakout above 1576.45 could invalidate bear thesis"
+      ],
+      "symbol": "KLAC"
+    },
+    "bull_case": {
+      "arguments": [
+        "RSI at 68.9 indicates strong momentum with room for further upside before overbought territory",
+        "Price trading above all key moving averages (SMA20/50/200) confirms bullish trend structure",
+        "20d range position at 0.61 suggests accumulation phase with breakout potential",
+        "Premarket gap of -4.45% creates immediate upside reversion opportunity",
+        "Volume ratio of 0.61x average indicates healthy consolidation before expansion"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 1576.45,
+        "support": 1457.68
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"KLAC\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"RSI at 68.9 indicates strong momentum with room for further upside before overbought territory\",\n    \"Price trading above all key moving averages (SMA20/50/200) confirms bullish trend structure\",\n    \"20d range position at 0.61 suggests accumulation phase with breakout potential\",\n    \"Premarket gap of -4.45% creates immediate upside reversion opportunity\",\n    \"Volume ratio of 0.61x average indicates healthy consolidation before expansion\"\n  ],\n  \"risks\": [\n    \"RSI approaching overbought levels may trigger short-term profit taking\",\n    \"Negative premarket gap could extend downside if not recovered quickly\",\n    \"Low volume relative to 20d average may indicate lack of immediate conviction\"\n  ],\n  \"key_levels\": {\n    \"support\": 1457.68,\n    \"resistance\": 1576.45\n  }\n}",
+      "risks": [
+        "RSI approaching overbought levels may trigger short-term profit taking",
+        "Negative premarket gap could extend downside if not recovered quickly",
+        "Low volume relative to 20d average may indicate lack of immediate conviction"
+      ],
+      "symbol": "KLAC"
+    },
+    "market_data": {
+      "close": 1534.26,
+      "data_quality_flags": [],
+      "high_20d": 1576.45,
+      "indicators": {
+        "atr14": 50.04107142857141,
+        "avg_volume20": 51633.5,
+        "rsi14": 68.93784358573092,
+        "sma20": 1457.6779999999999,
+        "sma200": 1099.063475,
+        "sma50": 1421.0538000000001,
+        "volatility20": 0.41709416676981914
+      },
+      "is_tradeable": true,
+      "low_20d": 1285.165,
+      "market_cap": 254240000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.04448724466518053,
+        "latest_price": 1466.005,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 3083.2000000000003
+      },
+      "price_summary": "KLAC last close 1534.26; 5d return 3.12%; 20d return -2.14%; current volume vs 20d average 0.61x; 20d range position 0.61; ATR14 50.04; RSI14 68.9; SMA20/50/200 1457.68/1421.05/1099.06; 20d annualized volatility 41.71%; premarket gap -4.45%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.04448724466518053,
+        "price_change_20d": -0.021411760203593477,
+        "price_change_5d": 0.03122731549939517,
+        "range_position": 0.6109537299338997,
+        "recent_volatility": 0.6448951649652597,
+        "volume_ratio": 0.610727531544443
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.054359616827842544,
+        "breakout_setup": 0.1640668791469502,
+        "gap_potential": 0.22243622332590265,
+        "overextension_penalty": -0.0,
+        "total": 1.1015021228473094,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.4606394035466141,
+        "volume_spike": 0.0
+      },
+      "symbol": "KLAC",
+      "volume": 31534.0
+    },
+    "symbol": "KLAC"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -5.98% signals immediate selling pressure",
+        "Price at 68.24 is near 20d high of 69.745, indicating overextended momentum",
+        "RSI at 63.6 suggests room to run but not yet overbought",
+        "Volume at 0.88x average indicates lack of conviction in current move",
+        "Volatility expansion of 48.96% increases risk of sharp reversal"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 69.75,
+        "support": 64.09
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"FCX\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Premarket gap of -5.98% signals immediate selling pressure\",\n    \"Price at 68.24 is near 20d high of 69.745, indicating overextended momentum\",\n    \"RSI at 63.6 suggests room to run but not yet overbought\",\n    \"Volume at 0.88x average indicates lack of conviction in current move\",\n    \"Volatility expansion of 48.96% increases risk of sharp reversal\"\n  ],\n  \"risks\": [\n    \"Strong 20d trend may continue despite gap\",\n    \"Premarket volume is low at 68k vs 20d average\",\n    \"SMA200 at 46.54 provides strong long-term support\"\n  ],\n  \"key_levels\": {\n    \"support\": 64.09,\n    \"resistance\": 69.75\n  }\n}",
+      "risks": [
+        "Strong 20d trend may continue despite gap",
+        "Premarket volume is low at 68k vs 20d average",
+        "SMA200 at 46.54 provides strong long-term support"
+      ],
+      "symbol": "FCX"
+    },
+    "bull_case": {
+      "arguments": [
+        "Price is trading above all major moving averages (SMA20, SMA50, SMA200) indicating strong bullish trend alignment.",
+        "RSI at 63.6 suggests momentum is building without being overbought, leaving room for further upside.",
+        "20-day return of 16.23% demonstrates significant recent strength and institutional accumulation.",
+        "Current price of 68.24 is near the 20-day high of 69.75, suggesting a breakout is imminent.",
+        "Volume is 0.88x average, indicating healthy participation without excessive speculation."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 69.75,
+        "support": 64.09
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"FCX\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Price is trading above all major moving averages (SMA20, SMA50, SMA200) indicating strong bullish trend alignment.\",\n    \"RSI at 63.6 suggests momentum is building without being overbought, leaving room for further upside.\",\n    \"20-day return of 16.23% demonstrates significant recent strength and institutional accumulation.\",\n    \"Current price of 68.24 is near the 20-day high of 69.75, suggesting a breakout is imminent.\",\n    \"Volume is 0.88x average, indicating healthy participation without excessive speculation.\"\n  ],\n  \"risks\": [\n    \"Premarket gap of -5.98% may indicate short-term selling pressure.\",\n    \"Price is at 87% of the 20-day range, approaching overextension levels.\",\n    \"Volatility at 48.96% requires careful position sizing.\"\n  ],\n  \"key_levels\": {\n    \"support\": 64.09,\n    \"resistance\": 69.75\n  }\n}",
+      "risks": [
+        "Premarket gap of -5.98% may indicate short-term selling pressure.",
+        "Price is at 87% of the 20-day range, approaching overextension levels.",
+        "Volatility at 48.96% requires careful position sizing."
+      ],
+      "symbol": "FCX"
+    },
+    "market_data": {
+      "close": 68.24,
+      "data_quality_flags": [],
+      "high_20d": 69.745,
+      "indicators": {
+        "atr14": 2.6496428571428585,
+        "avg_volume20": 997211.7,
+        "rsi14": 63.564760793465524,
+        "sma20": 64.08675,
+        "sma200": 46.53585,
+        "sma50": 59.333499999999994,
+        "volatility20": 0.4895702747736692
+      },
+      "is_tradeable": true,
+      "low_20d": 58.23,
+      "market_cap": 87740000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.059788980070339955,
+        "latest_price": 64.16,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 68428.3
+      },
+      "price_summary": "FCX last close 68.24; 5d return 4.08%; 20d return 16.23%; current volume vs 20d average 0.88x; 20d range position 0.87; ATR14 2.65; RSI14 63.6; SMA20/50/200 64.09/59.33/46.54; 20d annualized volatility 48.96%; premarket gap -5.98%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.059788980070339955,
+        "price_change_20d": 0.16232328393800022,
+        "price_change_5d": 0.040799206893922024,
+        "range_position": 0.8742690058479524,
+        "recent_volatility": 0.4950760166314237,
+        "volume_ratio": 0.8763976595942466
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.06471382515491547,
+        "breakout_setup": 0.18107964536928442,
+        "gap_potential": 0.29894490035169974,
+        "overextension_penalty": -0.0,
+        "total": 1.0983640970412023,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.3536257261653027,
+        "volume_spike": 0.0
+      },
+      "symbol": "FCX",
+      "volume": 873954.0
+    },
+    "symbol": "FCX"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -6.28% indicates immediate downward momentum",
+        "RSI at 60.4 is neutral-to-bullish, suggesting room for downside correction",
+        "Price is above SMA20 (409.03) but below SMA50 (365.06), creating mixed signals",
+        "20d range position at 0.58 indicates price is in the middle of a volatile range",
+        "Volume ratio of 0.74x average suggests lack of conviction in current price level"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 442.32,
+        "support": 409.03
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"MU\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Premarket gap of -6.28% indicates immediate downward momentum\",\n    \"RSI at 60.4 is neutral-to-bullish, suggesting room for downside correction\",\n    \"Price is above SMA20 (409.03) but below SMA50 (365.06), creating mixed signals\",\n    \"20d range position at 0.58 indicates price is in the middle of a volatile range\",\n    \"Volume ratio of 0.74x average suggests lack of conviction in current price level\"\n  ],\n  \"risks\": [\n    \"RSI 60.4 could trigger short-term bounce\",\n    \"SMA20 support at 409.03 may provide temporary floor\"\n  ],\n  \"key_levels\": {\n    \"support\": 409.03,\n    \"resistance\": 442.32\n  }\n}",
+      "risks": [
+        "RSI 60.4 could trigger short-term bounce",
+        "SMA20 support at 409.03 may provide temporary floor"
+      ],
+      "symbol": "MU"
+    },
+    "bull_case": {
+      "arguments": [
+        "Premarket gap of -6.28% is a classic pre-breakout setup, indicating potential mean reversion and momentum reversal upon open.",
+        "RSI14 at 60.44 confirms bullish momentum without overextension, providing room for further upside expansion.",
+        "Price is trading above the 20-day SMA (409.03) and significantly above the 50-day and 200-day SMAs, confirming a strong uptrend structure.",
+        "20-day range position at 0.58 suggests the stock is in the middle of a consolidation phase, often preceding a directional breakout.",
+        "Volume ratio of 0.74x average indicates healthy accumulation rather than distribution, supporting a sustainable long-term position."
+      ],
+      "confidence": 0.72,
+      "key_levels": {
+        "resistance": 442.32,
+        "support": 409.03
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"MU\",\n  \"position\": \"bull\",\n  \"confidence\": 0.72,\n  \"arguments\": [\n    \"Premarket gap of -6.28% is a classic pre-breakout setup, indicating potential mean reversion and momentum reversal upon open.\",\n    \"RSI14 at 60.44 confirms bullish momentum without overextension, providing room for further upside expansion.\",\n    \"Price is trading above the 20-day SMA (409.03) and significantly above the 50-day and 200-day SMAs, confirming a strong uptrend structure.\",\n    \"20-day range position at 0.58 suggests the stock is in the middle of a consolidation phase, often preceding a directional breakout.\",\n    \"Volume ratio of 0.74x average indicates healthy accumulation rather than distribution, supporting a sustainable long-term position.\"\n  ],\n  \"risks\": [\n    \"Premarket gap down could indicate negative sentiment or profit-taking, potentially extending the gap if not reversed quickly.\",\n    \"ATR14 of 22.84 indicates moderate volatility, which could lead to rapid price swings and increased stop-loss risk.\"\n  ],\n  \"key_levels\": {\n    \"support\": 409.03,\n    \"resistance\": 442.32\n  }\n}",
+      "risks": [
+        "Premarket gap down could indicate negative sentiment or profit-taking, potentially extending the gap if not reversed quickly.",
+        "ATR14 of 22.84 indicates moderate volatility, which could lead to rapid price swings and increased stop-loss risk."
+      ],
+      "symbol": "MU"
+    },
+    "market_data": {
+      "close": 412.44,
+      "data_quality_flags": [],
+      "high_20d": 442.32,
+      "indicators": {
+        "atr14": 22.843571428571433,
+        "avg_volume20": 565466.7,
+        "rsi14": 60.4423221915054,
+        "sma20": 409.03149999999994,
+        "sma200": 209.35587499999997,
+        "sma50": 365.05729999999994,
+        "volatility20": 0.6587436139818986
+      },
+      "is_tradeable": true,
+      "low_20d": 364.17,
+      "market_cap": 560160000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.06277276694791967,
+        "latest_price": 386.55,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 30295.050000000003
+      },
+      "price_summary": "MU last close 412.44; 5d return -1.98%; 20d return 13.68%; current volume vs 20d average 0.74x; 20d range position 0.58; ATR14 22.84; RSI14 60.4; SMA20/50/200 409.03/365.06/209.36; 20d annualized volatility 65.87%; premarket gap -6.28%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.06277276694791967,
+        "price_change_20d": 0.13682469680264608,
+        "price_change_5d": -0.01984362746262991,
+        "range_position": 0.584922136515791,
+        "recent_volatility": 0.6451970626128624,
+        "volume_ratio": 0.740800475076605
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.09231068530603011,
+        "breakout_setup": 0.0236034332266512,
+        "gap_potential": 0.3,
+        "overextension_penalty": -0.0,
+        "total": 1.0685384520221761,
+        "trend_quality": 0.19176928876602162,
+        "volatility_expansion": 0.46085504472347316,
+        "volume_spike": 0.0
+      },
+      "symbol": "MU",
+      "volume": 418898.0
+    },
+    "symbol": "MU"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -7.02% indicates immediate downside pressure",
+        "Price at 166.02 is 11.55% above 20d low, suggesting overextension",
+        "RSI at 54.6 shows no bullish momentum, price is not overbought",
+        "Volume ratio of 0.84x suggests lack of buying conviction"
+      ],
+      "confidence": 0.72,
+      "key_levels": {
+        "resistance": 180.79,
+        "support": 154.54
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"BE\",\n  \"position\": \"bear\",\n  \"confidence\": 0.72,\n  \"arguments\": [\n    \"Premarket gap of -7.02% indicates immediate downside pressure\",\n    \"Price at 166.02 is 11.55% above 20d low, suggesting overextension\",\n    \"RSI at 54.6 shows no bullish momentum, price is not overbought\",\n    \"Volume ratio of 0.84x suggests lack of buying conviction\"\n  ],\n  \"risks\": [\n    \"Potential mean reversion if gap fills quickly\",\n    \"High volatility (109.37% annualized) increases downside risk\"\n  ],\n  \"key_levels\": {\n    \"support\": 154.54,\n    \"resistance\": 180.79\n  }\n}",
+      "risks": [
+        "Potential mean reversion if gap fills quickly",
+        "High volatility (109.37% annualized) increases downside risk"
+      ],
+      "symbol": "BE"
+    },
+    "bull_case": {
+      "arguments": [
+        "Price at 166.02 is 11.55% above SMA200 at 80.89, indicating strong long-term trend momentum.",
+        "RSI14 at 54.61 is in neutral-to-bullish territory, suggesting room for upside expansion without overbought conditions.",
+        "Current price 166.02 is below 20d high 180.79, indicating the asset is not yet overextended.",
+        "20d return of 11.05% demonstrates consistent upward momentum over the last month.",
+        "Premarket gap of -7.02% is a classic contrarian setup for a long entry, as it often precedes a rebound."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 180.79,
+        "support": 154.54
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"BE\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Price at 166.02 is 11.55% above SMA200 at 80.89, indicating strong long-term trend momentum.\",\n    \"RSI14 at 54.61 is in neutral-to-bullish territory, suggesting room for upside expansion without overbought conditions.\",\n    \"Current price 166.02 is below 20d high 180.79, indicating the asset is not yet overextended.\",\n    \"20d return of 11.05% demonstrates consistent upward momentum over the last month.\",\n    \"Premarket gap of -7.02% is a classic contrarian setup for a long entry, as it often precedes a rebound.\"\n  ],\n  \"risks\": [\n    \"Premarket gap of -7.02% could indicate significant negative sentiment or news-driven selling.\",\n    \"Volume ratio of 0.84x is below average, which may suggest lack of immediate buying pressure.\",\n    \"20d range position of 0.70 indicates the asset is in the upper portion of its recent range.\"\n  ],\n  \"key_levels\": {\n    \"support\": 154.54,\n    \"resistance\": 180.79\n  }\n}",
+      "risks": [
+        "Premarket gap of -7.02% could indicate significant negative sentiment or news-driven selling.",
+        "Volume ratio of 0.84x is below average, which may suggest lack of immediate buying pressure.",
+        "20d range position of 0.70 indicates the asset is in the upper portion of its recent range."
+      ],
+      "symbol": "BE"
+    },
+    "market_data": {
+      "close": 166.02,
+      "data_quality_flags": [],
+      "high_20d": 180.79,
+      "indicators": {
+        "atr14": 15.720714285714292,
+        "avg_volume20": 314337.75,
+        "rsi14": 54.612389979688565,
+        "sma20": 154.53625,
+        "sma200": 80.89475,
+        "sma50": 133.8273,
+        "volatility20": 1.093717222093505
+      },
+      "is_tradeable": true,
+      "low_20d": 131.11,
+      "market_cap": 65690000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.07017226840139745,
+        "latest_price": 154.37,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 15408.800000000001
+      },
+      "price_summary": "BE last close 166.02; 5d return 3.53%; 20d return 11.05%; current volume vs 20d average 0.84x; 20d range position 0.70; ATR14 15.72; RSI14 54.6; SMA20/50/200 154.54/133.83/80.89; 20d annualized volatility 109.37%; premarket gap -7.02%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.07017226840139745,
+        "price_change_20d": 0.11050167224080276,
+        "price_change_5d": 0.03529558493389873,
+        "range_position": 0.7026972624798714,
+        "recent_volatility": 1.0081842304644897,
+        "volume_ratio": 0.843837560076701
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.1,
+        "breakout_setup": 0.0,
+        "gap_potential": 0.3,
+        "overextension_penalty": -0.0,
+        "total": 1.0684495599187542,
+        "trend_quality": 0.16844955991875427,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.0
+      },
+      "symbol": "BE",
+      "volume": 265250.0
+    },
+    "symbol": "BE"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 35.9 indicates oversold conditions with potential for mean reversion down.",
+        "Price trading below SMA20 (208.82) and SMA50 (218.45) confirms bearish momentum.",
+        "Premarket gap of -3.56% signals continued selling pressure before open.",
+        "20-day range position at 0.11 suggests price is near the bottom of recent consolidation.",
+        "Negative 20-day return (-14.33%) indicates significant short-term weakness."
+      ],
+      "confidence": 0.92,
+      "key_levels": {
+        "resistance": 208.82,
+        "support": 190.0
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"AMD\",\n  \"position\": \"bear\",\n  \"confidence\": 0.92,\n  \"arguments\": [\n    \"RSI at 35.9 indicates oversold conditions with potential for mean reversion down.\",\n    \"Price trading below SMA20 (208.82) and SMA50 (218.45) confirms bearish momentum.\",\n    \"Premarket gap of -3.56% signals continued selling pressure before open.\",\n    \"20-day range position at 0.11 suggests price is near the bottom of recent consolidation.\",\n    \"Negative 20-day return (-14.33%) indicates significant short-term weakness.\"\n  ],\n  \"risks\": [\n    \"Potential for mean reversion if oversold conditions persist.\",\n    \"Low volume ratio (0.99x) may indicate lack of conviction in downtrend.\",\n    \"SMA200 support at 187.01 could act as a floor if broken.\"\n  ],\n  \"key_levels\": {\n    \"support\": 190.0,\n    \"resistance\": 208.82\n  }\n}",
+      "risks": [
+        "Potential for mean reversion if oversold conditions persist.",
+        "Low volume ratio (0.99x) may indicate lack of conviction in downtrend.",
+        "SMA200 support at 187.01 could act as a floor if broken."
+      ],
+      "symbol": "AMD"
+    },
+    "bull_case": {
+      "arguments": [
+        "Premarket gap down is a classic bounce setup for momentum traders",
+        "RSI oversold at 35.9 indicates significant buying opportunity",
+        "Price is below SMA200 but above SMA200 support zone",
+        "20d range position at 0.11 suggests strong support level",
+        "Volume ratio near 1.0 indicates healthy accumulation"
+      ],
+      "confidence": 0.0,
+      "key_levels": {
+        "resistance": 208.82,
+        "support": 190.0
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"AMD\",\n  \"position\": \"bull\",\n  \"confidence\": 0.0,\n  \"arguments\": [\n    \"Premarket gap down is a classic bounce setup for momentum traders\",\n    \"RSI oversold at 35.9 indicates significant buying opportunity\",\n    \"Price is below SMA200 but above SMA200 support zone\",\n    \"20d range position at 0.11 suggests strong support level\",\n    \"Volume ratio near 1.0 indicates healthy accumulation\"\n  ],\n  \"risks\": [\n    \"RSI oversold could indicate deeper correction\",\n    \"Price below SMA200/50 creates short-term resistance\",\n    \"Premarket gap down may signal continued weakness\"\n  ],\n  \"key_levels\": {\n    \"support\": 190.0,\n    \"resistance\": 208.82\n  }\n}",
+      "risks": [
+        "RSI oversold could indicate deeper correction",
+        "Price below SMA200/50 creates short-term resistance",
+        "Premarket gap down may signal continued weakness"
+      ],
+      "symbol": "AMD"
+    },
+    "market_data": {
+      "close": 198.57,
+      "data_quality_flags": [],
+      "high_20d": 252.47,
+      "indicators": {
+        "atr14": 8.952857142857141,
+        "avg_volume20": 937001.4,
+        "rsi14": 35.90849886030607,
+        "sma20": 208.81925,
+        "sma200": 187.007475,
+        "sma50": 218.4475,
+        "volatility20": 0.8418699659873065
+      },
+      "is_tradeable": true,
+      "low_20d": 190.0,
+      "market_cap": 567070000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.03555421262023469,
+        "latest_price": 191.51,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 79602.05
+      },
+      "price_summary": "AMD last close 198.57; 5d return 0.99%; 20d return -14.33%; current volume vs 20d average 0.99x; 20d range position 0.11; ATR14 8.95; RSI14 35.9; SMA20/50/200 208.82/218.45/187.01; 20d annualized volatility 84.19%; premarket gap -3.56%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.03555421262023469,
+        "price_change_20d": -0.14331938392510457,
+        "price_change_5d": 0.009917607567897502,
+        "range_position": 0.11137102014294989,
+        "recent_volatility": 0.7674324827317788,
+        "volume_ratio": 0.98513513426981
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.07514442549946403,
+        "breakout_setup": 0.11512942539154969,
+        "gap_potential": 0.17777106310117347,
+        "overextension_penalty": -0.0,
+        "total": 1.0680449139921873,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.0
+      },
+      "symbol": "AMD",
+      "volume": 923073.0
+    },
+    "symbol": "AMD"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -5.3% signals immediate selling pressure",
+        "Price at 85% of 20d range indicates overbought conditions",
+        "Volume contraction to 0.52x average suggests lack of conviction",
+        "RSI at 56.2 lacks momentum strength for continuation"
+      ],
+      "confidence": 0.78,
+      "key_levels": {
+        "resistance": 343.79,
+        "support": 308.32
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"TER\",\n  \"position\": \"bear\",\n  \"confidence\": 0.78,\n  \"arguments\": [\n    \"Premarket gap of -5.3% signals immediate selling pressure\",\n    \"Price at 85% of 20d range indicates overbought conditions\",\n    \"Volume contraction to 0.52x average suggests lack of conviction\",\n    \"RSI at 56.2 lacks momentum strength for continuation\"\n  ],\n  \"risks\": [\n    \"Potential reversal if volume picks up\",\n    \"Mean reversion to SMA200 at 157.08\"\n  ],\n  \"key_levels\": {\n    \"support\": 308.32,\n    \"resistance\": 343.79\n  }\n}",
+      "risks": [
+        "Potential reversal if volume picks up",
+        "Mean reversion to SMA200 at 157.08"
+      ],
+      "symbol": "TER"
+    },
+    "bull_case": {
+      "arguments": [
+        "Strong 20-day trend with 42.82% gain indicates sustained bullish momentum",
+        "Price trading above all key moving averages (SMA20/50/200) confirms bullish alignment",
+        "RSI at 56.2 suggests room for upside before overbought conditions",
+        "Premarket gap of -5.30% presents opportunity for mean reversion bounce",
+        "Volatility expansion at 74.71% indicates increased price movement potential"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 343.79,
+        "support": 308.32
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"TER\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Strong 20-day trend with 42.82% gain indicates sustained bullish momentum\",\n    \"Price trading above all key moving averages (SMA20/50/200) confirms bullish alignment\",\n    \"RSI at 56.2 suggests room for upside before overbought conditions\",\n    \"Premarket gap of -5.30% presents opportunity for mean reversion bounce\",\n    \"Volatility expansion at 74.71% indicates increased price movement potential\"\n  ],\n  \"risks\": [\n    \"Current volume at 0.52x average may lack sufficient conviction\",\n    \"Premarket gap down could indicate broader market weakness\",\n    \"Price at 85% of 20-day range may face near-term resistance\"\n  ],\n  \"key_levels\": {\n    \"support\": 308.32,\n    \"resistance\": 343.79\n  }\n}",
+      "risks": [
+        "Current volume at 0.52x average may lack sufficient conviction",
+        "Premarket gap down could indicate broader market weakness",
+        "Price at 85% of 20-day range may face near-term resistance"
+      ],
+      "symbol": "TER"
+    },
+    "market_data": {
+      "close": 325.78,
+      "data_quality_flags": [],
+      "high_20d": 343.79,
+      "indicators": {
+        "atr14": 14.552500000000009,
+        "avg_volume20": 171137.0,
+        "rsi14": 56.16134751773049,
+        "sma20": 308.31925,
+        "sma200": 157.07595,
+        "sma50": 253.9452,
+        "volatility20": 0.7471461592691435
+      },
+      "is_tradeable": true,
+      "low_20d": 241.385,
+      "market_cap": 65450000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.053011234575480334,
+        "latest_price": 308.51,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 8794.550000000001
+      },
+      "price_summary": "TER last close 325.78; 5d return 2.25%; 20d return 42.82%; current volume vs 20d average 0.52x; 20d range position 0.85; ATR14 14.55; RSI14 56.2; SMA20/50/200 308.32/253.95/157.08; 20d annualized volatility 74.71%; premarket gap -5.30%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.053011234575480334,
+        "price_change_20d": 0.4282332310390178,
+        "price_change_5d": 0.022471910112359383,
+        "range_position": 0.8532790224032583,
+        "recent_volatility": 0.6668408548119208,
+        "volume_ratio": 0.5217340493289002
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.07444952626516878,
+        "breakout_setup": 0.07724154337282782,
+        "gap_potential": 0.2650561728774017,
+        "overextension_penalty": -0.0,
+        "total": 1.0677075288805495,
+        "trend_quality": 0.17464539007092197,
+        "volatility_expansion": 0.4763148962942292,
+        "volume_spike": 0.0
+      },
+      "symbol": "TER",
+      "volume": 89288.0
+    },
+    "symbol": "TER"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 80.1 indicates extreme overbought conditions with high probability of mean reversion.",
+        "Premarket gap of -4.33% suggests immediate selling pressure and lack of buying interest.",
+        "Price at 92% of 20-day range indicates near-term exhaustion of upward momentum.",
+        "Low volume relative to average (0.80x) implies weak support during the pullback."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 365.54,
+        "support": 307.82
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"CIEN\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"RSI at 80.1 indicates extreme overbought conditions with high probability of mean reversion.\",\n    \"Premarket gap of -4.33% suggests immediate selling pressure and lack of buying interest.\",\n    \"Price at 92% of 20-day range indicates near-term exhaustion of upward momentum.\",\n    \"Low volume relative to average (0.80x) implies weak support during the pullback.\"\n  ],\n  \"risks\": [\n    \"Potential for continued momentum if volume expands significantly.\",\n    \"Overreaction to technical overbought signals in a strong trend.\"\n  ],\n  \"key_levels\": {\n    \"support\": 307.82,\n    \"resistance\": 365.54\n  }\n}",
+      "risks": [
+        "Potential for continued momentum if volume expands significantly.",
+        "Overreaction to technical overbought signals in a strong trend."
+      ],
+      "symbol": "CIEN"
+    },
+    "bull_case": {
+      "arguments": [
+        "Premarket gap of -4.33% creates a high-probability bounce setup following the 45%+ 20-day rally",
+        "RSI at 80.12 indicates momentum is intact despite overbought readings, often preceding mean reversion rallies",
+        "Price remains 45.82 points above SMA200 (162.09), confirming the long-term uptrend structure",
+        "20-day range position of 0.92 suggests we are near the top of the current range, primed for breakout",
+        "Volume contraction to 0.80x average indicates accumulation phase before potential expansion"
+      ],
+      "confidence": 0.0,
+      "key_levels": {
+        "resistance": 365.54,
+        "support": 338.33
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"CIEN\",\n  \"position\": \"bull\",\n  \"confidence\": 0.0,\n  \"arguments\": [\n    \"Premarket gap of -4.33% creates a high-probability bounce setup following the 45%+ 20-day rally\",\n    \"RSI at 80.12 indicates momentum is intact despite overbought readings, often preceding mean reversion rallies\",\n    \"Price remains 45.82 points above SMA200 (162.09), confirming the long-term uptrend structure\",\n    \"20-day range position of 0.92 suggests we are near the top of the current range, primed for breakout\",\n    \"Volume contraction to 0.80x average indicates accumulation phase before potential expansion\"\n  ],\n  \"risks\": [\n    \"RSI overextension at 80.12 may lead to short-term pullback before continuation\",\n    \"Premarket gap of -4.33% could indicate weak institutional support at current levels\",\n    \"20-day range position of 0.92 suggests potential resistance at 365.54 high\"\n  ],\n  \"key_levels\": {\n    \"support\": 338.33,\n    \"resistance\": 365.54\n  }\n}",
+      "risks": [
+        "RSI overextension at 80.12 may lead to short-term pullback before continuation",
+        "Premarket gap of -4.33% could indicate weak institutional support at current levels",
+        "20-day range position of 0.92 suggests potential resistance at 365.54 high"
+      ],
+      "symbol": "CIEN"
+    },
+    "market_data": {
+      "close": 353.64,
+      "data_quality_flags": [],
+      "high_20d": 365.54,
+      "indicators": {
+        "atr14": 19.824999999999996,
+        "avg_volume20": 170510.0,
+        "rsi14": 80.12378342624966,
+        "sma20": 307.823,
+        "sma200": 162.09019999999998,
+        "sma50": 265.94489999999996,
+        "volatility20": 0.5874441903387652
+      },
+      "is_tradeable": true,
+      "low_20d": 238.99,
+      "market_cap": 73640000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.0432926139576971,
+        "latest_price": 338.33,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 11766.550000000001
+      },
+      "price_summary": "CIEN last close 353.64; 5d return 2.57%; 20d return 45.34%; current volume vs 20d average 0.80x; 20d range position 0.92; ATR14 19.82; RSI14 80.1; SMA20/50/200 307.82/265.94/162.09; 20d annualized volatility 58.74%; premarket gap -4.33%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.0432926139576971,
+        "price_change_20d": 0.4533947065592636,
+        "price_change_5d": 0.025712421144224562,
+        "range_position": 0.9176584555770825,
+        "recent_volatility": 0.5627758140185946,
+        "volume_ratio": 0.8033956952671397
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.09343305810051653,
+        "breakout_setup": 0.14484362628661887,
+        "gap_potential": 0.2164630697884855,
+        "overextension_penalty": -0.0,
+        "total": 1.056722478474617,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.4019827242989961,
+        "volume_spike": 0.0
+      },
+      "symbol": "CIEN",
+      "volume": 136987.0
+    },
+    "symbol": "CIEN"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -4.61% signals immediate downside pressure and rejection of higher levels.",
+        "Price is at 0.99 of 20d range, indicating overextended conditions ripe for a mean reversion.",
+        "RSI at 65.01 is not yet overbought, but the gap creates a fresh overbought scenario.",
+        "SMA200 at 3811.73 is above current price, suggesting a bearish long-term trend.",
+        "Volume spike of 2.19x on a gap suggests aggressive selling rather than accumulation."
+      ],
+      "confidence": 0.95,
+      "key_levels": {
+        "resistance": 3885.18,
+        "support": 3580.25
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"AZO\",\n  \"position\": \"bear\",\n  \"confidence\": 0.95,\n  \"arguments\": [\n    \"Premarket gap of -4.61% signals immediate downside pressure and rejection of higher levels.\",\n    \"Price is at 0.99 of 20d range, indicating overextended conditions ripe for a mean reversion.\",\n    \"RSI at 65.01 is not yet overbought, but the gap creates a fresh overbought scenario.\",\n    \"SMA200 at 3811.73 is above current price, suggesting a bearish long-term trend.\",\n    \"Volume spike of 2.19x on a gap suggests aggressive selling rather than accumulation.\"\n  ],\n  \"risks\": [\n    \"Potential for a short-term bounce if volume fails to sustain the gap.\",\n    \"Market-wide volatility could cause a temporary reversal.\"\n  ],\n  \"key_levels\": {\n    \"support\": 3580.25,\n    \"resistance\": 3885.18\n  }\n}",
+      "risks": [
+        "Potential for a short-term bounce if volume fails to sustain the gap.",
+        "Market-wide volatility could cause a temporary reversal."
+      ],
+      "symbol": "AZO"
+    },
+    "bull_case": {
+      "arguments": [
+        "Price at 3880.86 is near 20d high of 3885.18, indicating strong momentum and breakout potential.",
+        "RSI at 65.01 suggests bullish momentum without being overextended.",
+        "Volume is 2.19x average, confirming institutional accumulation and trend strength.",
+        "SMA20 (3732.43) and SMA50 (3592.34) are below current price, supporting upward trend.",
+        "Premarket gap of -4.61% may be a false dip or entry opportunity for long positions.",
+        "20d return of 10.24% shows consistent upward trajectory over the last month."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 3885.18,
+        "support": 3732.43
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"AZO\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Price at 3880.86 is near 20d high of 3885.18, indicating strong momentum and breakout potential.\",\n    \"RSI at 65.01 suggests bullish momentum without being overextended.\",\n    \"Volume is 2.19x average, confirming institutional accumulation and trend strength.\",\n    \"SMA20 (3732.43) and SMA50 (3592.34) are below current price, supporting upward trend.\",\n    \"Premarket gap of -4.61% may be a false dip or entry opportunity for long positions.\",\n    \"20d return of 10.24% shows consistent upward trajectory over the last month.\"\n  ],\n  \"risks\": [\n    \"Premarket gap down -4.61% could indicate short-term profit-taking.\",\n    \"Price near 20d high may face resistance at 3885.18.\",\n    \"RSI at 65.01 is approaching overbought territory.\"\n  ],\n  \"key_levels\": {\n    \"support\": 3732.43,\n    \"resistance\": 3885.18\n  }\n}",
+      "risks": [
+        "Premarket gap down -4.61% could indicate short-term profit-taking.",
+        "Price near 20d high may face resistance at 3885.18.",
+        "RSI at 65.01 is approaching overbought territory."
+      ],
+      "symbol": "AZO"
+    },
+    "market_data": {
+      "close": 3880.86,
+      "data_quality_flags": [],
+      "high_20d": 3885.18,
+      "indicators": {
+        "atr14": 101.30678571428575,
+        "avg_volume20": 14165.9,
+        "rsi14": 65.01493447119782,
+        "sma20": 3732.4269999999997,
+        "sma200": 3811.7307,
+        "sma50": 3592.3352999999997,
+        "volatility20": 0.3074322919216926
+      },
+      "is_tradeable": true,
+      "low_20d": 3580.25,
+      "market_cap": 59270000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.04610318331503844,
+        "latest_price": 3701.94,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 1835.7
+      },
+      "price_summary": "AZO last close 3880.86; 5d return 1.31%; 20d return 10.24%; current volume vs 20d average 2.19x; 20d range position 0.99; ATR14 101.31; RSI14 65.0; SMA20/50/200 3732.43/3592.34/3811.73; 20d annualized volatility 30.74%; premarket gap -4.61%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.04610318331503844,
+        "price_change_20d": 0.10240116805903932,
+        "price_change_5d": 0.013136529053344947,
+        "range_position": 0.9907534246575349,
+        "recent_volatility": 0.28350481494933355,
+        "volume_ratio": 2.1892714193944616
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.04350701722225046,
+        "breakout_setup": 0.24652138958890576,
+        "gap_potential": 0.2305159165751922,
+        "overextension_penalty": -0.0,
+        "total": 1.0419749045753186,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.20250343924952396,
+        "volume_spike": 0.11892714193944616
+      },
+      "symbol": "AZO",
+      "volume": 31013.0
+    },
+    "symbol": "AZO"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 27.8 indicates severe oversold conditions with high probability of mean reversion",
+        "Price is trading below all major moving averages (SMA20/50/200) creating bearish divergence",
+        "Premarket gap of -4.09% suggests continued downward momentum before session open",
+        "Volume spike of 1.6x average indicates aggressive selling pressure despite oversold readings",
+        "ATR of 13.70 suggests significant volatility with potential for extended downside moves"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 323.797,
+        "support": 286.065
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"RCL\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"RSI at 27.8 indicates severe oversold conditions with high probability of mean reversion\",\n    \"Price is trading below all major moving averages (SMA20/50/200) creating bearish divergence\",\n    \"Premarket gap of -4.09% suggests continued downward momentum before session open\",\n    \"Volume spike of 1.6x average indicates aggressive selling pressure despite oversold readings\",\n    \"ATR of 13.70 suggests significant volatility with potential for extended downside moves\"\n  ],\n  \"risks\": [\n    \"Oversold conditions may trigger a rapid bounce back to SMA20 at 323.80\",\n    \"Volume spike could indicate accumulation rather than distribution if price stabilizes\",\n    \"Mean reversion could occur faster than expected given the steep decline from 356.18 high\"\n  ],\n  \"key_levels\": {\n    \"support\": 286.065,\n    \"resistance\": 323.797\n  }\n}",
+      "risks": [
+        "Oversold conditions may trigger a rapid bounce back to SMA20 at 323.80",
+        "Volume spike could indicate accumulation rather than distribution if price stabilizes",
+        "Mean reversion could occur faster than expected given the steep decline from 356.18 high"
+      ],
+      "symbol": "RCL"
+    },
+    "bull_case": {
+      "arguments": [
+        "Premarket gap of -4.09% indicates significant buying pressure upon opening.",
+        "RSI14 at 27.8 signals oversold conditions with high probability of mean reversion.",
+        "Price is currently trading below the 20-day SMA at 323.80, creating a classic bounce setup.",
+        "Volume ratio of 1.60x average suggests strong institutional accumulation.",
+        "20-day range position of 0.40 indicates the asset is near the bottom of its recent range."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 323.8,
+        "support": 286.065
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"RCL\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Premarket gap of -4.09% indicates significant buying pressure upon opening.\",\n    \"RSI14 at 27.8 signals oversold conditions with high probability of mean reversion.\",\n    \"Price is currently trading below the 20-day SMA at 323.80, creating a classic bounce setup.\",\n    \"Volume ratio of 1.60x average suggests strong institutional accumulation.\",\n    \"20-day range position of 0.40 indicates the asset is near the bottom of its recent range.\"\n  ],\n  \"risks\": [\n    \"Continuation of the -4.09% gap could lead to further downside.\",\n    \"RSI oversold condition may persist if bearish momentum remains strong.\",\n    \"Market volatility of 46.54% creates potential for rapid price swings.\"\n  ],\n  \"key_levels\": {\n    \"support\": 286.065,\n    \"resistance\": 323.80\n  }\n}",
+      "risks": [
+        "Continuation of the -4.09% gap could lead to further downside.",
+        "RSI oversold condition may persist if bearish momentum remains strong.",
+        "Market volatility of 46.54% creates potential for rapid price swings."
+      ],
+      "symbol": "RCL"
+    },
+    "market_data": {
+      "close": 300.84,
+      "data_quality_flags": [],
+      "high_20d": 356.18,
+      "indicators": {
+        "atr14": 13.700714285714298,
+        "avg_volume20": 139839.25,
+        "rsi14": 27.751646284101597,
+        "sma20": 323.797,
+        "sma200": 301.528275,
+        "sma50": 304.5832,
+        "volatility20": 0.46536390131645244
+      },
+      "is_tradeable": true,
+      "low_20d": 286.065,
+      "market_cap": 71910000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.0408855205424809,
+        "latest_price": 288.54,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 7433.35
+      },
+      "price_summary": "RCL last close 300.84; 5d return -0.56%; 20d return 9.01%; current volume vs 20d average 1.60x; 20d range position 0.40; ATR14 13.70; RSI14 27.8; SMA20/50/200 323.80/304.58/301.53; 20d annualized volatility 46.54%; premarket gap -4.09%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.0408855205424809,
+        "price_change_20d": 0.0901184911403412,
+        "price_change_5d": -0.005619091690355127,
+        "range_position": 0.3959834097358652,
+        "recent_volatility": 0.714943191752076,
+        "volume_ratio": 1.5983924398908032
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.07590255221886662,
+        "breakout_setup": 0.0965234842441167,
+        "gap_potential": 0.20442760271240454,
+        "overextension_penalty": -0.0,
+        "total": 1.0366928831644682,
+        "trend_quality": 0.1,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.05983924398908032
+      },
+      "symbol": "RCL",
+      "volume": 223518.0
+    },
+    "symbol": "RCL"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -5.64% signals immediate downside momentum",
+        "Volume at 0.53x average indicates lack of support",
+        "RSI at 66.3 suggests overbought conditions within the uptrend",
+        "Price at 86% of 20d range indicates overextension",
+        "Volatility expansion of 58.20% suggests mean reversion risk"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 1498.31,
+        "support": 1326.75
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"FIX\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Premarket gap of -5.64% signals immediate downside momentum\",\n    \"Volume at 0.53x average indicates lack of support\",\n    \"RSI at 66.3 suggests overbought conditions within the uptrend\",\n    \"Price at 86% of 20d range indicates overextension\",\n    \"Volatility expansion of 58.20% suggests mean reversion risk\"\n  ],\n  \"risks\": [\n    \"Mean reversion to SMA20 at 1326.75\",\n    \"Potential continuation if volume increases\"\n  ],\n  \"key_levels\": {\n    \"support\": 1326.75,\n    \"resistance\": 1498.31\n  }\n}",
+      "risks": [
+        "Mean reversion to SMA20 at 1326.75",
+        "Potential continuation if volume increases"
+      ],
+      "symbol": "FIX"
+    },
+    "bull_case": {
+      "arguments": [
+        "Price at 1437.41 is 28.38% above 200-day SMA at 832.42, indicating strong long-term trend momentum.",
+        "RSI at 66.32 suggests bullish momentum without being overbought, leaving room for upside continuation.",
+        "Current price sits 0.86 of the 20-day range, implying significant room to run before hitting resistance.",
+        "Premarket gap of -5.64% is a classic setup for a morning rally as buyers absorb the dip.",
+        "Volume at 14663 is 53% of 20-day average, suggesting accumulation phase rather than distribution."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 1498.31,
+        "support": 1326.75
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"FIX\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Price at 1437.41 is 28.38% above 200-day SMA at 832.42, indicating strong long-term trend momentum.\",\n    \"RSI at 66.32 suggests bullish momentum without being overbought, leaving room for upside continuation.\",\n    \"Current price sits 0.86 of the 20-day range, implying significant room to run before hitting resistance.\",\n    \"Premarket gap of -5.64% is a classic setup for a morning rally as buyers absorb the dip.\",\n    \"Volume at 14663 is 53% of 20-day average, suggesting accumulation phase rather than distribution.\"\n  ],\n  \"risks\": [\n    \"Premarket gap down may indicate weak institutional support if not filled quickly.\",\n    \"Volume contraction at 0.53x average could lead to a pause in momentum.\",\n    \"20-day range position at 0.86 suggests approaching short-term resistance.\"\n  ],\n  \"key_levels\": {\n    \"support\": 1326.75,\n    \"resistance\": 1498.31\n  }\n}",
+      "risks": [
+        "Premarket gap down may indicate weak institutional support if not filled quickly.",
+        "Volume contraction at 0.53x average could lead to a pause in momentum.",
+        "20-day range position at 0.86 suggests approaching short-term resistance."
+      ],
+      "symbol": "FIX"
+    },
+    "market_data": {
+      "close": 1437.415,
+      "data_quality_flags": [],
+      "high_20d": 1498.31,
+      "indicators": {
+        "atr14": 66.01892857142859,
+        "avg_volume20": 27456.4,
+        "rsi14": 66.32677911544529,
+        "sma20": 1326.751,
+        "sma200": 832.415325,
+        "sma50": 1154.0995,
+        "volatility20": 0.5819750839002253
+      },
+      "is_tradeable": true,
+      "low_20d": 1077.27,
+      "market_cap": 60730000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.05636159355509708,
+        "latest_price": 1356.4,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 1806.9
+      },
+      "price_summary": "FIX last close 1437.41; 5d return 1.92%; 20d return 28.38%; current volume vs 20d average 0.53x; 20d range position 0.86; ATR14 66.02; RSI14 66.3; SMA20/50/200 1326.75/1154.10/832.42; 20d annualized volatility 58.20%; premarket gap -5.64%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.05636159355509708,
+        "price_change_20d": 0.2837845079353738,
+        "price_change_5d": 0.019219178762116096,
+        "range_position": 0.8553700361010831,
+        "recent_volatility": 0.5042156305450812,
+        "volume_ratio": 0.5340467067787473
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.07654821162924254,
+        "breakout_setup": 0.11761173704184251,
+        "gap_potential": 0.2818079677754854,
+        "overextension_penalty": -0.0,
+        "total": 1.0361219382644857,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.36015402181791517,
+        "volume_spike": 0.0
+      },
+      "symbol": "FIX",
+      "volume": 14663.0
+    },
+    "symbol": "FIX"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 17.3 indicates severe overbought conditions with no room for further upside",
+        "Price trading below all major moving averages (SMA20/50/200) confirms bearish trend",
+        "Premarket gap of -4.82% signals continued selling pressure before open",
+        "20d range position at 0.10 suggests price is near bottom but oversold bounce unlikely",
+        "Volume spike of 1.17x combined with negative trend quality score indicates distribution"
+      ],
+      "confidence": 0.95,
+      "key_levels": {
+        "resistance": 122.73,
+        "support": 102.09
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"APO\",\n  \"position\": \"bear\",\n  \"confidence\": 0.95,\n  \"arguments\": [\n    \"RSI at 17.3 indicates severe overbought conditions with no room for further upside\",\n    \"Price trading below all major moving averages (SMA20/50/200) confirms bearish trend\",\n    \"Premarket gap of -4.82% signals continued selling pressure before open\",\n    \"20d range position at 0.10 suggests price is near bottom but oversold bounce unlikely\",\n    \"Volume spike of 1.17x combined with negative trend quality score indicates distribution\"\n  ],\n  \"risks\": [\n    \"Potential mean reversion if oversold conditions trigger rapid bounce\",\n    \"Low liquidity during premarket may cause exaggerated gap moves\",\n    \"News headlines empty may indicate lack of catalyst for continued decline\"\n  ],\n  \"key_levels\": {\n    \"support\": 102.09,\n    \"resistance\": 122.73\n  }\n}",
+      "risks": [
+        "Potential mean reversion if oversold conditions trigger rapid bounce",
+        "Low liquidity during premarket may cause exaggerated gap moves",
+        "News headlines empty may indicate lack of catalyst for continued decline"
+      ],
+      "symbol": "APO"
+    },
+    "bull_case": {
+      "arguments": [
+        "Extreme oversold RSI at 17.3 indicates imminent mean reversion to the mean.",
+        "Premarket gap down 4.8% creates a high-probability bounce opportunity.",
+        "Volume spike of 1.17x average suggests institutional accumulation during the dip.",
+        "20d range position at 10% implies significant upside room before hitting resistance.",
+        "Volatility expansion at 57% signals energy buildup for a directional move."
+      ],
+      "confidence": 0.75,
+      "key_levels": {
+        "resistance": 122.73,
+        "support": 102.09
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"APO\",\n  \"position\": \"bull\",\n  \"confidence\": 0.75,\n  \"arguments\": [\n    \"Extreme oversold RSI at 17.3 indicates imminent mean reversion to the mean.\",\n    \"Premarket gap down 4.8% creates a high-probability bounce opportunity.\",\n    \"Volume spike of 1.17x average suggests institutional accumulation during the dip.\",\n    \"20d range position at 10% implies significant upside room before hitting resistance.\",\n    \"Volatility expansion at 57% signals energy buildup for a directional move.\"\n  ],\n  \"risks\": [\n    \"Deep downtrend may continue if RSI fails to recover.\",\n    \"Resistance at SMA20 and SMA50 requires confirmation before breakout.\",\n    \"Gap fill could extend further if bearish momentum persists.\"\n  ],\n  \"key_levels\": {\n    \"support\": 102.09,\n    \"resistance\": 122.73\n  }\n}",
+      "risks": [
+        "Deep downtrend may continue if RSI fails to recover.",
+        "Resistance at SMA20 and SMA50 requires confirmation before breakout.",
+        "Gap fill could extend further if bearish momentum persists."
+      ],
+      "symbol": "APO"
+    },
+    "market_data": {
+      "close": 106.46,
+      "data_quality_flags": [],
+      "high_20d": 140.145,
+      "indicators": {
+        "atr14": 5.691071428571428,
+        "avg_volume20": 432510.85,
+        "rsi14": 17.282479141835523,
+        "sma20": 122.72649999999999,
+        "sma200": 135.881525,
+        "sma50": 135.0006,
+        "volatility20": 0.5722825567927647
+      },
+      "is_tradeable": true,
+      "low_20d": 102.09,
+      "market_cap": 71850000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.048187112530527855,
+        "latest_price": 101.33,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 27168.850000000002
+      },
+      "price_summary": "APO last close 106.46; 5d return -6.35%; 20d return -26.00%; current volume vs 20d average 1.17x; 20d range position 0.10; ATR14 5.69; RSI14 17.3; SMA20/50/200 122.73/135.00/135.88; 20d annualized volatility 57.23%; premarket gap -4.82%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.048187112530527855,
+        "price_change_20d": -0.26002641273371796,
+        "price_change_5d": -0.06347042005718062,
+        "range_position": 0.09936334697589794,
+        "recent_volatility": 0.4990736803550542,
+        "volume_ratio": 1.1651222160091477
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.08909561382321105,
+        "breakout_setup": 0.12172412173586351,
+        "gap_potential": 0.24093556265263927,
+        "overextension_penalty": -0.0,
+        "total": 1.0247487200662386,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.35648120025361013,
+        "volume_spike": 0.016512221600914766
+      },
+      "symbol": "APO",
+      "volume": 503928.0
+    },
+    "symbol": "APO"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 33.4 indicates deep oversold conditions with high probability of reversal",
+        "Premarket gap of -4.66% suggests continued selling pressure",
+        "Price trading below SMA20 (46.90) confirms short-term downtrend",
+        "Volume ratio of 0.62x indicates lack of buying interest"
+      ],
+      "confidence": 0.98,
+      "key_levels": {
+        "resistance": 46.9,
+        "support": 42.88
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"INTC\",\n  \"position\": \"bear\",\n  \"confidence\": 0.98,\n  \"arguments\": [\n    \"RSI at 33.4 indicates deep oversold conditions with high probability of reversal\",\n    \"Premarket gap of -4.66% suggests continued selling pressure\",\n    \"Price trading below SMA20 (46.90) confirms short-term downtrend\",\n    \"Volume ratio of 0.62x indicates lack of buying interest\"\n  ],\n  \"risks\": [\n    \"Oversold bounce could trigger short-term reversal\",\n    \"Technical mean reversion may occur if RSI extends below 30\"\n  ],\n  \"key_levels\": {\n    \"support\": 42.88,\n    \"resistance\": 46.90\n  }\n}",
+      "risks": [
+        "Oversold bounce could trigger short-term reversal",
+        "Technical mean reversion may occur if RSI extends below 30"
+      ],
+      "symbol": "INTC"
+    },
+    "bull_case": {
+      "arguments": [
+        "RSI at 33.4 indicates oversold conditions with high probability of mean reversion",
+        "Price is below SMA20 but significantly above SMA200, suggesting long-term bullish structure",
+        "20d range position of 0.26 places price at bottom of range, favoring bounce",
+        "5d return of 4.20% shows recent momentum despite 20d decline",
+        "Premarket gap of -4.66% creates potential for gap fill and continuation"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 46.9,
+        "support": 42.88
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"INTC\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"RSI at 33.4 indicates oversold conditions with high probability of mean reversion\",\n    \"Price is below SMA20 but significantly above SMA200, suggesting long-term bullish structure\",\n    \"20d range position of 0.26 places price at bottom of range, favoring bounce\",\n    \"5d return of 4.20% shows recent momentum despite 20d decline\",\n    \"Premarket gap of -4.66% creates potential for gap fill and continuation\"\n  ],\n  \"risks\": [\n    \"Continued oversold conditions may delay reversal\",\n    \"Low volume ratio of 0.62x may lack conviction for breakout\",\n    \"High volatility of 46.55% increases downside risk\"\n  ],\n  \"key_levels\": {\n    \"support\": 42.88,\n    \"resistance\": 46.90\n  }\n}",
+      "risks": [
+        "Continued oversold conditions may delay reversal",
+        "Low volume ratio of 0.62x may lack conviction for breakout",
+        "High volatility of 46.55% increases downside risk"
+      ],
+      "symbol": "INTC"
+    },
+    "market_data": {
+      "close": 45.48,
+      "data_quality_flags": [],
+      "high_20d": 51.48,
+      "indicators": {
+        "atr14": 2.191785714285714,
+        "avg_volume20": 3199421.6,
+        "rsi14": 33.42657342657341,
+        "sma20": 46.896,
+        "sma200": 32.4602,
+        "sma50": 44.3794,
+        "volatility20": 0.4654752341581021
+      },
+      "is_tradeable": true,
+      "low_20d": 42.88,
+      "market_cap": 414430000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.046613896218117803,
+        "latest_price": 43.36,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 136145.35
+      },
+      "price_summary": "INTC last close 45.48; 5d return 4.20%; 20d return -3.13%; current volume vs 20d average 0.62x; 20d range position 0.26; ATR14 2.19; RSI14 33.4; SMA20/50/200 46.90/44.38/32.46; 20d annualized volatility 46.55%; premarket gap -4.66%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.046613896218117803,
+        "price_change_20d": -0.03130990415335477,
+        "price_change_5d": 0.042043762172069954,
+        "range_position": 0.2602517255379616,
+        "recent_volatility": 0.8414667051874425,
+        "volume_ratio": 0.6168652483936471
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.08032049671231731,
+        "breakout_setup": 0.07135004397537419,
+        "gap_potential": 0.23306948109058903,
+        "overextension_penalty": -0.0,
+        "total": 0.9847400217782806,
+        "trend_quality": 0.1,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.0
+      },
+      "symbol": "INTC",
+      "volume": 1973612.0
+    },
+    "symbol": "INTC"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "Premarket gap of -5.58% indicates immediate downward pressure",
+        "RSI at 67.8 signals overbought conditions with limited upside room",
+        "Price at 78% of 20d range suggests exhaustion near resistance",
+        "Volume contraction to 0.45x average implies lack of conviction for continuation"
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 395.78,
+        "support": 349.71
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"AMAT\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Premarket gap of -5.58% indicates immediate downward pressure\",\n    \"RSI at 67.8 signals overbought conditions with limited upside room\",\n    \"Price at 78% of 20d range suggests exhaustion near resistance\",\n    \"Volume contraction to 0.45x average implies lack of conviction for continuation\"\n  ],\n  \"risks\": [\n    \"Potential mean reversion to SMA20 at 349.71\",\n    \"Market-wide sector rotation could trigger additional downside\"\n  ],\n  \"key_levels\": {\n    \"support\": 349.71,\n    \"resistance\": 395.78\n  }\n}",
+      "risks": [
+        "Potential mean reversion to SMA20 at 349.71",
+        "Market-wide sector rotation could trigger additional downside"
+      ],
+      "symbol": "AMAT"
+    },
+    "bull_case": {
+      "arguments": [
+        "Strong uptrend confirmed by price above all moving averages (SMA20/50/200)",
+        "RSI at 67.8 indicates bullish momentum without being overbought",
+        "20-day range position at 0.78 suggests room for further upside",
+        "Premarket gap of -5.58% presents high-risk entry opportunity for long",
+        "Total score of 0.98 indicates strong bullish signal"
+      ],
+      "confidence": 0.98,
+      "key_levels": {
+        "resistance": 395.78,
+        "support": 349.71
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"AMAT\",\n  \"position\": \"bull\",\n  \"confidence\": 0.98,\n  \"arguments\": [\n    \"Strong uptrend confirmed by price above all moving averages (SMA20/50/200)\",\n    \"RSI at 67.8 indicates bullish momentum without being overbought\",\n    \"20-day range position at 0.78 suggests room for further upside\",\n    \"Premarket gap of -5.58% presents high-risk entry opportunity for long\",\n    \"Total score of 0.98 indicates strong bullish signal\"\n  ],\n  \"risks\": [\n    \"High volatility (55.97% annualized) may cause sharp pullbacks\",\n    \"Low volume ratio (0.45x) could indicate lack of immediate buying pressure\",\n    \"RSI approaching overbought territory at 67.8\"\n  ],\n  \"key_levels\": {\n    \"support\": 349.71,\n    \"resistance\": 395.78\n  }\n}",
+      "risks": [
+        "High volatility (55.97% annualized) may cause sharp pullbacks",
+        "Low volume ratio (0.45x) could indicate lack of immediate buying pressure",
+        "RSI approaching overbought territory at 67.8"
+      ],
+      "symbol": "AMAT"
+    },
+    "market_data": {
+      "close": 372.075,
+      "data_quality_flags": [],
+      "high_20d": 395.78,
+      "indicators": {
+        "atr14": 16.11785714285714,
+        "avg_volume20": 344736.55,
+        "rsi14": 67.78595260501326,
+        "sma20": 349.7115,
+        "sma200": 227.94095,
+        "sma50": 315.9016,
+        "volatility20": 0.5597229305347511
+      },
+      "is_tradeable": true,
+      "low_20d": 287.51,
+      "market_cap": 330960000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.05579520258012495,
+        "latest_price": 351.315,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 12741.75
+      },
+      "price_summary": "AMAT last close 372.07; 5d return -0.41%; 20d return 13.77%; current volume vs 20d average 0.45x; 20d range position 0.78; ATR14 16.12; RSI14 67.8; SMA20/50/200 349.71/315.90/227.94; 20d annualized volatility 55.97%; premarket gap -5.58%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.05579520258012495,
+        "price_change_20d": 0.13768747420079785,
+        "price_change_5d": -0.004135217600770846,
+        "range_position": 0.7810566177149719,
+        "recent_volatility": 0.5287456223377623,
+        "volume_ratio": 0.44630022549103077
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.07219806554618084,
+        "breakout_setup": 0.05090539541759069,
+        "gap_potential": 0.27897601290062474,
+        "overextension_penalty": -0.0,
+        "total": 0.9797549183913694,
+        "trend_quality": 0.2,
+        "volatility_expansion": 0.3776754445269731,
+        "volume_spike": 0.0
+      },
+      "symbol": "AMAT",
+      "volume": 153856.0
+    },
+    "symbol": "AMAT"
+  },
+  {
+    "bear_case": {
+      "arguments": [
+        "RSI at 40.4 signals oversold conditions with high probability of mean reversion.",
+        "Price is trading below all major moving averages (SMA20/50/200) indicating strong bearish trend.",
+        "Premarket gap of -5.78% suggests immediate downside momentum.",
+        "20-day range position at 0.23 indicates price is near the bottom of the range."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 78.77,
+        "support": 69.25
+      },
+      "position": "bear",
+      "raw_response": "{\n  \"symbol\": \"HOOD\",\n  \"position\": \"bear\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"RSI at 40.4 signals oversold conditions with high probability of mean reversion.\",\n    \"Price is trading below all major moving averages (SMA20/50/200) indicating strong bearish trend.\",\n    \"Premarket gap of -5.78% suggests immediate downside momentum.\",\n    \"20-day range position at 0.23 indicates price is near the bottom of the range.\"\n  ],\n  \"risks\": [\n    \"Potential short-term bounce due to oversold RSI levels.\",\n    \"Low volume ratio of 0.58x may indicate lack of selling pressure.\"\n  ],\n  \"key_levels\": {\n    \"support\": 69.25,\n    \"resistance\": 78.77\n  }\n}",
+      "risks": [
+        "Potential short-term bounce due to oversold RSI levels.",
+        "Low volume ratio of 0.58x may indicate lack of selling pressure."
+      ],
+      "symbol": "HOOD"
+    },
+    "bull_case": {
+      "arguments": [
+        "Premarket gap of -5.78% creates a high-probability bounce opportunity as price is 23% of the 20-day range.",
+        "5-day return of 9.70% demonstrates strong short-term momentum despite the 20-day decline.",
+        "Current volume is 58% of average, indicating a potential accumulation phase before a volume-driven breakout.",
+        "RSI at 40.4 suggests oversold conditions with room to recover before overbought territory."
+      ],
+      "confidence": 0.85,
+      "key_levels": {
+        "resistance": 95.88,
+        "support": 69.25
+      },
+      "position": "bull",
+      "raw_response": "{\n  \"symbol\": \"HOOD\",\n  \"position\": \"bull\",\n  \"confidence\": 0.85,\n  \"arguments\": [\n    \"Premarket gap of -5.78% creates a high-probability bounce opportunity as price is 23% of the 20-day range.\",\n    \"5-day return of 9.70% demonstrates strong short-term momentum despite the 20-day decline.\",\n    \"Current volume is 58% of average, indicating a potential accumulation phase before a volume-driven breakout.\",\n    \"RSI at 40.4 suggests oversold conditions with room to recover before overbought territory.\"\n  ],\n  \"risks\": [\n    \"SMA50 and SMA200 are above current price, indicating a longer-term downtrend that must be overcome.\",\n    \"ATR of 5.00 indicates high volatility, which could lead to rapid price reversals.\"\n  ],\n  \"key_levels\": {\n    \"support\": 69.25,\n    \"resistance\": 95.88\n  }\n}",
+      "risks": [
+        "SMA50 and SMA200 are above current price, indicating a longer-term downtrend that must be overcome.",
+        "ATR of 5.00 indicates high volatility, which could lead to rapid price reversals."
+      ],
+      "symbol": "HOOD"
+    },
+    "market_data": {
+      "close": 78.765,
+      "data_quality_flags": [],
+      "high_20d": 95.88,
+      "indicators": {
+        "atr14": 5.004285714285716,
+        "avg_volume20": 902245.9,
+        "rsi14": 40.35802469135802,
+        "sma20": 78.481,
+        "sma200": 107.00125,
+        "sma50": 99.53150000000001,
+        "volatility20": 1.0103429874737748
+      },
+      "is_tradeable": true,
+      "low_20d": 69.25,
+      "market_cap": 76260000000.0,
+      "news_headlines": [],
+      "premarket": {
+        "gap_pct": -0.05776677458261915,
+        "latest_price": 74.215,
+        "timestamp": "2026-03-04T00:00:00+00:00",
+        "volume": 31706.2
+      },
+      "price_summary": "HOOD last close 78.77; 5d return 9.70%; 20d return -27.59%; current volume vs 20d average 0.58x; 20d range position 0.23; ATR14 5.00; RSI14 40.4; SMA20/50/200 78.48/99.53/107.00; 20d annualized volatility 101.03%; premarket gap -5.78%.",
+      "raw_metrics": {
+        "premarket_gap_pct": -0.05776677458261915,
+        "price_change_20d": -0.2758573135974993,
+        "price_change_5d": 0.09700557103064078,
+        "range_position": 0.2271696311328638,
+        "recent_volatility": 0.839166938585007,
+        "volume_ratio": 0.5837998266326286
+      },
+      "score_breakdown": {
+        "atr_efficiency": 0.1,
+        "breakout_setup": 0.0,
+        "gap_potential": 0.28883387291309576,
+        "overextension_penalty": -0.0,
+        "total": 0.9774017741476637,
+        "trend_quality": 0.08856790123456793,
+        "volatility_expansion": 0.5,
+        "volume_spike": 0.0
+      },
+      "symbol": "HOOD",
+      "volume": 526731.0
+    },
+    "symbol": "HOOD"
+  }
+]

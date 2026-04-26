@@ -1,0 +1,902 @@
+[
+  {
+    "close": 79.09,
+    "data_quality_flags": [],
+    "high_20d": 79.28,
+    "indicators": {
+      "atr14": 4.27892857142857,
+      "avg_volume20": 565518.85,
+      "rsi14": 65.35517452541336,
+      "sma20": 71.12625,
+      "sma200": 107.36565,
+      "sma50": 75.3883,
+      "volatility20": 0.6513299381354823
+    },
+    "is_tradeable": true,
+    "low_20d": 63.53,
+    "market_cap": 76260000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": 0.05639145277531917,
+      "latest_price": 83.55,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 79019.05
+    },
+    "price_summary": "HOOD last close 79.09; 5d return 13.59%; 20d return 4.00%; current volume vs 20d average 2.04x; 20d range position 0.74; ATR14 4.28; RSI14 65.4; SMA20/50/200 71.13/75.39/107.37; 20d annualized volatility 65.13%; premarket gap 5.64%.",
+    "raw_metrics": {
+      "premarket_gap_pct": 0.05639145277531917,
+      "price_change_20d": 0.03997370151216306,
+      "price_change_5d": 0.13586097946287534,
+      "range_position": 0.7381404174573056,
+      "recent_volatility": 0.6366712142227652,
+      "volume_ratio": 2.037537740784414
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.09017002932162874,
+      "breakout_setup": 0.24249272980149209,
+      "gap_potential": 0.28195726387659586,
+      "overextension_penalty": -0.0,
+      "total": 1.273138950094419,
+      "trend_quality": 0.1,
+      "volatility_expansion": 0.45476515301626086,
+      "volume_spike": 0.10375377407844143
+    },
+    "symbol": "HOOD",
+    "volume": 1152266.0
+  },
+  {
+    "close": 272.415,
+    "data_quality_flags": [],
+    "high_20d": 273.405,
+    "indicators": {
+      "atr14": 12.129642857142859,
+      "avg_volume20": 328704.45,
+      "rsi14": 64.1204971560986,
+      "sma20": 232.50275000000002,
+      "sma200": 163.7941,
+      "sma50": 229.37329999999997,
+      "volatility20": 0.6687761373764523
+    },
+    "is_tradeable": true,
+    "low_20d": 198.645,
+    "market_cap": 334860000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.023126479819393246,
+      "latest_price": 266.115,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 25883.100000000002
+    },
+    "price_summary": "LRCX last close 272.42; 5d return 21.38%; 20d return 25.35%; current volume vs 20d average 1.16x; 20d range position 0.99; ATR14 12.13; RSI14 64.1; SMA20/50/200 232.50/229.37/163.79; 20d annualized volatility 66.88%; premarket gap -2.31%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.023126479819393246,
+      "price_change_20d": 0.2535201546107124,
+      "price_change_5d": 0.2137542327570845,
+      "range_position": 0.9875000000000006,
+      "recent_volatility": 0.6636409142002769,
+      "volume_ratio": 1.163978765727084
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.07421056633655058,
+      "breakout_setup": 0.23864324651726282,
+      "gap_potential": 0.11563239909696624,
+      "overextension_penalty": -0.0,
+      "total": 1.1189133129522573,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.47402922442876927,
+      "volume_spike": 0.016397876572708393
+    },
+    "symbol": "LRCX",
+    "volume": 382605.0
+  },
+  {
+    "close": 366.105,
+    "data_quality_flags": [],
+    "high_20d": 366.195,
+    "indicators": {
+      "atr14": 21.49857142857143,
+      "avg_volume20": 269989.1,
+      "rsi14": 68.5866118110911,
+      "sma20": 306.8935,
+      "sma200": 169.66535,
+      "sma50": 287.1328,
+      "volatility20": 0.8521177493924782
+    },
+    "is_tradeable": true,
+    "low_20d": 249.365,
+    "market_cap": 138120000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.0127832179292826,
+      "latest_price": 361.425,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 11891.800000000001
+    },
+    "price_summary": "WDC last close 366.11; 5d return 17.28%; 20d return 46.04%; current volume vs 20d average 0.74x; 20d range position 1.00; ATR14 21.50; RSI14 68.6; SMA20/50/200 306.89/287.13/169.67; 20d annualized volatility 85.21%; premarket gap -1.28%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.0127832179292826,
+      "price_change_20d": 0.46036019864775923,
+      "price_change_5d": 0.17284959154252788,
+      "range_position": 0.9992877774700275,
+      "recent_volatility": 0.7790813428585665,
+      "volume_ratio": 0.7422781141905359
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.09787069933749167,
+      "breakout_setup": 0.24923177776867314,
+      "gap_potential": 0.063916089646413,
+      "overextension_penalty": -0.0,
+      "total": 1.1110185667525778,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.5,
+      "volume_spike": 0.0
+    },
+    "symbol": "WDC",
+    "volume": 200407.0
+  },
+  {
+    "close": 365.45,
+    "data_quality_flags": [],
+    "high_20d": 372.76,
+    "indicators": {
+      "atr14": 15.929642857142861,
+      "avg_volume20": 127500.6,
+      "rsi14": 64.67729393468119,
+      "sma20": 319.514,
+      "sma200": 191.240275,
+      "sma50": 310.3071,
+      "volatility20": 0.7128792890105615
+    },
+    "is_tradeable": true,
+    "low_20d": 273.25,
+    "market_cap": 65450000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.01191681488575718,
+      "latest_price": 361.095,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 4754.900000000001
+    },
+    "price_summary": "TER last close 365.45; 5d return 14.02%; 20d return 20.11%; current volume vs 20d average 1.02x; 20d range position 0.93; ATR14 15.93; RSI14 64.7; SMA20/50/200 319.51/310.31/191.24; 20d annualized volatility 71.29%; premarket gap -1.19%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.01191681488575718,
+      "price_change_20d": 0.20105168022348208,
+      "price_change_5d": 0.140178460002496,
+      "range_position": 0.9332237142596145,
+      "recent_volatility": 0.7495186639968808,
+      "volume_ratio": 1.0181285421401938
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.07264852855904987,
+      "breakout_setup": 0.18749144889861813,
+      "gap_potential": 0.059584074428785896,
+      "overextension_penalty": -0.0,
+      "total": 1.0215369061004733,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.5,
+      "volume_spike": 0.0018128542140193771
+    },
+    "symbol": "TER",
+    "volume": 129812.0
+  },
+  {
+    "close": 172.79,
+    "data_quality_flags": [],
+    "high_20d": 176.6,
+    "indicators": {
+      "atr14": 9.213571428571425,
+      "avg_volume20": 428771.35,
+      "rsi14": 69.99479640952256,
+      "sma20": 145.655,
+      "sma200": 92.98144999999998,
+      "sma50": 138.4885,
+      "volatility20": 0.7496394506179513
+    },
+    "is_tradeable": true,
+    "low_20d": 124.015,
+    "market_cap": 151090000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.006771225186642673,
+      "latest_price": 171.62,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 21859.350000000002
+    },
+    "price_summary": "GLW last close 172.79; 5d return 16.29%; 20d return 17.14%; current volume vs 20d average 1.05x; 20d range position 0.93; ATR14 9.21; RSI14 70.0; SMA20/50/200 145.66/138.49/92.98; 20d annualized volatility 74.96%; premarket gap -0.68%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.006771225186642673,
+      "price_change_20d": 0.171378211646668,
+      "price_change_5d": 0.162942522546776,
+      "range_position": 0.9320067814758632,
+      "recent_volatility": 0.7646401901156961,
+      "volume_ratio": 1.050877116673024
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.08887060814255673,
+      "breakout_setup": 0.1810941026679784,
+      "gap_potential": 0.03385612593321336,
+      "overextension_penalty": -0.0,
+      "total": 1.008908548411051,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.5,
+      "volume_spike": 0.005087711667302397
+    },
+    "symbol": "GLW",
+    "volume": 450586.0
+  },
+  {
+    "close": 313.555,
+    "data_quality_flags": [],
+    "high_20d": 318.68,
+    "indicators": {
+      "atr14": 21.687857142857144,
+      "avg_volume20": 313760.4,
+      "rsi14": 63.18427016502282,
+      "sma20": 264.13625,
+      "sma200": 163.01409999999998,
+      "sma50": 251.0798,
+      "volatility20": 0.9275177461889148
+    },
+    "is_tradeable": true,
+    "low_20d": 215.59,
+    "market_cap": 63010000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.00017540782318893597,
+      "latest_price": 313.5,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 12571.1
+    },
+    "price_summary": "COHR last close 313.56; 5d return 22.95%; 20d return 11.73%; current volume vs 20d average 0.62x; 20d range position 0.95; ATR14 21.69; RSI14 63.2; SMA20/50/200 264.14/251.08/163.01; 20d annualized volatility 92.75%; premarket gap -0.02%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.00017540782318893597,
+      "price_change_20d": 0.1173253037807791,
+      "price_change_5d": 0.22948280594439874,
+      "range_position": 0.9502861577262586,
+      "recent_volatility": 0.8937440888153124,
+      "volume_ratio": 0.6160592605057872
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.1,
+      "breakout_setup": 0.19892243784981903,
+      "gap_potential": 0.0008770391159446799,
+      "overextension_penalty": -0.0,
+      "total": 0.9997994769657638,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.5,
+      "volume_spike": 0.0
+    },
+    "symbol": "COHR",
+    "volume": 193295.0
+  },
+  {
+    "close": 1649.33,
+    "data_quality_flags": [],
+    "high_20d": 1670.265,
+    "indicators": {
+      "atr14": 70.2664285714286,
+      "avg_volume20": 24045.7,
+      "rsi14": 64.55412358967095,
+      "sma20": 1452.3875,
+      "sma200": 973.1500500000001,
+      "sma50": 1386.9398999999999,
+      "volatility20": 0.6460560837179082
+    },
+    "is_tradeable": true,
+    "low_20d": 1258.49,
+    "market_cap": 60730000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.011719910509115779,
+      "latest_price": 1630.0,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 1200.55
+    },
+    "price_summary": "FIX last close 1649.33; 5d return 15.61%; 20d return 18.59%; current volume vs 20d average 0.95x; 20d range position 0.95; ATR14 70.27; RSI14 64.6; SMA20/50/200 1452.39/1386.94/973.15; 20d annualized volatility 64.61%; premarket gap -1.17%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.011719910509115779,
+      "price_change_20d": 0.18590287464588218,
+      "price_change_5d": 0.15613455863282377,
+      "range_position": 0.9523451815936532,
+      "recent_volatility": 0.6419980460571365,
+      "volume_ratio": 0.9517710027156623
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.07100502281878966,
+      "breakout_setup": 0.2103342720983669,
+      "gap_potential": 0.0585995525455789,
+      "overextension_penalty": -0.0,
+      "total": 0.9985088803606901,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.45857003289795467,
+      "volume_spike": 0.0
+    },
+    "symbol": "FIX",
+    "volume": 22886.0
+  },
+  {
+    "close": 465.39,
+    "data_quality_flags": [],
+    "high_20d": 471.26,
+    "indicators": {
+      "atr14": 26.673928571428572,
+      "avg_volume20": 874425.75,
+      "rsi14": 65.48969129363722,
+      "sma20": 398.79,
+      "sma200": 253.22695,
+      "sma50": 403.78240000000005,
+      "volatility20": 0.8190714733841026
+    },
+    "is_tradeable": true,
+    "low_20d": 311.61,
+    "market_cap": 560160000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.016684930918154636,
+      "latest_price": 457.625,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 24217.25
+    },
+    "price_summary": "MU last close 465.39; 5d return 23.19%; 20d return 22.54%; current volume vs 20d average 0.86x; 20d range position 0.96; ATR14 26.67; RSI14 65.5; SMA20/50/200 398.79/403.78/253.23; 20d annualized volatility 81.91%; premarket gap -1.67%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.016684930918154636,
+      "price_change_20d": 0.22541997998841445,
+      "price_change_5d": 0.23187485110775818,
+      "range_position": 0.9632320701534607,
+      "recent_volatility": 0.7756339213992431,
+      "volume_ratio": 0.8619508288725486
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.0955253607061768,
+      "breakout_setup": 0.21058413373729556,
+      "gap_potential": 0.08342465459077318,
+      "overextension_penalty": -0.0,
+      "total": 0.9895341490342455,
+      "trend_quality": 0.1,
+      "volatility_expansion": 0.5,
+      "volume_spike": 0.0
+    },
+    "symbol": "MU",
+    "volume": 753712.0
+  },
+  {
+    "close": 310.39,
+    "data_quality_flags": [],
+    "high_20d": 312.43,
+    "indicators": {
+      "atr14": 13.866071428571427,
+      "avg_volume20": 232311.9,
+      "rsi14": 65.45284050949442,
+      "sma20": 268.24899999999997,
+      "sma200": 179.810125,
+      "sma50": 250.16170000000002,
+      "volatility20": 0.6416961306041263
+    },
+    "is_tradeable": true,
+    "low_20d": 231.8,
+    "market_cap": 124240000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.0053481104417022725,
+      "latest_price": 308.73,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 9495.5
+    },
+    "price_summary": "VRT last close 310.39; 5d return 18.30%; 20d return 27.01%; current volume vs 20d average 0.89x; 20d range position 0.97; ATR14 13.87; RSI14 65.5; SMA20/50/200 268.25/250.16/179.81; 20d annualized volatility 64.17%; premarket gap -0.53%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.0053481104417022725,
+      "price_change_20d": 0.2701121204681234,
+      "price_change_5d": 0.1830239737774897,
+      "range_position": 0.9746992434577698,
+      "recent_volatility": 0.6187545278262431,
+      "volume_ratio": 0.8875094216008736
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.07445510179973275,
+      "breakout_setup": 0.2294613228518958,
+      "gap_potential": 0.02674055220851136,
+      "overextension_penalty": -0.0,
+      "total": 0.9726244967360279,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.44196751987588795,
+      "volume_spike": 0.0
+    },
+    "symbol": "VRT",
+    "volume": 206179.0
+  },
+  {
+    "close": 1795.8,
+    "data_quality_flags": [],
+    "high_20d": 1796.835,
+    "indicators": {
+      "atr14": 61.64321428571431,
+      "avg_volume20": 45508.1,
+      "rsi14": 68.91306871900346,
+      "sma20": 1558.7775,
+      "sma200": 1203.24595,
+      "sma50": 1492.7077000000002,
+      "volatility20": 0.504032786904175
+    },
+    "is_tradeable": true,
+    "low_20d": 1376.37,
+    "market_cap": 254240000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.01659427553179639,
+      "latest_price": 1766.0,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 3564.2000000000003
+    },
+    "price_summary": "KLAC last close 1795.80; 5d return 15.98%; 20d return 24.68%; current volume vs 20d average 0.94x; 20d range position 1.00; ATR14 61.64; RSI14 68.9; SMA20/50/200 1558.78/1492.71/1203.25; 20d annualized volatility 50.40%; premarket gap -1.66%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.01659427553179639,
+      "price_change_20d": 0.24684089204876836,
+      "price_change_5d": 0.15975536511175825,
+      "range_position": 0.9978117236640413,
+      "recent_volatility": 0.529946939598483,
+      "volume_ratio": 0.9411291616217773
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.0572105415281159,
+      "breakout_setup": 0.24819892248580006,
+      "gap_potential": 0.08297137765898195,
+      "overextension_penalty": -0.0,
+      "total": 0.9669143699575287,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.37853352828463077,
+      "volume_spike": 0.0
+    },
+    "symbol": "KLAC",
+    "volume": 42829.0
+  },
+  {
+    "close": 63.81,
+    "data_quality_flags": [],
+    "high_20d": 65.65,
+    "indicators": {
+      "atr14": 3.3992857142857145,
+      "avg_volume20": 3342798.95,
+      "rsi14": 78.6190890629533,
+      "sma20": 50.05525,
+      "sma200": 36.60955,
+      "sma50": 47.8838,
+      "volatility20": 0.7738134085315278
+    },
+    "is_tradeable": true,
+    "low_20d": 40.64,
+    "market_cap": 414430000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.0003917881209842608,
+      "latest_price": 63.785,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 125831.8
+    },
+    "price_summary": "INTC last close 63.81; 5d return 20.56%; 20d return 47.98%; current volume vs 20d average 0.95x; 20d range position 0.93; ATR14 3.40; RSI14 78.6; SMA20/50/200 50.06/47.88/36.61; 20d annualized volatility 77.38%; premarket gap -0.04%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.0003917881209842608,
+      "price_change_20d": 0.47982374768089064,
+      "price_change_5d": 0.20555450595125646,
+      "range_position": 0.9264294282287084,
+      "recent_volatility": 0.727022134810149,
+      "volume_ratio": 0.950760140689885
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.08878665084588921,
+      "breakout_setup": 0.15988873217364033,
+      "gap_potential": 0.001958940604921304,
+      "overextension_penalty": -0.0,
+      "total": 0.9506343236244509,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.5,
+      "volume_spike": 0.0
+    },
+    "symbol": "INTC",
+    "volume": 3178200.0
+  },
+  {
+    "close": 163.04,
+    "data_quality_flags": [],
+    "high_20d": 169.355,
+    "indicators": {
+      "atr14": 7.174285714285716,
+      "avg_volume20": 519310.5,
+      "rsi14": 64.5936525408182,
+      "sma20": 147.36625,
+      "sma200": 215.99805,
+      "sma50": 150.332,
+      "volatility20": 0.6322722362142494
+    },
+    "is_tradeable": true,
+    "low_20d": 134.605,
+    "market_cap": 498360000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": 0.02361383709519133,
+      "latest_price": 166.89,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 56764.05
+    },
+    "price_summary": "ORCL last close 163.04; 5d return 13.86%; 20d return 9.40%; current volume vs 20d average 1.90x; 20d range position 0.77; ATR14 7.17; RSI14 64.6; SMA20/50/200 147.37/150.33/216.00; 20d annualized volatility 63.23%; premarket gap 2.36%.",
+    "raw_metrics": {
+      "premarket_gap_pct": 0.02361383709519133,
+      "price_change_20d": 0.09404462338533803,
+      "price_change_5d": 0.1386269990921154,
+      "range_position": 0.765925925925926,
+      "recent_volatility": 0.6048635433670423,
+      "volume_ratio": 1.9013923269412039
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.07333870741623442,
+      "breakout_setup": 0.12895991781158003,
+      "gap_potential": 0.11806918547595666,
+      "overextension_penalty": -0.0,
+      "total": 0.9425524315172075,
+      "trend_quality": 0.1,
+      "volatility_expansion": 0.4320453881193159,
+      "volume_spike": 0.09013923269412039
+    },
+    "symbol": "ORCL",
+    "volume": 987413.0
+  },
+  {
+    "close": 1360.73,
+    "data_quality_flags": [],
+    "high_20d": 1378.36,
+    "indicators": {
+      "atr14": 52.40000000000002,
+      "avg_volume20": 28611.1,
+      "rsi14": 75.3104789691223,
+      "sma20": 1157.2795,
+      "sma200": 964.8016250000001,
+      "sma50": 1147.1018,
+      "volatility20": 0.5984686822041736
+    },
+    "is_tradeable": true,
+    "low_20d": 997.26,
+    "market_cap": 80160000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.011188847162919836,
+      "latest_price": 1345.505,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 1408.3000000000002
+    },
+    "price_summary": "MPWR last close 1360.73; 5d return 14.30%; 20d return 26.61%; current volume vs 20d average 0.94x; 20d range position 0.95; ATR14 52.40; RSI14 75.3; SMA20/50/200 1157.28/1147.10/964.80; 20d annualized volatility 59.85%; premarket gap -1.12%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.011188847162919836,
+      "price_change_20d": 0.26614869265841623,
+      "price_change_5d": 0.1430095423694644,
+      "range_position": 0.9546203346203349,
+      "recent_volatility": 0.5593091373182887,
+      "volume_ratio": 0.9433401721709407
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.0641812360522171,
+      "breakout_setup": 0.20951162243795637,
+      "gap_potential": 0.05594423581459918,
+      "overextension_penalty": -0.0,
+      "total": 0.9291436209606931,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.3995065266559205,
+      "volume_spike": 0.0
+    },
+    "symbol": "MPWR",
+    "volume": 26990.0
+  },
+  {
+    "close": 255.09,
+    "data_quality_flags": [],
+    "high_20d": 255.415,
+    "indicators": {
+      "atr14": 10.819999999999999,
+      "avg_volume20": 694066.1,
+      "rsi14": 75.30046852719495,
+      "sma20": 216.0315,
+      "sma200": 200.48074999999997,
+      "sma50": 209.6092,
+      "volatility20": 0.49861235966208
+    },
+    "is_tradeable": true,
+    "low_20d": 192.91,
+    "market_cap": 567070000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": 0.002312909169312805,
+      "latest_price": 255.68,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 19838.800000000003
+    },
+    "price_summary": "AMD last close 255.09; 5d return 15.11%; 20d return 33.55%; current volume vs 20d average 0.62x; 20d range position 1.00; ATR14 10.82; RSI14 75.3; SMA20/50/200 216.03/209.61/200.48; 20d annualized volatility 49.86%; premarket gap 0.23%.",
+    "raw_metrics": {
+      "premarket_gap_pct": 0.002312909169312805,
+      "price_change_20d": 0.335479817810586,
+      "price_change_5d": 0.15107621497224843,
+      "range_position": 0.9951626107017937,
+      "recent_volatility": 0.5090680789693423,
+      "volume_ratio": 0.6221568810232916
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.07069400342362826,
+      "breakout_setup": 0.24601856207613015,
+      "gap_potential": 0.011564545846564023,
+      "overextension_penalty": -0.0,
+      "total": 0.8918971677529955,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.36362005640667305,
+      "volume_spike": 0.0
+    },
+    "symbol": "AMD",
+    "volume": 431818.0
+  },
+  {
+    "close": 193.44,
+    "data_quality_flags": [],
+    "high_20d": 198.1,
+    "indicators": {
+      "atr14": 8.278928571428574,
+      "avg_volume20": 115510.5,
+      "rsi14": 75.84958002620016,
+      "sma20": 172.92149999999998,
+      "sma200": 141.64985000000001,
+      "sma50": 188.40879999999999,
+      "volatility20": 0.594774619882822
+    },
+    "is_tradeable": true,
+    "low_20d": 151.48,
+    "market_cap": 149040000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.018145161290322533,
+      "latest_price": 189.93,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 4265.55
+    },
+    "price_summary": "SCCO last close 193.44; 5d return 11.22%; 20d return -6.19%; current volume vs 20d average 0.81x; 20d range position 0.70; ATR14 8.28; RSI14 75.8; SMA20/50/200 172.92/188.41/141.65; 20d annualized volatility 59.48%; premarket gap -1.81%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.018145161290322533,
+      "price_change_20d": -0.06188166828322017,
+      "price_change_5d": 0.11223551057957692,
+      "range_position": 0.7033188065705667,
+      "recent_volatility": 0.6262069685254518,
+      "volume_ratio": 0.8115712424411634
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.07133071901217065,
+      "breakout_setup": 0.17471825889164605,
+      "gap_potential": 0.09072580645161267,
+      "overextension_penalty": -0.0,
+      "total": 0.8840654761593235,
+      "trend_quality": 0.1,
+      "volatility_expansion": 0.44729069180389414,
+      "volume_spike": 0.0
+    },
+    "symbol": "SCCO",
+    "volume": 93745.0
+  },
+  {
+    "close": 154.47,
+    "data_quality_flags": [],
+    "high_20d": 155.41,
+    "indicators": {
+      "atr14": 6.309285714285717,
+      "avg_volume20": 264837.7,
+      "rsi14": 68.98652982681206,
+      "sma20": 133.85375000000002,
+      "sma200": 133.3467,
+      "sma50": 134.75509999999997,
+      "volatility20": 0.6402142304569695
+    },
+    "is_tradeable": true,
+    "low_20d": 115.45,
+    "market_cap": 222750000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.00029131870266062987,
+      "latest_price": 154.425,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 10416.0
+    },
+    "price_summary": "ANET last close 154.47; 5d return 15.60%; 20d return 24.08%; current volume vs 20d average 1.22x; 20d range position 0.98; ATR14 6.31; RSI14 69.0; SMA20/50/200 133.85/134.76/133.35; 20d annualized volatility 64.02%; premarket gap -0.03%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.00029131870266062987,
+      "price_change_20d": 0.2408225560285968,
+      "price_change_5d": 0.15603951504265834,
+      "range_position": 0.9764764764764765,
+      "recent_volatility": 0.6213045124833695,
+      "volume_ratio": 1.220581510864956
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.06807455292598041,
+      "breakout_setup": 0.23098336246520365,
+      "gap_potential": 0.0014565935133031493,
+      "overextension_penalty": -0.0,
+      "total": 0.8663615974791039,
+      "trend_quality": 0.1,
+      "volatility_expansion": 0.4437889374881211,
+      "volume_spike": 0.022058151086495604
+    },
+    "symbol": "ANET",
+    "volume": 323256.0
+  },
+  {
+    "close": 395.56,
+    "data_quality_flags": [],
+    "high_20d": 406.93,
+    "indicators": {
+      "atr14": 15.989285714285712,
+      "avg_volume20": 215280.3,
+      "rsi14": 57.54730302174527,
+      "sma20": 362.309,
+      "sma200": 256.123425,
+      "sma50": 353.6371,
+      "volatility20": 0.5614879006953593
+    },
+    "is_tradeable": true,
+    "low_20d": 320.79,
+    "market_cap": 330960000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": -0.010213368389119275,
+      "latest_price": 391.52,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 10539.35
+    },
+    "price_summary": "AMAT last close 395.56; 5d return 11.58%; 20d return 12.59%; current volume vs 20d average 0.88x; 20d range position 0.87; ATR14 15.99; RSI14 57.5; SMA20/50/200 362.31/353.64/256.12; 20d annualized volatility 56.15%; premarket gap -1.02%.",
+    "raw_metrics": {
+      "premarket_gap_pct": -0.010213368389119275,
+      "price_change_20d": 0.1258930350382832,
+      "price_change_5d": 0.11579363064511572,
+      "range_position": 0.8738908606921029,
+      "recent_volatility": 0.5519811187552297,
+      "volume_ratio": 0.8788960253214066
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.06736982891042957,
+      "breakout_setup": 0.16017481545151174,
+      "gap_potential": 0.051066841945596374,
+      "overextension_penalty": -0.0,
+      "total": 0.8530729260768257,
+      "trend_quality": 0.1801892120869811,
+      "volatility_expansion": 0.39427222768230696,
+      "volume_spike": 0.0
+    },
+    "symbol": "AMAT",
+    "volume": 189209.0
+  },
+  {
+    "close": 178.65,
+    "data_quality_flags": [],
+    "high_20d": 229.09,
+    "indicators": {
+      "atr14": 14.542499999999999,
+      "avg_volume20": 226298.25,
+      "rsi14": 35.93519278096801,
+      "sma20": 205.95299999999997,
+      "sma200": 202.014725,
+      "sma50": 193.6807,
+      "volatility20": 0.8442959972351295
+    },
+    "is_tradeable": true,
+    "low_20d": 164.12,
+    "market_cap": 72880000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": 0.02927511894766297,
+      "latest_price": 183.88,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 12663.6
+    },
+    "price_summary": "NET last close 178.65; 5d return -17.36%; 20d return -0.16%; current volume vs 20d average 0.73x; 20d range position 0.22; ATR14 14.54; RSI14 35.9; SMA20/50/200 205.95/193.68/202.01; 20d annualized volatility 84.43%; premarket gap 2.93%.",
+    "raw_metrics": {
+      "premarket_gap_pct": 0.02927511894766297,
+      "price_change_20d": -0.0015648577656066642,
+      "price_change_5d": -0.1736053288925895,
+      "range_position": 0.22364168077574267,
+      "recent_volatility": 0.7385256446590223,
+      "volume_ratio": 0.7277077927027716
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.1,
+      "breakout_setup": 0.0,
+      "gap_potential": 0.14637559473831485,
+      "overextension_penalty": -0.0,
+      "total": 0.8463755947383149,
+      "trend_quality": 0.1,
+      "volatility_expansion": 0.5,
+      "volume_spike": 0.0
+    },
+    "symbol": "NET",
+    "volume": 164679.0
+  },
+  {
+    "close": 44.19,
+    "data_quality_flags": [],
+    "high_20d": 55.675,
+    "indicators": {
+      "atr14": 1.879285714285715,
+      "avg_volume20": 1308754.4,
+      "rsi14": 24.267551133222767,
+      "sma20": 48.676,
+      "sma200": 65.880375,
+      "sma50": 56.0559,
+      "volatility20": 0.6174403987220656
+    },
+    "is_tradeable": true,
+    "low_20d": 42.13,
+    "market_cap": 66180000000.00001,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": 0.01946141661009277,
+      "latest_price": 45.05,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 58121.15
+    },
+    "price_summary": "NKE last close 44.19; 5d return 3.49%; 20d return -25.61%; current volume vs 20d average 0.93x; 20d range position 0.11; ATR14 1.88; RSI14 24.3; SMA20/50/200 48.68/56.06/65.88; 20d annualized volatility 61.74%; premarket gap 1.95%.",
+    "raw_metrics": {
+      "premarket_gap_pct": 0.01946141661009277,
+      "price_change_20d": -0.2560606060606061,
+      "price_change_5d": 0.03489461358313806,
+      "range_position": 0.11482720178372327,
+      "recent_volatility": 0.5183813606813805,
+      "volume_ratio": 0.9329397479007521
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.07087899654091102,
+      "breakout_setup": 0.10432224485177675,
+      "gap_potential": 0.09730708305046386,
+      "overextension_penalty": -0.0,
+      "total": 0.842780724929852,
+      "trend_quality": 0.2,
+      "volatility_expansion": 0.3702724004867004,
+      "volume_spike": 0.0
+    },
+    "symbol": "NKE",
+    "volume": 1220989.0
+  },
+  {
+    "close": 380.725,
+    "data_quality_flags": [],
+    "high_20d": 382.1,
+    "indicators": {
+      "atr14": 12.175357142857141,
+      "avg_volume20": 663498.25,
+      "rsi14": 77.5283376703568,
+      "sma20": 327.72400000000005,
+      "sma200": 331.25879999999995,
+      "sma50": 328.56440000000003,
+      "volatility20": 0.4643771930264138
+    },
+    "is_tradeable": true,
+    "low_20d": 289.99,
+    "market_cap": 2001000000000.0,
+    "news_headlines": [],
+    "premarket": {
+      "gap_pct": 0.02459780681594314,
+      "latest_price": 390.09,
+      "timestamp": "2026-04-16T00:00:00+00:00",
+      "volume": 32096.15
+    },
+    "price_summary": "AVGO last close 380.73; 5d return 13.98%; 20d return 21.31%; current volume vs 20d average 0.84x; 20d range position 0.99; ATR14 12.18; RSI14 77.5; SMA20/50/200 327.72/328.56/331.26; 20d annualized volatility 46.44%; premarket gap 2.46%.",
+    "raw_metrics": {
+      "premarket_gap_pct": 0.02459780681594314,
+      "price_change_20d": 0.21307949657479686,
+      "price_change_5d": 0.13980989446897696,
+      "range_position": 0.9850721962870481,
+      "recent_volatility": 0.4555861682148308,
+      "volume_ratio": 0.8415093785100413
+    },
+    "score_breakdown": {
+      "atr_efficiency": 0.053299000340828434,
+      "breakout_setup": 0.2387139667739182,
+      "gap_potential": 0.1229890340797157,
+      "overextension_penalty": -0.0,
+      "total": 0.8404206927764843,
+      "trend_quality": 0.1,
+      "volatility_expansion": 0.325418691582022,
+      "volume_spike": 0.0
+    },
+    "symbol": "AVGO",
+    "volume": 558340.0
+  }
+]
