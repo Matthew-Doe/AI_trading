@@ -6,7 +6,7 @@ import math
 import time
 from collections import deque
 from dataclasses import asdict, is_dataclass
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -43,8 +43,16 @@ def get_logger(log_dir: Path, run_id: str) -> logging.Logger:
 
 def dataclass_to_dict(value: Any) -> Any:
     if is_dataclass(value):
-        return asdict(value)
+        return dataclass_to_dict(asdict(value))
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, date):
+        return value.isoformat()
+    if isinstance(value, Path):
+        return str(value)
     if isinstance(value, list):
+        return [dataclass_to_dict(item) for item in value]
+    if isinstance(value, tuple):
         return [dataclass_to_dict(item) for item in value]
     if isinstance(value, dict):
         return {key: dataclass_to_dict(item) for key, item in value.items()}

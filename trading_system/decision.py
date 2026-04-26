@@ -39,19 +39,7 @@ class DecisionEngine:
         )
 
     def decide(self, debates: list[SymbolDebate]) -> list[TradeDecision]:
-        try:
-            prompt = self._build_decision_prompt(debates)
-            raw, payload = self._generate_valid_decision_json(prompt)
-            decisions = self._validate_and_normalize(
-                payload,
-                generation_probability=self._last_generation_probability,
-            )
-        except DecisionError as exc:
-            self.logger.warning(
-                "Batch decision generation failed, falling back to per-symbol decisions: %s",
-                exc,
-            )
-            decisions = self._decide_per_symbol(debates)
+        decisions = self._decide_per_symbol(debates)
         self.logger.info(
             "Decision model produced %s actionable decisions",
             len([item for item in decisions if item.action != "skip"]),
@@ -69,8 +57,7 @@ class DecisionEngine:
             )
             try:
                 payload = self._extract_json(raw)
-                if "decisions" not in payload:
-                    raise DecisionError("Decision payload missing decisions list.")
+                payload = self._normalize_decision_payload(payload)
                 return raw, payload
             except Exception as exc:  # noqa: BLE001
                 last_error = str(exc)
@@ -162,30 +149,27 @@ class DecisionEngine:
         }
         return dedent(
             f"""
-            You are the High-Conviction Portfolio Decision Model for ONE symbol.
-            Your goal is to decide whether to take a LONG, SHORT, or SKIP position.
+            Return ONLY one valid JSON object. No markdown. No prose. No thoughts.
 
             Required schema:
             {{
               "symbol": "{debate.symbol}",
-              "action": "long",
+              "action": "long|short|skip",
               "confidence": 0.0,
               "target_price": 0.0,
               "invalidation_price": 0.0,
-              "reasoning_rebuttal": "Explain why the opposing case is incorrect or why the risk is acceptable."
+              "reward_risk_ratio": 0.0,
+              "reason": "12 words max"
             }}
 
-            Strategic Rules:
-            1. MOMENTUM > MEAN REVERSION: If price is above SMA20 > SMA50 > SMA200, it is in a 'Super Trend'. IGNORE 'overbought' RSI flags unless RSI > 92.
-            2. STRICT R/R: All non-skip trades MUST have a Reward/Risk ratio >= 2.5.
-            3. GRANULAR CONFIDENCE: You MUST use the full range of confidence from 0.50 to 0.99.
-               - 0.95+: Generational opportunity.
-               - 0.85-0.94: High-quality momentum breakout.
-               - 0.70-0.84: Solid setup, but with significant risks.
-               - 0.50-0.69: Speculative.
-               AVOID using '0.63' or any other 'safe' middle-ground numbers. Be precise.
+            Rules:
+            - Choose exactly one action: long, short, or skip.
+            - Use confidence 0.50-0.99 for long/short, 0.0 for skip.
+            - Non-skip trades require reward_risk_ratio >= 2.5.
+            - If SMA20 > SMA50 > SMA200, ignore overbought RSI unless RSI > 92.
+            - Keep reason short. Do not include analysis text outside JSON.
 
-            Input Data:
+            Input:
             {json.dumps(payload, indent=2)}
             """
         ).strip()
@@ -215,17 +199,33 @@ class DecisionEngine:
                 raise DecisionError("No JSON object found in decision model response.")
             return json.loads(raw[start : end + 1])
 
+    @staticmethod
+    def _normalize_decision_payload(payload: object) -> dict:
+        if not isinstance(payload, dict):
+            raise DecisionError("Decision payload must be a JSON object.")
+        if "decisions" in payload:
+            decisions = payload["decisions"]
+            if not isinstance(decisions, list):
+                raise DecisionError("Decision payload missing decisions list.")
+            return payload
+
+        if {"symbol", "action"}.issubset(payload):
+            return {"decisions": [payload]}
+
+        raise DecisionError("Decision payload missing decisions list.")
+
     def _validate_and_normalize(
         self,
         payload: dict,
         generation_probability: float | None = None,
     ) -> list[TradeDecision]:
-        if "decisions" not in payload or not isinstance(payload["decisions"], list):
-            raise DecisionError("Decision payload missing decisions list.")
+        payload = self._normalize_decision_payload(payload)
 
         decisions: list[TradeDecision] = []
         confidence_cap = self._decision_confidence_cap(generation_probability)
         for item in payload["decisions"]:
+            if not isinstance(item, dict):
+                raise DecisionError("Decision item must be a JSON object.")
             action = str(item["action"]).lower()
             if action not in {"long", "short", "skip"}:
                 raise DecisionError(f"Invalid action {action}")
@@ -340,7 +340,7 @@ class DecisionEngine:
                         target_price=target_price,
                         invalidation_price=invalidation_price,
                         reward_risk_ratio=reward_risk_ratio,
-                        catalyst=self._optional_text(payload.get("reasoning_rebuttal")),
+                        catalyst=self._optional_text(payload.get("reason") or payload.get("reasoning_rebuttal")),
                     )
                 )
             except DecisionError as exc:
@@ -388,6 +388,7 @@ class DecisionEngine:
             )
             try:
                 payload = self._extract_json(raw)
+                payload = self._normalize_single_decision_payload(payload, symbol)
                 if payload.get("symbol") != symbol:
                     raise DecisionError(f"Single-symbol decision symbol mismatch for {symbol}")
                 action = str(payload.get("action", "")).lower()
@@ -398,6 +399,8 @@ class DecisionEngine:
                     float(payload.get("confidence", 0.0)),
                     1.0
                 )
+                if payload.get("symbol") != symbol:
+                    payload["symbol"] = symbol
                 return payload
             except Exception as exc:  # noqa: BLE001
                 last_error = str(exc)
@@ -415,6 +418,21 @@ class DecisionEngine:
                     raw[:200],
                 )
         raise DecisionError(f"Unable to obtain valid single-symbol decision JSON for {symbol}: {last_error}")
+
+    @classmethod
+    def _normalize_single_decision_payload(cls, payload: object, symbol: str) -> dict:
+        normalized = cls._normalize_decision_payload(payload)
+        decisions = normalized["decisions"]
+        symbol_matches = [
+            item
+            for item in decisions
+            if isinstance(item, dict) and str(item.get("symbol", "")).upper() == symbol
+        ]
+        if len(symbol_matches) == 1:
+            return symbol_matches[0]
+        if len(decisions) == 1 and isinstance(decisions[0], dict):
+            return decisions[0]
+        raise DecisionError(f"Single-symbol decision symbol mismatch for {symbol}")
 
     @staticmethod
     def _build_json_repair_prompt(raw: str, original_prompt: str, error: str) -> str:

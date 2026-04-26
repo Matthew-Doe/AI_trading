@@ -1,4 +1,5 @@
 from datetime import UTC, datetime
+from types import SimpleNamespace
 
 from trading_system.data import DataIngestionError
 from trading_system.confidence_calibration import build_historical_decision_outcomes
@@ -31,6 +32,24 @@ class StubCalibrator:
         return self.calibrated_confidence
 
 
+def _dummy_debate(symbol: str = "AAA"):
+    indicators = SimpleNamespace(rsi14=55.0, sma20=101.0, sma50=100.0, sma200=95.0)
+    premarket = SimpleNamespace(latest_price=102.0, gap_pct=1.2, volume=100000)
+    market_data = SimpleNamespace(
+        price_summary=f"{symbol} compact summary",
+        indicators=indicators,
+        premarket=premarket,
+    )
+    bull_case = SimpleNamespace(confidence=0.82, arguments=["breakout"])
+    bear_case = SimpleNamespace(confidence=0.35, arguments=["extended"])
+    return SimpleNamespace(
+        symbol=symbol,
+        market_data=market_data,
+        bull_case=bull_case,
+        bear_case=bear_case,
+    )
+
+
 def test_decision_normalization_and_thresholding():
     config = TradingConfig(min_confidence=0.6)
     engine = DecisionEngine(config, DummyLogger(), confidence_calibrator=IdentityCalibrator())
@@ -45,6 +64,52 @@ def test_decision_normalization_and_thresholding():
     active = [item for item in decisions if item.action != "skip"]
     assert round(sum(item.allocation for item in active), 6) == 1.0
     assert next(item for item in decisions if item.symbol == "CCC").action == "skip"
+
+
+def test_decide_uses_single_symbol_generation_without_batch_probe():
+    config = TradingConfig(min_confidence=0.6)
+    engine = DecisionEngine(config, DummyLogger(), confidence_calibrator=IdentityCalibrator())
+    debate = _dummy_debate("AAA")
+
+    def fail_if_batch_called(prompt):
+        del prompt
+        raise AssertionError("batch decision generation should not be used")
+
+    engine._generate_valid_decision_json = fail_if_batch_called  # type: ignore[method-assign]
+    engine._build_single_symbol_prompt = lambda debate: "prompt"  # type: ignore[method-assign]
+    engine._generate_valid_single_decision_json = (  # type: ignore[method-assign]
+        lambda prompt, symbol: {
+            "symbol": symbol,
+            "action": "long",
+            "confidence": 0.8,
+            "target_price": 110.0,
+            "invalidation_price": 96.0,
+            "reward_risk_ratio": 2.5,
+        }
+    )
+
+    decisions = engine.decide([debate])
+
+    assert len(decisions) == 1
+    assert decisions[0].symbol == "AAA"
+    assert decisions[0].action == "long"
+
+
+def test_validate_and_normalize_wraps_single_decision_object():
+    config = TradingConfig(min_confidence=0.6)
+    engine = DecisionEngine(config, DummyLogger(), confidence_calibrator=IdentityCalibrator())
+    payload = {
+        "symbol": "AAA",
+        "action": "long",
+        "confidence": 0.9,
+        "allocation": 0.8,
+    }
+
+    decisions = engine._validate_and_normalize(payload)
+
+    assert len(decisions) == 1
+    assert decisions[0].symbol == "AAA"
+    assert decisions[0].action == "long"
 
 
 def test_decide_per_symbol_skips_symbol_after_repeated_json_failures():
@@ -80,6 +145,30 @@ def test_validate_and_normalize_caps_confidence_with_generation_probability():
 
     assert decisions[0].action == "skip"
     assert decisions[0].confidence == 0.55
+
+
+def test_generate_valid_single_decision_json_accepts_decisions_wrapper():
+    config = TradingConfig(min_confidence=0.6)
+    engine = DecisionEngine(config, DummyLogger(), confidence_calibrator=IdentityCalibrator())
+    engine._ollama_generate = (  # type: ignore[method-assign]
+        lambda prompt, temperature: (
+            '{"decisions":[{"symbol":"AAA","action":"long","confidence":0.8,'
+            '"target_price":110.0,"invalidation_price":96.0,"reward_risk_ratio":2.5}]}'
+        )
+    )
+
+    payload = engine._generate_valid_single_decision_json("prompt", "AAA")
+
+    assert payload["symbol"] == "AAA"
+    assert payload["action"] == "long"
+
+
+def test_extract_json_handles_preamble_and_trailing_text():
+    raw = "thinking... {\"decisions\": [{\"symbol\": \"AAA\", \"action\": \"skip\", \"confidence\": 0.0}]} trailing"
+
+    payload = DecisionEngine._extract_json(raw)
+
+    assert payload["decisions"][0]["symbol"] == "AAA"
 
 
 def test_build_historical_decision_outcomes_skips_incomplete_forward_window(tmp_path):
