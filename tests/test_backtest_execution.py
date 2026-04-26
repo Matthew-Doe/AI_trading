@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import datetime, UTC, timedelta
 from trading_system.backtest_execution import BacktestExecutionEngine, BacktestPosition
 from trading_system.models import IndicatorSnapshot, PremarketSnapshot, SymbolMarketData, TradeDecision
 
@@ -31,18 +31,16 @@ def test_backtest_execution_long_entry_and_exit():
     # Equity = (10000 - 909) + (6 * 160) = 9091 + 960 = 10051
     assert engine.equity == 10051.0
     
-    # 3. Test Take Profit Exit
-    # Process decisions again with higher price to trigger TP
+    # 3. Test Take Profit Arms Trailing Exit
     engine.process_decisions([], {"AAPL": 165.0}, now)
-    # TP triggered at 165
-    # Exit Fill = 165 * 0.99 = 163.35
-    # Proceeds = 6 * 163.35 = 980.1
-    # New Cash = 9091 + 980.1 = 10071.1
-    
+    assert "AAPL" in engine.positions
+    assert engine.positions["AAPL"].take_profit_armed is True
+
+    engine.process_decisions([], {"AAPL": 155.0}, now)
+
     assert "AAPL" not in engine.positions
     assert len(engine.trades) == 1
-    assert engine.trades[0].exit_reason == "take_profit"
-    assert engine.cash == 10071.1
+    assert engine.trades[0].exit_reason == "trailing_take_profit"
 
 def test_backtest_execution_short_stop_loss():
     engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.01)
@@ -108,6 +106,102 @@ def test_backtest_execution_uses_simulated_open_for_new_entries():
     )
 
     assert engine.positions["AAPL"].entry_price == 153.52
+
+
+def test_backtest_execution_preserves_minimum_cash_reserve():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        max_position_size_pct=1.0,
+        min_cash_reserve_pct=0.2,
+    )
+    now = datetime(2026, 3, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=1.0)],
+        {"AAPL": 100.0},
+        now,
+    )
+
+    assert engine.cash == 2000.0
+    assert engine.positions["AAPL"].qty == 80
+
+
+def test_backtest_execution_penalizes_recent_symbol_losers():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        max_position_size_pct=1.0,
+        loser_penalty_factor=0.5,
+        loser_skip_after=2,
+    )
+    now = datetime(2026, 3, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=0.4, invalidation_price=90.0)],
+        {"AAPL": 100.0},
+        now,
+    )
+    engine.process_decisions([], {"AAPL": 80.0}, now + timedelta(days=1))
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=0.4, invalidation_price=90.0)],
+        {"AAPL": 100.0},
+        now + timedelta(days=2),
+    )
+
+    assert engine.positions["AAPL"].qty == 18
+
+
+def test_backtest_execution_skips_symbol_after_repeated_recent_losses():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        max_position_size_pct=1.0,
+        loser_skip_after=2,
+    )
+    now = datetime(2026, 3, 2, tzinfo=UTC)
+
+    for offset in (0, 2):
+        engine.process_decisions(
+            [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=0.1, invalidation_price=90.0)],
+            {"AAPL": 100.0},
+            now + timedelta(days=offset),
+        )
+        engine.process_decisions([], {"AAPL": 80.0}, now + timedelta(days=offset + 1))
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=0.1)],
+        {"AAPL": 100.0},
+        now + timedelta(days=4),
+    )
+
+    assert "AAPL" not in engine.positions
+
+
+def test_backtest_execution_lets_winners_run_with_trailing_take_profit():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        max_position_size_pct=1.0,
+        base_hold_days=3,
+        winner_hold_days=10,
+        trailing_take_profit_pct=0.05,
+    )
+    now = datetime(2026, 3, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=0.5, target_price=110.0, invalidation_price=95.0)],
+        {"AAPL": 100.0},
+        now,
+    )
+    engine.process_decisions([], {"AAPL": 112.0}, now + timedelta(days=3))
+    assert "AAPL" in engine.positions
+
+    engine.process_decisions([], {"AAPL": 106.0}, now + timedelta(days=4))
+
+    assert "AAPL" not in engine.positions
+    assert engine.trades[0].exit_reason == "trailing_take_profit"
 
 if __name__ == "__main__":
     test_backtest_execution_long_entry_and_exit()

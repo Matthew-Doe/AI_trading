@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -15,10 +16,47 @@ from trading_system.selection import CandidateSelector
 from trading_system.utils import ensure_dir, get_logger, write_json, dataclass_to_dict
 from trading_system.backtest_execution import BacktestExecutionEngine, BacktestTradeRecord
 from trading_system.confidence_calibration import ConfidenceCalibrator
+from trading_system.models import SymbolMarketData, TradeDecision
 
 def get_config_hash(config: TradingConfig) -> str:
     data = f"{config.llm_debate_model}-{config.llm_decision_model}-{config.candidate_count}"
     return hashlib.md5(data.encode()).hexdigest()
+
+
+def benchmark_regime_is_constructive(
+    benchmark: SymbolMarketData | None,
+    *,
+    min_5d_return: float,
+) -> bool:
+    if benchmark is None:
+        return True
+    indicators = benchmark.indicators
+    return (
+        benchmark.close > indicators.sma20
+        and indicators.sma20 >= indicators.sma50
+        and benchmark.raw_metrics.get("price_change_5d", 0.0) >= min_5d_return
+    )
+
+
+def apply_spy_regime_filter(
+    decisions: list[TradeDecision],
+    all_symbol_prices: dict[str, SymbolMarketData],
+    *,
+    benchmark_symbol: str,
+    enabled: bool,
+    min_5d_return: float = -0.01,
+) -> list[TradeDecision]:
+    if not enabled:
+        return decisions
+    benchmark = all_symbol_prices.get(benchmark_symbol)
+    if benchmark_regime_is_constructive(benchmark, min_5d_return=min_5d_return):
+        return decisions
+    return [
+        replace(decision, action="skip", allocation=0.0)
+        if decision.action == "long"
+        else decision
+        for decision in decisions
+    ]
 
 
 def build_backtest_report(
@@ -44,6 +82,17 @@ def build_backtest_report(
             "universe_source": "current_companiesmarketcap_snapshot",
             "entry_price_rule": "simulated_open_or_close_with_slippage",
             "exit_price_rule": "daily_close_stop_target_or_time_expiry",
+            "strategy_controls": {
+                "min_cash_reserve_pct": config.backtest_min_cash_reserve_pct,
+                "base_hold_days": config.backtest_base_hold_days,
+                "winner_hold_days": config.backtest_winner_hold_days,
+                "trailing_take_profit_pct": config.backtest_trailing_take_profit_pct,
+                "loser_penalty_factor": config.backtest_loser_penalty_factor,
+                "loser_skip_after": config.backtest_loser_skip_after,
+                "spy_regime_filter": config.backtest_spy_regime_filter,
+                "benchmark_symbol": config.benchmark_symbol,
+                "benchmark_min_5d_return": config.backtest_benchmark_min_5d_return,
+            },
             "known_limitations": [
                 "Universe membership is not point-in-time unless dated universe snapshots were preloaded.",
                 "Stops and targets are evaluated on daily close snapshots, not intraday high/low bars.",
@@ -70,7 +119,17 @@ def run_backtest():
     market_data = MarketDataService(config, logger)
     selector = CandidateSelector(logger)
     
-    execution = BacktestExecutionEngine(initial_cash=args.initial_cash, market_data_service=market_data)
+    execution = BacktestExecutionEngine(
+        initial_cash=args.initial_cash,
+        market_data_service=market_data,
+        min_cash_reserve_pct=config.backtest_min_cash_reserve_pct,
+        base_hold_days=config.backtest_base_hold_days,
+        winner_hold_days=config.backtest_winner_hold_days,
+        trailing_take_profit_pct=config.backtest_trailing_take_profit_pct,
+        take_profit_r_multiple=config.take_profit_r_multiple,
+        loser_penalty_factor=config.backtest_loser_penalty_factor,
+        loser_skip_after=config.backtest_loser_skip_after,
+    )
     
     backtest_root = ensure_dir(Path("backtests") / datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"))
     
@@ -119,6 +178,13 @@ def run_backtest():
             # 4. Run Decision
             decision_engine = DecisionEngine(config, logger, confidence_calibrator=calibrator)
             decisions = decision_engine.decide(debates)
+            decisions = apply_spy_regime_filter(
+                decisions,
+                full_price_map,
+                benchmark_symbol=config.benchmark_symbol,
+                enabled=config.backtest_spy_regime_filter,
+                min_5d_return=config.backtest_benchmark_min_5d_return,
+            )
             write_json(day_path / "decisions.json", decisions)
 
             # 5. Realistic Execution

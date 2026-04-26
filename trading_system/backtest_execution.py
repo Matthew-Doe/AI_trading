@@ -17,6 +17,10 @@ class BacktestPosition:
     side: str  # "long" or "short"
     stop_price: float | None = None
     take_profit_price: float | None = None
+    confidence: float = 0.0
+    allocation: float = 0.0
+    take_profit_armed: bool = False
+    best_price: float | None = None
 
 @dataclass
 class BacktestTradeRecord:
@@ -32,6 +36,8 @@ class BacktestTradeRecord:
     net_pnl: float = 0.0
     costs: float = 0.0
     holding_period_days: int = 0
+    confidence: float = 0.0
+    allocation: float = 0.0
 
 class BacktestExecutionEngine:
     def __init__(
@@ -40,8 +46,16 @@ class BacktestExecutionEngine:
         slippage_pct: float = 0.001,  # 0.1% per leg
         commission_fixed: float = 0.0,
         max_position_size_pct: float = 0.15,
-        market_data_service: Any = None
+        market_data_service: Any = None,
+        min_cash_reserve_pct: float = 0.0,
+        base_hold_days: int = 3,
+        winner_hold_days: int = 10,
+        trailing_take_profit_pct: float = 0.05,
+        take_profit_r_multiple: float = 2.0,
+        loser_penalty_factor: float = 0.5,
+        loser_skip_after: int = 2,
     ):
+        self.initial_cash = initial_cash
         self.cash = initial_cash
         self.equity = initial_cash
         self.positions: dict[str, BacktestPosition] = {}
@@ -50,6 +64,13 @@ class BacktestExecutionEngine:
         self.commission_fixed = commission_fixed
         self.max_position_size_pct = max_position_size_pct
         self.market_data_service = market_data_service
+        self.min_cash_reserve_pct = min_cash_reserve_pct
+        self.base_hold_days = base_hold_days
+        self.winner_hold_days = winner_hold_days
+        self.trailing_take_profit_pct = trailing_take_profit_pct
+        self.take_profit_r_multiple = take_profit_r_multiple
+        self.loser_penalty_factor = loser_penalty_factor
+        self.loser_skip_after = loser_skip_after
 
     def update_equity(self, current_prices: dict[str, MarketSnapshot]):
         """Calculates current portfolio value based on latest prices."""
@@ -86,18 +107,32 @@ class BacktestExecutionEngine:
             reason = ""
             
             if pos.side == "long":
-                if pos.stop_price and price <= pos.stop_price:
+                if pos.take_profit_armed:
+                    pos.best_price = max(pos.best_price or pos.entry_price, price)
+                    trailing_stop = pos.best_price * (1.0 - self.trailing_take_profit_pct)
+                    if price <= trailing_stop:
+                        exit_triggered, reason = True, "trailing_take_profit"
+                if not exit_triggered and pos.stop_price and price <= pos.stop_price:
                     exit_triggered, reason = True, "stop_loss"
-                elif pos.take_profit_price and price >= pos.take_profit_price:
-                    exit_triggered, reason = True, "take_profit"
+                elif not exit_triggered and pos.take_profit_price and price >= pos.take_profit_price:
+                    pos.take_profit_armed = True
+                    pos.best_price = max(pos.best_price or pos.entry_price, price)
             else: # short
-                if pos.stop_price and price >= pos.stop_price:
+                if pos.take_profit_armed:
+                    pos.best_price = min(pos.best_price or pos.entry_price, price)
+                    trailing_stop = pos.best_price * (1.0 + self.trailing_take_profit_pct)
+                    if price >= trailing_stop:
+                        exit_triggered, reason = True, "trailing_take_profit"
+                if not exit_triggered and pos.stop_price and price >= pos.stop_price:
                     exit_triggered, reason = True, "stop_loss"
-                elif pos.take_profit_price and price <= pos.take_profit_price:
-                    exit_triggered, reason = True, "take_profit"
+                elif not exit_triggered and pos.take_profit_price and price <= pos.take_profit_price:
+                    pos.take_profit_armed = True
+                    pos.best_price = min(pos.best_price or pos.entry_price, price)
 
             days_held = (current_time - pos.entry_time).days
-            if not exit_triggered and days_held >= 3:
+            is_winner = price > pos.entry_price if pos.side == "long" else price < pos.entry_price
+            hold_limit = self.winner_hold_days if is_winner else self.base_hold_days
+            if not exit_triggered and days_held >= hold_limit:
                 exit_triggered, reason = True, "time_expiry"
 
             if exit_triggered:
@@ -112,6 +147,9 @@ class BacktestExecutionEngine:
         for dec in decisions:
             if dec.action == "skip": continue
             if dec.symbol in self.positions: continue
+            recent_losses = self._recent_symbol_losses(dec.symbol)
+            if recent_losses >= self.loser_skip_after:
+                continue
             
             snapshot = all_symbol_prices.get(dec.symbol)
             if snapshot is None: continue
@@ -121,14 +159,18 @@ class BacktestExecutionEngine:
             fill_price = price * (1 + self.slippage_pct) if dec.action == "long" else price * (1 - self.slippage_pct)
             
             # Position Sizing
-            alloc = min(dec.allocation or 0.05, self.max_position_size_pct)
+            loser_penalty = self.loser_penalty_factor ** recent_losses
+            alloc = min((dec.allocation or 0.05) * loser_penalty, self.max_position_size_pct)
             target_notional = self.equity * alloc
+            available_cash = max(0.0, self.cash - (self.equity * self.min_cash_reserve_pct))
             
-            if target_notional > self.cash:
-                target_notional = self.cash
+            if target_notional > available_cash:
+                target_notional = available_cash
             
             qty = int(target_notional / fill_price)
             if qty <= 0: continue
+
+            take_profit_price = self._take_profit_price(dec, fill_price)
 
             # Open Position
             cost = (qty * fill_price)
@@ -140,7 +182,10 @@ class BacktestExecutionEngine:
                 entry_time=current_time,
                 side=dec.action,
                 stop_price=dec.invalidation_price,
-                take_profit_price=dec.target_price
+                take_profit_price=take_profit_price,
+                confidence=dec.confidence,
+                allocation=alloc,
+                best_price=fill_price,
             )
             self.update_equity(all_symbol_prices) # Immediate equity update
 
@@ -157,6 +202,31 @@ class BacktestExecutionEngine:
         if isinstance(snapshot, SymbolMarketData):
             return float(snapshot.premarket.latest_price or snapshot.close)
         return float(snapshot)
+
+    def _take_profit_price(self, decision: TradeDecision, fill_price: float) -> float | None:
+        if decision.target_price is not None:
+            return decision.target_price
+        if decision.invalidation_price is None:
+            return None
+        if decision.action == "long":
+            risk = fill_price - decision.invalidation_price
+            return fill_price + (risk * self.take_profit_r_multiple) if risk > 0 else None
+        if decision.action == "short":
+            risk = decision.invalidation_price - fill_price
+            return fill_price - (risk * self.take_profit_r_multiple) if risk > 0 else None
+        return None
+
+    def _recent_symbol_losses(self, symbol: str) -> int:
+        losses = 0
+        for trade in reversed(self.trades):
+            if trade.symbol != symbol:
+                continue
+            if trade.net_pnl > 0:
+                break
+            losses += 1
+            if losses >= self.loser_skip_after:
+                break
+        return losses
 
     def _close_position(self, pos: BacktestPosition, price: float, exit_time: datetime, reason: str):
         # Exit Price with Slippage
@@ -188,7 +258,9 @@ class BacktestExecutionEngine:
             gross_pnl=gross_pnl,
             net_pnl=gross_pnl - total_costs,
             costs=total_costs,
-            holding_period_days=(exit_time - pos.entry_time).days
+            holding_period_days=(exit_time - pos.entry_time).days,
+            confidence=pos.confidence,
+            allocation=pos.allocation,
         )
         self.trades.append(record)
 
