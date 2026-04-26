@@ -1,0 +1,14 @@
+.codex
+.cache/
+.pytest_cache/
+.venv/
+__pycache__/
+*.pyc
+
+.env
+.env.*
+!.env.example
+
+logs/
+runs/
+backtests/
