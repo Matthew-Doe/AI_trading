@@ -122,7 +122,7 @@ class TradingConfig:
     backtest_trailing_take_profit_pct: float = float(os.getenv("BACKTEST_TRAILING_TAKE_PROFIT_PCT", "0.05"))
     backtest_loser_penalty_factor: float = float(os.getenv("BACKTEST_LOSER_PENALTY_FACTOR", "0.50"))
     backtest_loser_skip_after: int = int(os.getenv("BACKTEST_LOSER_SKIP_AFTER", "2"))
-    backtest_spy_regime_filter: bool = os.getenv("BACKTEST_SPY_REGIME_FILTER", "true").lower() == "true"
+    backtest_spy_regime_filter: bool = os.getenv("BACKTEST_SPY_REGIME_FILTER", "false").lower() == "true"
     backtest_benchmark_min_5d_return: float = float(os.getenv("BACKTEST_BENCHMARK_MIN_5D_RETURN", "-0.01"))
     buy_more_threshold: float = float(os.getenv("BUY_MORE_THRESHOLD", "0.05"))
     execute_orders: bool = os.getenv("EXECUTE_ORDERS", "false").lower() == "true"
