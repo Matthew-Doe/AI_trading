@@ -1,33 +1,30 @@
 # AI Trading System
 
-Production-structured local Python trading system for daily pre-open idea generation, AI debate, final decisioning, explicit LLM token tracking, and Alpaca paper-order execution. The default configuration scans 200 symbols and debates the top 20.
+Local Python system for AI-assisted paper-trading research. It builds a U.S. equity universe, ranks candidates, runs bull/bear LLM debates, generates final trade decisions, simulates or submits Alpaca paper orders, and writes auditable run artifacts.
 
-Index exposure is supported through tradable proxy ETFs such as `SPY`, `QQQ`, `DIA`, and `IWM`.
+This is research software, not financial advice. Backtest results should be treated as exploratory until the data, execution, and calibration assumptions are independently reviewed.
 
-## Architecture
+## Main Modules
 
-- `trading_system/data.py`: dynamic top-500 universe, OHLCV ingestion, premarket snapshot, indicators, optional news
-- `trading_system/selection.py`: tunable scoring model for candidate selection
-- `trading_system/debate.py`: sequential bull/bear debates through Ollama, OpenAI, or Anthropic with strict JSON validation
-- `trading_system/decision.py`: final portfolio decision layer with normalized allocations
-- `trading_system/llm.py`: provider abstraction, Ollama logprob capture, and normalized token usage tracking
-- `trading_system/execution.py`: Alpaca paper-trading order planning, held-position evaluation, and submission safeguards
-- `trading_system/main.py`: end-to-end orchestrator, replay mode, mock mode, artifact writing, CLI summary
-- `trading_system/scheduler.py`: APScheduler-based daily runner
+- `trading_system/data.py`: universe, OHLCV, indicators, premarket data, data-quality checks
+- `trading_system/selection.py`: candidate scoring and ranking
+- `trading_system/debate.py`: bull/bear LLM debate generation
+- `trading_system/decision.py`: final decision JSON validation, calibration, allocation normalization
+- `trading_system/execution.py`: Alpaca paper order planning and safeguards
+- `trading_system/backtest_execution.py`: portfolio-style backtest execution simulation
+- `backtest_engine.py`: chronological backtest runner
+- `trading_system/dashboard.py`: local read-only dashboard
 
 ## Setup
 
-1. Create and activate a virtual environment.
-2. Install dependencies:
-
 ```bash
+python -m venv .venv
+. .venv/bin/activate
 pip install -r requirements.txt
+cp .env.example .env
 ```
 
-3. Copy `.env.example` to `.env` and fill in Alpaca paper credentials.
-4. Configure one LLM provider.
-
-Ollama:
+Fill in `.env` with Alpaca paper credentials and one LLM provider. The default provider is Ollama.
 
 ```bash
 ollama serve
@@ -35,192 +32,96 @@ ollama pull qwen3.5:4b
 ollama pull qwen3.5:9b
 ```
 
-OpenAI:
+Keep `EXECUTE_ORDERS=false` unless you intentionally want paper orders submitted.
 
-```bash
-export LLM_PROVIDER=openai
-export OPENAI_API_KEY=your_key_here
-export OPENAI_DEBATE_MODEL=your_openai_debate_model
-export OPENAI_DECISION_MODEL=your_openai_decision_model
-```
+## Common Commands
 
-Anthropic:
-
-```bash
-export LLM_PROVIDER=anthropic
-export ANTHROPIC_API_KEY=your_key_here
-export ANTHROPIC_DEBATE_MODEL=your_anthropic_debate_model
-export ANTHROPIC_DECISION_MODEL=your_anthropic_decision_model
-```
-
-5. Leave `EXECUTE_ORDERS=false` until you are ready to let the paper account submit orders.
-
-## Running
-
-Mock run with no external APIs:
+Mock run:
 
 ```bash
 python -m trading_system.main --mock
 ```
 
-Run with provider/API-key overrides for a single invocation:
-
-```bash
-python -m trading_system.main \
-  --llm-provider openai \
-  --openai-api-key your_key_here \
-  --llm-debate-model your_openai_debate_model \
-  --llm-decision-model your_openai_decision_model
-```
-
-Live paper run:
+Daily pipeline:
 
 ```bash
 python -m trading_system.main
 ```
 
-Optional news:
+Backtest:
 
 ```bash
-python -m trading_system.main --include-news
+python backtest_engine.py --start 2026-03-01 --end 2026-04-20
 ```
 
-Replay a prior run:
-
-```bash
-python -m trading_system.main --replay-run-id 20260414T123000Z
-```
-
-Regenerate the latest run report:
-
-```bash
-python -m trading_system.main --latest-report
-```
-
-Serve the live local dashboard:
+Dashboard:
 
 ```bash
 python -m trading_system.dashboard
 ```
 
-Then open `http://127.0.0.1:8765`. The dashboard is read-only and auto-refreshes run artifacts and the newest log tail.
-It also charts portfolio performance since the start of Alpaca portfolio history against `BENCHMARK_SYMBOL`, which defaults to `SPY`.
+Open `http://127.0.0.1:8765`.
 
-Send only the market-close Telegram summary:
-
-```bash
-python -m trading_system.main --market-close-summary
-```
-
-## Scheduler
-
-Run the built-in scheduler:
+Tests:
 
 ```bash
-python -m trading_system.scheduler
+python -m pytest -q
 ```
 
-Or schedule with cron for `8:30 AM`, `12:30 PM`, and `3:30 PM` ET on weekdays:
+## Configuration
 
-```cron
-30 8,12,15 * * 1-5 cd /home/matthew/devel/AI_trading && /path/to/venv/bin/python -m trading_system.main >> logs/cron.log 2>&1
-```
+Most behavior is controlled by `.env`. Important settings include:
 
-The pipeline checks the NYSE calendar and exits without trading on non-market days.
+- `CANDIDATE_COUNT`: number of selected symbols debated each day
+- `MIN_CONFIDENCE`: minimum calibrated confidence before action
+- `MIN_REWARD_RISK_RATIO`: minimum reward/risk for actionable trades
+- `MAX_SINGLE_TRADE_PCT`: default new-position cap
+- `CASH_RICH_TRADE_PCT`: larger cap when cash is abundant
+- `MAX_TOTAL_EXPOSURE`: portfolio exposure cap
+- `MAX_DAILY_LOSS_PCT`: daily loss kill switch
+- `INDEX_PROXY_SYMBOLS`: tradable index proxies, default `SPY,QQQ,DIA,IWM`
+- `EXECUTE_ORDERS`: must be `true` to submit paper orders
 
-The built-in scheduler uses `SCHEDULED_TIMES_ET`, which defaults to `08:30,12:30,15:30`.
-
-The market-close Telegram summary uses `BENCHMARK_SYMBOL` and runs at `MARKET_CLOSE_SUMMARY_HOUR_ET:MARKET_CLOSE_SUMMARY_MINUTE_ET`, which defaults to `20:00` for `SPY`.
-
-## Data Sources
-
-- Universe: `companiesmarketcap.com` U.S. market-cap rankings, fetched dynamically
-- Market data: Alpaca market data when credentials are present, with `yfinance` fallback
-- Optional news: `yfinance`
-- Execution and account state: `alpaca-py` paper trading
-
-## Safety Controls
-
-- Paper trading only
-- No hardcoded tickers
-- Configurable index proxy symbols added to the universe via `INDEX_PROXY_SYMBOLS`
-- Sequential debate execution, no threads
-- Confidence thresholding before execution
-- Market-data quality gates with per-symbol quarantine flags
-- Max single new trade capped at 1% of account equity by default
-- Marketable limit/bracket-limit order planning with ATR-derived stop and target levels
-- High-confidence long trades can raise the single-trade cap to 10% of cash only after Telegram approval
-- Open pending orders are reviewed before the market opens and can be cancelled if extended-hours price movement exceeds a configured threshold
-- Held-position signals: `buy_more`, `sell`, `hold`
-- Existing position and open-order checks
-- Max total exposure cap
-- Daily loss and per-position weight caps
-- Max per-trade risk budget based on ATR/price stop proxy
-- Shared request limiter capped at 100 external requests per minute
-- Fail-safe run termination on critical failures
+See `.env.example` for the full list.
 
 ## Artifacts
 
-Each run writes to `runs/<run_id>/`:
+Pipeline runs write to `runs/<run_id>/`. Backtests write to `backtests/<run_id>/`.
 
-- `universe.json`
+Important files:
+
 - `selected_symbols.json`
 - `debates.json`
 - `decisions.json`
 - `order_plans.json`
-- `held_position_signals.json`
 - `execution_results.json`
-- `llm_usage.json`
-- `report.json`
-- `report.html`
+- `backtest_report.json`
+- `report.json` / `report.html`
 - `summary.txt`
 
-Structured logs are written to `logs/<run_id>.log`.
+Logs are written under `logs/`. Cached market data is written under `.cache/`.
 
-Cached universe and symbol snapshots are written under `.cache/` to reduce repeated external calls and tolerate transient data-source failures.
+## Safety Controls
 
-## Index Proxies
+- Dry-run by default
+- Paper-trading Alpaca endpoint by default
+- Market-data quality flags
+- JSON schema validation for LLM outputs
+- Confidence thresholding and calibration
+- Max trade, exposure, weight, risk, and daily-loss caps
+- Existing-position and open-order checks
+- Optional Telegram approval for oversized high-confidence longs
 
-The system cannot submit an order for a raw market index, but it can trade liquid ETFs that track those indexes. By default the universe is extended with:
+## Backtests
 
-- `SPY` for the S&P 500
-- `QQQ` for the Nasdaq-100
-- `DIA` for the Dow Jones Industrial Average
-- `IWM` for the Russell 2000
+The repository includes one main completed backtest under:
 
-Override the default set with:
-
-```bash
-export INDEX_PROXY_SYMBOLS=SPY,QQQ,VTI
+```text
+backtests/20260426T040610Z/
 ```
 
-## Notes
+That run covers `2026-03-01` through `2026-04-20` and finished at approximately `+15.31%` equity return. Treat it as a test artifact, not proof of strategy robustness. Known caveats include current-universe bias risk, daily-close stop/target simulation, calibration assumptions, and LLM output variability.
 
-- `companiesmarketcap.com` parsing may require maintenance if the site changes its markup.
-- Intraday/premarket data availability depends on Yahoo Finance coverage.
-- Alpaca shorting support in paper mode can vary by symbol and account settings; the code gates shorts with `ALLOW_SHORTING`.
-- The system defaults to dry-run order behavior even in live mode unless `EXECUTE_ORDERS=true`.
-- Token usage is recorded for every LLM call and summarized in both `llm_usage.json` and `summary.txt`.
-- On Ollama, `/api/generate` supports `logprobs`; the final decision layer uses average output probability as a confidence cap before execution decisions are made.
-- Telegram receives an end-of-run token summary including input, output, total, and tokens-per-second rates.
-- Telegram can also send a daily end-of-after-hours summary comparing portfolio return to `SPY`.
-- Pending open orders are reviewed before `9:30 AM ET` using extended-hours prices; orders with moves above `PENDING_ORDER_REVIEW_MAX_GAP_PCT` are cancelled.
+## External Review
 
-## Telegram
-
-To send order summaries and approve oversized high-confidence long orders from Telegram, set:
-
-```bash
-export TELEGRAM_BOT_TOKEN=your_bot_token
-export TELEGRAM_CHAT_ID=your_chat_id
-export TELEGRAM_APPROVAL_TIMEOUT_SECONDS=300
-```
-
-Behavior:
-
-- After each submitted or dry-run order, the bot sends a summary message.
-- Standard new `long` orders can scale from the default `1%` cap up to `5%` of available cash when cash is at least `20%` of account equity.
-- For new `long` orders with confidence `>= 0.95`, the system can expand the cap from `1%` to `10%` of cash.
-- The larger cap is used only if you tap the Telegram `Approve` button before timeout.
-- Without approval, the order stays at the normal `MAX_SINGLE_TRADE_PCT` cap.
-- At the end of after-hours trading, the bot can send a daily summary comparing portfolio performance to `SPY`.
+`external_review/request.md` contains a short prompt for outside reviewers. The main questions are whether confidence accuracy, profitability, logging, backtest realism, and auditability can be improved.
