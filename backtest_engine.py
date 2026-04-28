@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import statistics
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
@@ -61,12 +62,136 @@ def build_backtest_report(
             ],
         },
         "performance": execution.get_summary(),
+        "confidence_analysis": build_confidence_analysis(execution.trades),
         "tax": execution.get_tax_summary(),
         "sizing_logs": execution.sizing_logs,
         "exit_adjustment_logs": execution.exit_adjustment_logs,
         "daily_history": daily_stats,
         "all_trades": [dataclass_to_dict(t) for t in execution.trades],
     }
+
+
+CONFIDENCE_BUCKETS = (
+    (0.50, 0.60),
+    (0.60, 0.70),
+    (0.70, 0.80),
+    (0.80, 0.90),
+    (0.90, 1.00),
+)
+
+
+def build_confidence_analysis(trades: list[BacktestTradeRecord]) -> dict:
+    rows = [_trade_confidence_row(trade) for trade in trades]
+    return {
+        **_summarize_confidence_rows(rows),
+        "buckets": {
+            _bucket_label(lower, upper): _summarize_confidence_rows(
+                [
+                    row
+                    for row in rows
+                    if row["confidence"] >= lower
+                    and (row["confidence"] < upper or (upper == 1.0 and row["confidence"] <= upper))
+                ]
+            )
+            for lower, upper in CONFIDENCE_BUCKETS
+        },
+        "correlations": {
+            "confidence_vs_net_pnl": _correlation(
+                [row["confidence"] for row in rows],
+                [row["net_pnl"] for row in rows],
+            ),
+            "confidence_vs_return_pct": _correlation(
+                [row["confidence"] for row in rows],
+                [row["return_pct"] for row in rows],
+            ),
+            "confidence_vs_win_loss": _correlation(
+                [row["confidence"] for row in rows],
+                [1.0 if row["net_pnl"] > 0 else 0.0 for row in rows],
+            ),
+            "confidence_vs_mfe_pct": _correlation(
+                [row["confidence"] for row in rows],
+                [row["mfe_pct"] for row in rows],
+            ),
+            "confidence_vs_mae_pct": _correlation(
+                [row["confidence"] for row in rows],
+                [row["mae_pct"] for row in rows],
+            ),
+        },
+    }
+
+
+def _trade_confidence_row(trade: BacktestTradeRecord) -> dict[str, float | str | None]:
+    notional = abs(trade.entry_price * trade.qty)
+    return_pct = trade.return_pct
+    if not return_pct and notional > 0:
+        return_pct = trade.net_pnl / notional
+    return {
+        "confidence": float(getattr(trade, "confidence", 0.0) or 0.0),
+        "allocation": float(getattr(trade, "allocation", 0.0) or 0.0),
+        "net_pnl": float(trade.net_pnl),
+        "return_pct": float(return_pct or 0.0),
+        "risk_normalized_return": float(getattr(trade, "risk_normalized_return", 0.0) or 0.0),
+        "mfe_pct": float(getattr(trade, "mfe_pct", 0.0) or 0.0),
+        "mae_pct": float(getattr(trade, "mae_pct", 0.0) or 0.0),
+        "exit_reason": trade.exit_reason,
+    }
+
+
+def _summarize_confidence_rows(rows: list[dict]) -> dict:
+    wins = [row for row in rows if row["net_pnl"] > 0]
+    losses = [row for row in rows if row["net_pnl"] < 0]
+    returns = [row["return_pct"] for row in rows]
+    gross_wins = sum(row["net_pnl"] for row in wins)
+    gross_losses = -sum(row["net_pnl"] for row in losses)
+    return {
+        "trade_count": len(rows),
+        "win_rate": _ratio(len(wins), len(rows)),
+        "average_return_pct": _mean(returns),
+        "median_return_pct": _median(returns),
+        "average_winner_pct": _mean([row["return_pct"] for row in wins]),
+        "average_loser_pct": _mean([row["return_pct"] for row in losses]),
+        "profit_factor": round(gross_wins / gross_losses, 4) if gross_losses else None if gross_wins else 0.0,
+        "stop_loss_rate": _ratio(
+            len([row for row in rows if row["exit_reason"] == "stop_loss"]),
+            len(rows),
+        ),
+        "average_mfe_pct": _mean([row["mfe_pct"] for row in rows]),
+        "average_mae_pct": _mean([row["mae_pct"] for row in rows]),
+        "average_risk_normalized_return": _mean(
+            [row["risk_normalized_return"] for row in rows]
+        ),
+    }
+
+
+def _bucket_label(lower: float, upper: float) -> str:
+    return f"{lower:.2f}-{upper:.2f}"
+
+
+def _ratio(numerator: int, denominator: int) -> float:
+    return round(numerator / denominator, 4) if denominator else 0.0
+
+
+def _mean(values: list[float]) -> float:
+    return round(sum(values) / len(values), 4) if values else 0.0
+
+
+def _median(values: list[float]) -> float:
+    return round(statistics.median(values), 4) if values else 0.0
+
+
+def _correlation(xs: list[float], ys: list[float]) -> float:
+    if len(xs) < 2 or len(xs) != len(ys):
+        return 0.0
+    x_mean = sum(xs) / len(xs)
+    y_mean = sum(ys) / len(ys)
+    x_diffs = [value - x_mean for value in xs]
+    y_diffs = [value - y_mean for value in ys]
+    x_var = sum(value * value for value in x_diffs)
+    y_var = sum(value * value for value in y_diffs)
+    if x_var <= 0 or y_var <= 0:
+        return 0.0
+    covariance = sum(x * y for x, y in zip(x_diffs, y_diffs))
+    return round(covariance / ((x_var * y_var) ** 0.5), 4)
 
 
 def build_backtest_skip_decision(symbol: str, reason: str) -> TradeDecision:

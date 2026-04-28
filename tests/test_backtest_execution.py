@@ -24,6 +24,8 @@ def test_backtest_execution_long_entry_and_exit():
     assert "AAPL" in engine.positions
     assert engine.positions["AAPL"].qty == 6
     assert engine.positions["AAPL"].entry_price == 151.5
+    assert engine.positions["AAPL"].confidence == 0.9
+    assert engine.positions["AAPL"].allocation == 0.1
     assert engine.cash == 10000.0 - 909.0
     
     # 2. Test Equity Update
@@ -42,6 +44,10 @@ def test_backtest_execution_long_entry_and_exit():
     assert "AAPL" not in engine.positions
     assert len(engine.trades) == 1
     assert engine.trades[0].exit_reason == "target_hit"
+    assert engine.trades[0].confidence == 0.9
+    assert engine.trades[0].allocation == 0.1
+    assert engine.trades[0].return_pct == 0.0574
+    assert engine.trades[0].risk_normalized_return == 0.0
     assert engine.cash == 10071.1
 
 def test_backtest_execution_short_stop_loss():

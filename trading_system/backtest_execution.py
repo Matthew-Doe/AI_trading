@@ -22,6 +22,8 @@ class BacktestPosition:
     sizing_reason: str = ""
     risk_notional: float = 0.0
     stop_distance: float = 0.0
+    confidence: float = 0.0
+    allocation: float = 0.0
 
 @dataclass
 class BacktestTradeRecord:
@@ -41,6 +43,10 @@ class BacktestTradeRecord:
     risk_notional: float = 0.0
     mfe_pct: float = 0.0
     mae_pct: float = 0.0
+    confidence: float = 0.0
+    allocation: float = 0.0
+    return_pct: float = 0.0
+    risk_normalized_return: float = 0.0
 
 class BacktestExecutionEngine:
     def __init__(
@@ -190,6 +196,8 @@ class BacktestExecutionEngine:
                 sizing_reason=sizing_reason,
                 risk_notional=risk_notional,
                 stop_distance=stop_distance,
+                confidence=dec.confidence,
+                allocation=dec.allocation or 0.0,
             )
             self.sizing_logs.append(
                 {
@@ -403,6 +411,13 @@ class BacktestExecutionEngine:
             risk_notional=pos.risk_notional,
             mfe_pct=self._mfe_pct(pos),
             mae_pct=self._mae_pct(pos),
+            confidence=pos.confidence,
+            allocation=pos.allocation,
+            return_pct=self._return_pct(pos=pos, net_pnl=gross_pnl - total_costs),
+            risk_normalized_return=self._risk_normalized_return(
+                net_pnl=gross_pnl - total_costs,
+                risk_notional=pos.risk_notional,
+            ),
         )
         self.trades.append(record)
         if record.net_pnl < 0 and self.wash_sale_cooldown_days:
@@ -445,6 +460,19 @@ class BacktestExecutionEngine:
         if pos.side == "long":
             return round(((pos.lowest_price or pos.entry_price) - pos.entry_price) / pos.entry_price, 4)
         return round((pos.entry_price - (pos.highest_price or pos.entry_price)) / pos.entry_price, 4)
+
+    @staticmethod
+    def _return_pct(*, pos: BacktestPosition, net_pnl: float) -> float:
+        notional = abs(pos.entry_price * pos.qty)
+        if notional <= 0:
+            return 0.0
+        return round(net_pnl / notional, 4)
+
+    @staticmethod
+    def _risk_normalized_return(*, net_pnl: float, risk_notional: float) -> float:
+        if risk_notional <= 0:
+            return 0.0
+        return round(net_pnl / risk_notional, 4)
 
     def get_tax_summary(self) -> dict[str, Any]:
         loss_sales = [
