@@ -284,6 +284,78 @@ def test_backtest_tax_summary_estimates_wash_sale_rebuy_loss_deferral():
     assert tax["wash_sale_disallowed_loss_estimate"] == 100.0
     assert tax["taxable_realized_pnl_estimate"] == 0.0
 
+
+def test_exit_counterfactuals_track_delayed_long_pl_after_stop_loss():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        wash_sale_cooldown_days=0,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=120.0,
+                invalidation_price=95.0,
+            )
+        ],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions([], {"AAPL": 90.0}, start + timedelta(days=1))
+    engine.process_decisions([], {"AAPL": 95.0}, start + timedelta(days=2))
+    engine.process_decisions([], {"AAPL": 105.0}, start + timedelta(days=3))
+    engine.process_decisions([], {"AAPL": 108.0}, start + timedelta(days=4))
+
+    analysis = engine.get_exit_counterfactuals_analysis()
+    stop_loss = analysis["by_exit_reason"]["stop_loss"]
+
+    assert stop_loss["hold_1"]["count"] == 1
+    assert stop_loss["hold_1"]["average_delayed_pnl"] == -50.0
+    assert stop_loss["hold_1"]["average_delta_vs_actual"] == 50.0
+    assert stop_loss["hold_1"]["recovery_rate"] == 1.0
+    assert stop_loss["hold_1"]["delayed_win_rate"] == 0.0
+    assert stop_loss["hold_3"]["average_delayed_pnl"] == 80.0
+    assert stop_loss["hold_5"]["incomplete_count"] == 1
+
+
+def test_exit_counterfactuals_track_delayed_short_pl_and_group_by_exit_reason():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        wash_sale_cooldown_days=0,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="TSLA",
+                action="short",
+                confidence=0.8,
+                allocation=0.1,
+                target_price=80.0,
+                invalidation_price=105.0,
+            )
+        ],
+        {"TSLA": 100.0},
+        start,
+    )
+    engine.process_decisions([], {"TSLA": 106.0}, start + timedelta(days=1))
+    engine.process_decisions([], {"TSLA": 102.0}, start + timedelta(days=2))
+
+    analysis = engine.get_exit_counterfactuals_analysis()
+    stop_loss = analysis["by_exit_reason"]["stop_loss"]
+
+    assert stop_loss["hold_1"]["count"] == 1
+    assert stop_loss["hold_1"]["average_delayed_pnl"] == -20.0
+    assert stop_loss["hold_1"]["average_delta_vs_actual"] == 40.0
+
 if __name__ == "__main__":
     test_backtest_execution_long_entry_and_exit()
     test_backtest_execution_short_stop_loss()

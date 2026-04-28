@@ -90,6 +90,39 @@ class TaxShadowTradeRecord:
     confidence: float = 0.0
     allocation: float = 0.0
 
+
+@dataclass
+class PendingExitCounterfactual:
+    id: int
+    symbol: str
+    side: str
+    entry_time: datetime
+    entry_price: float
+    exit_time: datetime
+    actual_exit_price: float
+    actual_exit_reason: str
+    qty: int
+    actual_net_pnl: float
+    costs: float
+    observations_seen: int = 0
+    completed_horizons: set[int] = field(default_factory=set)
+
+
+@dataclass
+class ExitCounterfactualRecord:
+    id: int
+    symbol: str
+    side: str
+    actual_exit_reason: str
+    horizon: int
+    actual_net_pnl: float
+    delayed_net_pnl: float
+    delta_vs_actual: float
+    delayed_win: bool
+    recovered: bool
+    observation_time: datetime
+    observation_price: float
+
 class BacktestExecutionEngine:
     def __init__(
         self, 
@@ -115,6 +148,10 @@ class BacktestExecutionEngine:
         self.tax_shadow_positions: dict[int, TaxShadowPosition] = {}
         self.tax_shadow_trades: list[TaxShadowTradeRecord] = []
         self._next_tax_shadow_id = 1
+        self.pending_exit_counterfactuals: dict[int, PendingExitCounterfactual] = {}
+        self.exit_counterfactual_records: list[ExitCounterfactualRecord] = []
+        self.exit_counterfactual_horizons = (1, 3, 5)
+        self._next_exit_counterfactual_id = 1
         self.sizing_logs: list[dict[str, Any]] = []
         self.exit_adjustment_logs: list[dict[str, Any]] = []
         self.market_data_service = market_data_service
@@ -142,6 +179,7 @@ class BacktestExecutionEngine:
     ):
         """Executes new decisions and checks existing positions for stops/targets."""
         
+        self._process_exit_counterfactuals(all_symbol_prices, current_time)
         self._process_tax_shadow_positions(decisions, all_symbol_prices, current_time)
 
         # 1. Manage Existing Positions (Check Stops/Targets)
@@ -476,10 +514,84 @@ class BacktestExecutionEngine:
             ),
         )
         self.trades.append(record)
+        self._start_exit_counterfactual(record)
         if record.net_pnl < 0 and self.wash_sale_cooldown_days:
             self.loss_cooldowns[pos.symbol] = exit_time + timedelta(
                 days=self.wash_sale_cooldown_days
             )
+
+    def _start_exit_counterfactual(self, trade: BacktestTradeRecord) -> None:
+        if trade.exit_time is None or trade.exit_price is None or trade.exit_reason is None:
+            return
+        counterfactual_id = self._next_exit_counterfactual_id
+        self._next_exit_counterfactual_id += 1
+        self.pending_exit_counterfactuals[counterfactual_id] = PendingExitCounterfactual(
+            id=counterfactual_id,
+            symbol=trade.symbol,
+            side=trade.side,
+            entry_time=trade.entry_time,
+            entry_price=trade.entry_price,
+            exit_time=trade.exit_time,
+            actual_exit_price=trade.exit_price,
+            actual_exit_reason=trade.exit_reason,
+            qty=trade.qty,
+            actual_net_pnl=trade.net_pnl,
+            costs=trade.costs,
+        )
+
+    def _process_exit_counterfactuals(
+        self,
+        all_symbol_prices: dict[str, MarketSnapshot],
+        current_time: datetime,
+    ) -> None:
+        to_remove: list[int] = []
+        for pending_id, pending in self.pending_exit_counterfactuals.items():
+            snapshot = all_symbol_prices.get(pending.symbol)
+            if snapshot is None:
+                continue
+            price = self._mark_price(snapshot, fallback=pending.actual_exit_price)
+            pending.observations_seen += 1
+            if pending.observations_seen in self.exit_counterfactual_horizons:
+                delayed_net_pnl = self._delayed_exit_net_pnl(pending, price)
+                delta = delayed_net_pnl - pending.actual_net_pnl
+                self.exit_counterfactual_records.append(
+                    ExitCounterfactualRecord(
+                        id=pending.id,
+                        symbol=pending.symbol,
+                        side=pending.side,
+                        actual_exit_reason=pending.actual_exit_reason,
+                        horizon=pending.observations_seen,
+                        actual_net_pnl=round(pending.actual_net_pnl, 2),
+                        delayed_net_pnl=round(delayed_net_pnl, 2),
+                        delta_vs_actual=round(delta, 2),
+                        delayed_win=delayed_net_pnl > 0,
+                        recovered=delta > 0,
+                        observation_time=current_time,
+                        observation_price=price,
+                    )
+                )
+                pending.completed_horizons.add(pending.observations_seen)
+            if pending.observations_seen >= max(self.exit_counterfactual_horizons):
+                to_remove.append(pending_id)
+
+        for pending_id in to_remove:
+            del self.pending_exit_counterfactuals[pending_id]
+
+    def _delayed_exit_net_pnl(
+        self,
+        pending: PendingExitCounterfactual,
+        price: float,
+    ) -> float:
+        fill_price = (
+            price * (1 - self.slippage_pct)
+            if pending.side == "long"
+            else price * (1 + self.slippage_pct)
+        )
+        if pending.side == "long":
+            gross_pnl = (fill_price - pending.entry_price) * pending.qty
+        else:
+            gross_pnl = (pending.entry_price - fill_price) * pending.qty
+        return gross_pnl - pending.costs
 
     def _process_tax_shadow_positions(
         self,
@@ -894,4 +1006,71 @@ class BacktestExecutionEngine:
             ),
             "closed_shadow_trades": [trade.__dict__ for trade in closed],
             "open_shadow_trades": [pos.__dict__ for pos in self.tax_shadow_positions.values()],
+        }
+
+    def get_exit_counterfactuals_analysis(self) -> dict[str, Any]:
+        by_reason: dict[str, dict[str, Any]] = {}
+        reasons = {
+            record.actual_exit_reason for record in self.exit_counterfactual_records
+        } | {
+            pending.actual_exit_reason
+            for pending in self.pending_exit_counterfactuals.values()
+        }
+        for reason in sorted(reasons):
+            by_reason[reason] = {
+                f"hold_{horizon}": self._summarize_exit_counterfactual_group(
+                    reason=reason,
+                    horizon=horizon,
+                )
+                for horizon in self.exit_counterfactual_horizons
+            }
+        return {
+            "horizons": list(self.exit_counterfactual_horizons),
+            "completed_count": len(self.exit_counterfactual_records),
+            "pending_count": len(self.pending_exit_counterfactuals),
+            "by_exit_reason": by_reason,
+            "records": [record.__dict__ for record in self.exit_counterfactual_records],
+        }
+
+    def _summarize_exit_counterfactual_group(
+        self,
+        *,
+        reason: str,
+        horizon: int,
+    ) -> dict[str, Any]:
+        records = [
+            record
+            for record in self.exit_counterfactual_records
+            if record.actual_exit_reason == reason and record.horizon == horizon
+        ]
+        incomplete = [
+            pending
+            for pending in self.pending_exit_counterfactuals.values()
+            if pending.actual_exit_reason == reason
+            and pending.observations_seen < horizon
+            and horizon not in pending.completed_horizons
+        ]
+        return {
+            "count": len(records),
+            "incomplete_count": len(incomplete),
+            "average_delayed_pnl": (
+                round(sum(record.delayed_net_pnl for record in records) / len(records), 2)
+                if records
+                else 0.0
+            ),
+            "average_delta_vs_actual": (
+                round(sum(record.delta_vs_actual for record in records) / len(records), 2)
+                if records
+                else 0.0
+            ),
+            "recovery_rate": (
+                round(sum(1 for record in records if record.recovered) / len(records), 4)
+                if records
+                else 0.0
+            ),
+            "delayed_win_rate": (
+                round(sum(1 for record in records if record.delayed_win) / len(records), 4)
+                if records
+                else 0.0
+            ),
         }
