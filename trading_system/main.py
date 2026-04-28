@@ -154,6 +154,8 @@ def run_pipeline(config: TradingConfig, args: argparse.Namespace) -> int:
                 write_json(run_path / "held_position_signals.json", held_position_signals)
                 write_json(run_path / "order_plans.json", order_plans)
                 execution_results = execution.submit_orders(order_plans)
+                write_json(run_path / "tax_loss_cooldowns.json", execution.get_tax_state_snapshot())
+                write_json(run_path / "tax_blocked_orders.json", execution.tax_blocked_orders)
             else:
                 logger.warning(
                     "Alpaca credentials not configured. Skipping execution stage after decisioning."
@@ -161,6 +163,8 @@ def run_pipeline(config: TradingConfig, args: argparse.Namespace) -> int:
                 write_json(run_path / "pending_order_reviews.json", pending_order_reviews)
                 write_json(run_path / "held_position_signals.json", held_position_signals)
                 write_json(run_path / "order_plans.json", order_plans)
+                write_json(run_path / "tax_loss_cooldowns.json", {"cooldowns": {}})
+                write_json(run_path / "tax_blocked_orders.json", [])
         else:
             order_plans = build_mock_order_plans(decisions, selected_symbols)
             write_json(run_path / "pending_order_reviews.json", pending_order_reviews)
@@ -480,6 +484,9 @@ def order_plan_from_dict(payload: dict) -> OrderPlan:
         take_profit_price=payload.get("take_profit_price"),
         risk_notional=payload.get("risk_notional", 0.0),
         order_style=payload.get("order_style", "market"),
+        tax_loss_exit=payload.get("tax_loss_exit", False),
+        tax_cooldown_until=payload.get("tax_cooldown_until"),
+        estimated_tax_loss=payload.get("estimated_tax_loss"),
     )
 
 

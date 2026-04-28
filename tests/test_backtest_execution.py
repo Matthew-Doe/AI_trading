@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 from trading_system.backtest_execution import BacktestExecutionEngine, BacktestPosition
 from trading_system.models import IndicatorSnapshot, PremarketSnapshot, SymbolMarketData, TradeDecision
 
@@ -41,7 +41,7 @@ def test_backtest_execution_long_entry_and_exit():
     
     assert "AAPL" not in engine.positions
     assert len(engine.trades) == 1
-    assert engine.trades[0].exit_reason == "take_profit"
+    assert engine.trades[0].exit_reason == "target_hit"
     assert engine.cash == 10071.1
 
 def test_backtest_execution_short_stop_loss():
@@ -108,6 +108,114 @@ def test_backtest_execution_uses_simulated_open_for_new_entries():
     )
 
     assert engine.positions["AAPL"].entry_price == 153.52
+
+
+def test_backtest_execution_blocks_rebuy_after_loss_for_wash_sale_cooldown():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        wash_sale_cooldown_days=31,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=120.0,
+                invalidation_price=95.0,
+            )
+        ],
+        {"AAPL": 100.0},
+        start,
+    )
+
+    next_day = start + timedelta(days=1)
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=110.0,
+                invalidation_price=80.0,
+            )
+        ],
+        {"AAPL": 90.0},
+        next_day,
+    )
+
+    assert "AAPL" not in engine.positions
+    assert len(engine.tax_blocked_decisions) == 1
+    assert engine.tax_blocked_decisions[0]["reason"] == "wash_sale_loss_cooldown"
+
+    after_cooldown = next_day + timedelta(days=31)
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=120.0,
+                invalidation_price=80.0,
+            )
+        ],
+        {"AAPL": 91.0},
+        after_cooldown,
+    )
+
+    assert "AAPL" in engine.positions
+
+
+def test_backtest_tax_summary_estimates_wash_sale_rebuy_loss_deferral():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        wash_sale_cooldown_days=0,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=120.0,
+                invalidation_price=95.0,
+            )
+        ],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions([], {"AAPL": 90.0}, start + timedelta(days=1))
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=120.0,
+                invalidation_price=80.0,
+            )
+        ],
+        {"AAPL": 91.0},
+        start + timedelta(days=2),
+    )
+
+    tax = engine.get_tax_summary()
+
+    assert tax["loss_sale_count"] == 1
+    assert tax["wash_sale_candidate_count"] == 1
+    assert tax["wash_sale_disallowed_loss_estimate"] == 100.0
+    assert tax["taxable_realized_pnl_estimate"] == 0.0
 
 if __name__ == "__main__":
     test_backtest_execution_long_entry_and_exit()

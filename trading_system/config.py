@@ -117,6 +117,13 @@ class TradingConfig:
     max_slippage_pct: float = float(os.getenv("MAX_SLIPPAGE_PCT", "0.01"))
     min_reward_risk_ratio: float = float(os.getenv("MIN_REWARD_RISK_RATIO", "1.5"))
     buy_more_threshold: float = float(os.getenv("BUY_MORE_THRESHOLD", "0.05"))
+    tax_loss_cooldown_days: int = int(os.getenv("TAX_LOSS_COOLDOWN_DAYS", "31"))
+    backtest_wash_sale_cooldown_days: int = int(
+        os.getenv("BACKTEST_WASH_SALE_COOLDOWN_DAYS", "31")
+    )
+    backtest_min_thesis_days: int = int(os.getenv("BACKTEST_MIN_THESIS_DAYS", "2"))
+    backtest_breakeven_after_days: int = int(os.getenv("BACKTEST_BREAKEVEN_AFTER_DAYS", "2"))
+    backtest_max_hold_days: int = int(os.getenv("BACKTEST_MAX_HOLD_DAYS", "7"))
     execute_orders: bool = os.getenv("EXECUTE_ORDERS", "false").lower() == "true"
     allow_shorting: bool = os.getenv("ALLOW_SHORTING", "true").lower() == "true"
     telegram_bot_token: str = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()

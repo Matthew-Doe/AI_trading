@@ -9,12 +9,13 @@ import pandas_market_calendars as mcal
 
 from trading_system.config import TradingConfig
 from trading_system.data import MarketDataService
-from trading_system.debate import OllamaDebateEngine
-from trading_system.decision import DecisionEngine
+from trading_system.debate import DebateError, OllamaDebateEngine
+from trading_system.decision import DecisionEngine, DecisionError
 from trading_system.selection import CandidateSelector
 from trading_system.utils import ensure_dir, get_logger, write_json, dataclass_to_dict
 from trading_system.backtest_execution import BacktestExecutionEngine, BacktestTradeRecord
 from trading_system.confidence_calibration import ConfidenceCalibrator
+from trading_system.models import TradeDecision
 
 def get_config_hash(config: TradingConfig) -> str:
     data = f"{config.llm_debate_model}-{config.llm_decision_model}-{config.candidate_count}"
@@ -43,17 +44,39 @@ def build_backtest_report(
             "status": status,
             "universe_source": "current_companiesmarketcap_snapshot",
             "entry_price_rule": "simulated_open_or_close_with_slippage",
-            "exit_price_rule": "daily_close_stop_target_or_time_expiry",
+            "exit_price_rule": "daily_close_stop_target_or_staged_thesis_exit",
+            "sizing_rule": "live_style_risk_allocation_cash_and_position_caps",
+            "staged_exit": {
+                "min_thesis_days": config.backtest_min_thesis_days,
+                "breakeven_after_days": config.backtest_breakeven_after_days,
+                "max_hold_days": config.backtest_max_hold_days,
+            },
+            "tax_rule": "wash_sale_loss_cooldown_and_same_symbol_rebuy_estimate",
+            "wash_sale_cooldown_days": execution.wash_sale_cooldown_days,
             "known_limitations": [
                 "Universe membership is not point-in-time unless dated universe snapshots were preloaded.",
                 "Stops and targets are evaluated on daily close snapshots, not intraday high/low bars.",
                 "Short accounting is a conservative cash-reserved approximation, not broker margin simulation.",
+                "Tax estimates are same-symbol wash-sale approximations, not broker tax-lot accounting.",
             ],
         },
         "performance": execution.get_summary(),
+        "tax": execution.get_tax_summary(),
+        "sizing_logs": execution.sizing_logs,
+        "exit_adjustment_logs": execution.exit_adjustment_logs,
         "daily_history": daily_stats,
         "all_trades": [dataclass_to_dict(t) for t in execution.trades],
     }
+
+
+def build_backtest_skip_decision(symbol: str, reason: str) -> TradeDecision:
+    return TradeDecision(
+        symbol=symbol,
+        action="skip",
+        confidence=0.0,
+        allocation=0.0,
+        catalyst=reason,
+    )
 
 def run_backtest():
     parser = argparse.ArgumentParser()
@@ -70,7 +93,12 @@ def run_backtest():
     market_data = MarketDataService(config, logger)
     selector = CandidateSelector(logger)
     
-    execution = BacktestExecutionEngine(initial_cash=args.initial_cash, market_data_service=market_data)
+    execution = BacktestExecutionEngine(
+        initial_cash=args.initial_cash,
+        wash_sale_cooldown_days=config.backtest_wash_sale_cooldown_days,
+        config=config,
+        market_data_service=market_data,
+    )
     
     backtest_root = ensure_dir(Path("backtests") / datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"))
     
@@ -112,13 +140,53 @@ def run_backtest():
             # 3. Run Debates
             debate_engine = OllamaDebateEngine(config, logger)
             debates = []
+            forced_skip_decisions: list[TradeDecision] = []
+            debate_failures: list[dict[str, str]] = []
             for symbol_data in selected:
-                debates.append(debate_engine.run_debate_for_symbol(symbol_data))
+                try:
+                    debates.append(debate_engine.run_debate_for_symbol(symbol_data))
+                except DebateError as exc:
+                    logger.warning(
+                        "Skipping %s in backtest after debate JSON failure: %s",
+                        symbol_data.symbol,
+                        exc,
+                    )
+                    debate_failures.append(
+                        {
+                            "symbol": symbol_data.symbol,
+                            "error": str(exc),
+                        }
+                    )
+                    forced_skip_decisions.append(
+                        build_backtest_skip_decision(
+                            symbol_data.symbol,
+                            "backtest_debate_failure_default_skip",
+                        )
+                    )
             write_json(day_path / "debates.json", debates)
+            write_json(day_path / "debate_failures.json", debate_failures)
 
             # 4. Run Decision
             decision_engine = DecisionEngine(config, logger, confidence_calibrator=calibrator)
-            decisions = decision_engine.decide(debates)
+            if debates:
+                try:
+                    decisions = decision_engine.decide(debates)
+                except DecisionError as exc:
+                    logger.warning(
+                        "Defaulting %s backtest decisions to skip after decision JSON failure: %s",
+                        len(debates),
+                        exc,
+                    )
+                    decisions = [
+                        build_backtest_skip_decision(
+                            debate.symbol,
+                            "backtest_decision_failure_default_skip",
+                        )
+                        for debate in debates
+                    ]
+            else:
+                decisions = []
+            decisions.extend(forced_skip_decisions)
             write_json(day_path / "decisions.json", decisions)
 
             # 5. Realistic Execution

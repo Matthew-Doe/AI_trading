@@ -95,6 +95,9 @@ class OrderPlan:
     take_profit_price: float | None = None
     risk_notional: float = 0.0
     order_style: str = "market"
+    tax_loss_exit: bool = False
+    tax_cooldown_until: str | None = None
+    estimated_tax_loss: float | None = None
 
 
 @dataclass(slots=True)
@@ -108,6 +111,9 @@ class HeldPositionSignal:
     delta_qty: int
     reason: str
     max_trade_pct: float = 0.0
+    tax_loss_exit: bool = False
+    tax_cooldown_until: str | None = None
+    estimated_tax_loss: float | None = None
 
 
 @dataclass(slots=True)

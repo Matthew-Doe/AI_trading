@@ -74,7 +74,7 @@ class OllamaDebateEngine:
             raw = self._llm_generate(
                 model=self.config.get_debate_model(),
                 prompt=current_prompt,
-                temperature=self.config.debate_temperature if attempt == 0 else 0.0,
+                temperature=0.0,
                 stage="debate",
                 symbol=symbol,
                 role=role,

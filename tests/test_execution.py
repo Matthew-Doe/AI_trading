@@ -4,7 +4,8 @@ from types import SimpleNamespace
 from trading_system.config import TradingConfig
 from trading_system.execution import AlpacaExecutionEngine
 from trading_system.main import load_mock_universe
-from trading_system.models import TradeDecision
+from trading_system.models import OrderPlan, TradeDecision
+from trading_system.tax_state import TaxLossCooldownState
 
 
 class DummyLogger:
@@ -39,6 +40,9 @@ class FakeTradingClient:
 
     def cancel_order_by_id(self, order_id):
         self.cancelled_order_ids.append(order_id)
+
+    def submit_order(self, order_data):
+        return SimpleNamespace(id="submitted-1", status="submitted")
 
 
 def test_evaluate_held_positions_returns_three_signal_types():
@@ -75,6 +79,8 @@ def test_evaluate_held_positions_avoids_selling_long_at_loss():
 
     assert len(signals) == 1
     assert signals[0].signal == "sell"
+    assert signals[0].tax_loss_exit is True
+    assert signals[0].estimated_tax_loss == 200.0
     assert "active conviction" in signals[0].reason
 
 
@@ -342,3 +348,69 @@ def test_submit_orders_records_skip_when_open_order_exists():
     assert len(results) == 1
     assert results[0]["status"] == "skipped_open_order"
     assert "Open order already exists" in results[0]["reason"]
+
+
+def test_live_tax_loss_cooldown_blocks_new_long_entries(tmp_path):
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        run_dir=tmp_path,
+        min_confidence=0.6,
+        max_single_trade_pct=0.20,
+        tax_loss_cooldown_days=31,
+    )
+    engine.logger = DummyLogger()
+    engine.client = FakeTradingClient(equity="100000", buying_power="100000", cash="100000")
+    engine.telegram = FakeTelegramNotifier(approved=False)
+    engine.run_id = "test-run"
+    engine.tax_state = TaxLossCooldownState(tmp_path / "tax_loss_cooldowns.json")
+    engine.tax_blocked_orders = []
+    engine.tax_state.record_loss_sale(symbol="AAPL", cooldown_days=31, estimated_loss=123.45)
+
+    selected = load_mock_universe()
+    decisions = [TradeDecision(symbol="AAPL", action="long", confidence=0.85, allocation=0.10)]
+
+    plans = engine.build_order_plans(decisions, selected)
+
+    assert plans == []
+    assert engine.tax_blocked_orders == [
+        {
+            "symbol": "AAPL",
+            "blocked_until": engine.tax_state.cooldowns["AAPL"]["blocked_until"],
+            "reason": "tax_loss_cooldown",
+        }
+    ]
+
+
+def test_submit_orders_records_live_tax_loss_cooldown(tmp_path):
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        run_dir=tmp_path,
+        execute_orders=True,
+        tax_loss_cooldown_days=31,
+    )
+    engine.logger = DummyLogger()
+    engine.client = FakeTradingClient()
+    engine.telegram = FakeTelegramNotifier(approved=False)
+    engine.run_id = "test-run"
+    engine.tax_state = TaxLossCooldownState(tmp_path / "tax_loss_cooldowns.json")
+    engine.tax_blocked_orders = []
+
+    results = engine.submit_orders(
+        [
+            OrderPlan(
+                symbol="AAPL",
+                side="sell",
+                qty=10,
+                notional=1000.0,
+                confidence=0.7,
+                allocation=0.0,
+                reason="test loss sale",
+                tax_loss_exit=True,
+                estimated_tax_loss=200.0,
+            )
+        ]
+    )
+
+    assert results[0]["status"] == "submitted"
+    assert results[0]["tax_loss_cooldown"]["symbol"] == "AAPL"
+    assert engine.tax_state.is_blocked("AAPL")

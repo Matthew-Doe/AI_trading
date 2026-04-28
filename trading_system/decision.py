@@ -53,7 +53,7 @@ class DecisionEngine:
         for attempt in range(self.config.ollama_retries):
             raw = self._ollama_generate(
                 prompt=current_prompt,
-                temperature=self.config.decision_temperature if attempt == 0 else 0.0,
+                temperature=0.0,
             )
             try:
                 payload = self._extract_json(raw)
@@ -384,7 +384,7 @@ class DecisionEngine:
         for attempt in range(self.config.ollama_retries):
             raw = self._ollama_generate(
                 prompt=current_prompt,
-                temperature=self.config.decision_temperature if attempt == 0 else 0.0,
+                temperature=0.0,
             )
             try:
                 payload = self._extract_json(raw)

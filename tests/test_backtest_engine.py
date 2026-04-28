@@ -25,5 +25,10 @@ def test_build_backtest_report_documents_assumptions_and_limitations(tmp_path):
     metadata = report["metadata"]
     assert metadata["universe_source"] == "current_companiesmarketcap_snapshot"
     assert metadata["entry_price_rule"] == "simulated_open_or_close_with_slippage"
-    assert metadata["exit_price_rule"] == "daily_close_stop_target_or_time_expiry"
+    assert metadata["exit_price_rule"] == "daily_close_stop_target_or_staged_thesis_exit"
+    assert metadata["sizing_rule"] == "live_style_risk_allocation_cash_and_position_caps"
+    assert metadata["staged_exit"]["max_hold_days"] == 7
+    assert metadata["tax_rule"] == "wash_sale_loss_cooldown_and_same_symbol_rebuy_estimate"
+    assert metadata["wash_sale_cooldown_days"] == 31
     assert "not point-in-time" in metadata["known_limitations"][0]
+    assert report["tax"]["wash_sale_cooldown_days"] == 31

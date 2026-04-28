@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import math
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from typing import Iterable
 from zoneinfo import ZoneInfo
 
@@ -24,6 +24,7 @@ from trading_system.models import (
     SymbolMarketData,
     TradeDecision,
 )
+from trading_system.tax_state import TaxLossCooldownState
 from trading_system.telegram import TelegramNotifier
 
 
@@ -43,6 +44,8 @@ class AlpacaExecutionEngine:
             url_override=config.alpaca_paper_base_url,
         )
         self.telegram = TelegramNotifier(config, logger)
+        self.tax_state = TaxLossCooldownState(config.run_dir / "tax_loss_cooldowns.json")
+        self.tax_blocked_orders: list[dict[str, object]] = []
 
     def _standard_trade_cap(
         self,
@@ -96,6 +99,8 @@ class AlpacaExecutionEngine:
         for decision in actionables:
             if decision.symbol in open_positions:
                 self.logger.info("Skipping %s because a position already exists.", decision.symbol)
+                continue
+            if decision.action == "long" and self._is_tax_loss_blocked(decision.symbol):
                 continue
             if decision.action == "short" and not self.config.allow_shorting:
                 self.logger.info("Skipping %s short because shorting is disabled.", decision.symbol)
@@ -345,6 +350,9 @@ class AlpacaExecutionEngine:
             target_qty = current_qty
             reason = "No stronger action identified."
             max_trade_pct = self.config.max_single_trade_pct
+            tax_loss_exit = False
+            estimated_tax_loss = None
+            tax_cooldown_until = None
 
             if market_data is None or decision is None or decision.action == "skip":
                 signal = "sell"
@@ -384,6 +392,17 @@ class AlpacaExecutionEngine:
                 confidence = decision.confidence if decision else 0.5
                 reason = "Existing position remains aligned with current model conviction."
 
+            if signal == "sell" and side == "long" and self._would_sell_long_at_loss(position):
+                tax_loss_exit = True
+                estimated_tax_loss = self._position_unrealized_loss(position)
+                tax_cooldown_until = (
+                    datetime.now(UTC) + timedelta(days=max(0, self.config.tax_loss_cooldown_days))
+                ).isoformat()
+                reason = (
+                    f"{reason} Tax note: sale is expected to realize a loss; "
+                    f"future same-symbol long entries will be blocked until {tax_cooldown_until}."
+                )
+
             signals.append(
                 HeldPositionSignal(
                     symbol=symbol,
@@ -395,6 +414,9 @@ class AlpacaExecutionEngine:
                     delta_qty=target_qty - current_qty,
                     reason=reason,
                     max_trade_pct=max_trade_pct,
+                    tax_loss_exit=tax_loss_exit,
+                    tax_cooldown_until=tax_cooldown_until,
+                    estimated_tax_loss=estimated_tax_loss,
                 )
             )
 
@@ -422,6 +444,29 @@ class AlpacaExecutionEngine:
             except (TypeError, ValueError):
                 return False
 
+    @staticmethod
+    def _position_unrealized_loss(position) -> float | None:
+        try:
+            qty = abs(float(position.qty))
+            market_value = abs(float(position.market_value))
+            avg_entry_price = float(getattr(position, "avg_entry_price", 0.0) or 0.0)
+            if qty <= 0 or avg_entry_price <= 0:
+                unrealized_pl = getattr(position, "unrealized_pl", None)
+                if unrealized_pl is None:
+                    return None
+                return abs(min(0.0, float(unrealized_pl)))
+            current_price = market_value / qty
+            loss = (avg_entry_price - current_price) * qty
+            return round(loss, 2) if loss > 0 else None
+        except (TypeError, ValueError, ZeroDivisionError):
+            unrealized_pl = getattr(position, "unrealized_pl", None)
+            if unrealized_pl is None:
+                return None
+            try:
+                return abs(min(0.0, float(unrealized_pl)))
+            except (TypeError, ValueError):
+                return None
+
     def build_held_position_order_plans(
         self,
         held_signals: list[HeldPositionSignal],
@@ -439,6 +484,8 @@ class AlpacaExecutionEngine:
             if qty <= 0:
                 continue
             if signal.signal == "buy_more":
+                if signal.current_side == "long" and self._is_tax_loss_blocked(signal.symbol):
+                    continue
                 side = "buy_more" if signal.current_side == "long" else "sell"
             else:
                 side = "sell" if signal.current_side == "long" else "buy_more"
@@ -453,6 +500,9 @@ class AlpacaExecutionEngine:
                     reason=signal.reason,
                     max_trade_pct=signal.max_trade_pct,
                     order_style=self.config.order_style,
+                    tax_loss_exit=signal.tax_loss_exit,
+                    tax_cooldown_until=signal.tax_cooldown_until,
+                    estimated_tax_loss=signal.estimated_tax_loss,
                 )
             )
         return plans
@@ -514,9 +564,56 @@ class AlpacaExecutionEngine:
                 }
                 self.logger.info("Dry-run order for %s qty=%s side=%s", plan.symbol, plan.qty, plan.side)
             results.append(payload)
+            if (
+                self.config.execute_orders
+                and getattr(plan, "tax_loss_exit", False)
+                and payload.get("status") not in {"rejected", "canceled"}
+            ):
+                entry = self.tax_state.record_loss_sale(
+                    symbol=plan.symbol,
+                    cooldown_days=self.config.tax_loss_cooldown_days,
+                    estimated_loss=plan.estimated_tax_loss,
+                    source="live_order_submission",
+                    notes=f"run_id={self.run_id} side={plan.side} qty={plan.qty}",
+                )
+                payload["tax_loss_cooldown"] = entry
+                self.logger.info(
+                    "Recorded tax-loss cooldown for %s until %s",
+                    plan.symbol,
+                    entry["blocked_until"],
+                )
             self.telegram.send_trade_summary(run_id=self.run_id, order_plan=plan, payload=payload)
 
         return results
+
+    def _is_tax_loss_blocked(self, symbol: str) -> bool:
+        tax_state = getattr(self, "tax_state", None)
+        if tax_state is None or self.config.tax_loss_cooldown_days <= 0:
+            return False
+        if not tax_state.is_blocked(symbol):
+            return False
+        if not hasattr(self, "tax_blocked_orders"):
+            self.tax_blocked_orders = []
+        blocked_until = tax_state.cooldowns[symbol.upper()]["blocked_until"]
+        self.logger.info(
+            "Skipping %s because tax-loss cooldown is active until %s.",
+            symbol,
+            blocked_until,
+        )
+        self.tax_blocked_orders.append(
+            {
+                "symbol": symbol,
+                "blocked_until": blocked_until,
+                "reason": "tax_loss_cooldown",
+            }
+        )
+        return True
+
+    def get_tax_state_snapshot(self) -> dict[str, object]:
+        tax_state = getattr(self, "tax_state", None)
+        if tax_state is None:
+            return {"cooldowns": {}}
+        return tax_state.snapshot()
 
     def _build_order_request(self, plan: OrderPlan, side: OrderSide):
         if (
