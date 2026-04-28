@@ -63,6 +63,45 @@ def test_trading_config_defaults_confidence_actionable_move_pct(monkeypatch):
     assert config.confidence_actionable_move_pct == 0.02
 
 
+def test_behavior_experiment_flags_default_disabled(monkeypatch):
+    for name in (
+        "ENABLE_TAX_LOSS_SIZE_COOLDOWN_TIERS",
+        "ENABLE_TAX_ADJUSTED_EV_REENTRY",
+        "ENABLE_PROFIT_PROTECTION_BANDS",
+        "ENABLE_PARTIAL_PROFIT_TAKING",
+        "ENABLE_CONDITIONAL_HOLD_EXTENSION",
+        "ENABLE_STRICT_THESIS_FAILURE_REASONS",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+    config = _fresh_trading_config()()
+
+    assert config.enable_tax_loss_size_cooldown_tiers is False
+    assert config.enable_tax_adjusted_ev_reentry is False
+    assert config.enable_profit_protection_bands is False
+    assert config.enable_partial_profit_taking is False
+    assert config.enable_conditional_hold_extension is False
+    assert config.enable_strict_thesis_failure_reasons is False
+
+
+def test_behavior_experiment_flags_read_from_environment(monkeypatch):
+    monkeypatch.setenv("ENABLE_TAX_LOSS_SIZE_COOLDOWN_TIERS", "true")
+    monkeypatch.setenv("ENABLE_TAX_ADJUSTED_EV_REENTRY", "true")
+    monkeypatch.setenv("ENABLE_PROFIT_PROTECTION_BANDS", "true")
+    monkeypatch.setenv("ENABLE_PARTIAL_PROFIT_TAKING", "true")
+    monkeypatch.setenv("ENABLE_CONDITIONAL_HOLD_EXTENSION", "true")
+    monkeypatch.setenv("ENABLE_STRICT_THESIS_FAILURE_REASONS", "true")
+
+    config = _fresh_trading_config()()
+
+    assert config.enable_tax_loss_size_cooldown_tiers is True
+    assert config.enable_tax_adjusted_ev_reentry is True
+    assert config.enable_profit_protection_bands is True
+    assert config.enable_partial_profit_taking is True
+    assert config.enable_conditional_hold_extension is True
+    assert config.enable_strict_thesis_failure_reasons is True
+
+
 def test_fetch_forward_close_window_uses_next_three_trading_days():
     config = TradingConfig()
     service = MarketDataService.__new__(MarketDataService)

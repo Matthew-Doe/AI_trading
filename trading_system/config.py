@@ -19,6 +19,13 @@ def _parse_symbol_list(value: str, default: tuple[str, ...]) -> tuple[str, ...]:
     return tuple(items) if items else default
 
 
+def _parse_bool_env(name: str, default: bool = False) -> bool:
+    value = os.getenv(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
+
+
 def _parse_schedule_times(
     value: str | None, fallback_hour: int, fallback_minute: int
 ) -> tuple[tuple[int, int], ...]:
@@ -124,6 +131,24 @@ class TradingConfig:
     backtest_min_thesis_days: int = int(os.getenv("BACKTEST_MIN_THESIS_DAYS", "2"))
     backtest_breakeven_after_days: int = int(os.getenv("BACKTEST_BREAKEVEN_AFTER_DAYS", "2"))
     backtest_max_hold_days: int = int(os.getenv("BACKTEST_MAX_HOLD_DAYS", "7"))
+    enable_tax_loss_size_cooldown_tiers: bool = _parse_bool_env(
+        "ENABLE_TAX_LOSS_SIZE_COOLDOWN_TIERS"
+    )
+    enable_tax_adjusted_ev_reentry: bool = _parse_bool_env(
+        "ENABLE_TAX_ADJUSTED_EV_REENTRY"
+    )
+    enable_profit_protection_bands: bool = _parse_bool_env(
+        "ENABLE_PROFIT_PROTECTION_BANDS"
+    )
+    enable_partial_profit_taking: bool = _parse_bool_env(
+        "ENABLE_PARTIAL_PROFIT_TAKING"
+    )
+    enable_conditional_hold_extension: bool = _parse_bool_env(
+        "ENABLE_CONDITIONAL_HOLD_EXTENSION"
+    )
+    enable_strict_thesis_failure_reasons: bool = _parse_bool_env(
+        "ENABLE_STRICT_THESIS_FAILURE_REASONS"
+    )
     execute_orders: bool = os.getenv("EXECUTE_ORDERS", "false").lower() == "true"
     allow_shorting: bool = os.getenv("ALLOW_SHORTING", "true").lower() == "true"
     telegram_bot_token: str = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
