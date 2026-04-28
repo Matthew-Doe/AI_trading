@@ -145,6 +145,9 @@ def test_validate_and_normalize_caps_confidence_with_generation_probability():
 
     assert decisions[0].action == "skip"
     assert decisions[0].confidence == 0.55
+    assert decisions[0].raw_confidence == 0.9
+    assert decisions[0].calibrated_confidence == 0.55
+    assert decisions[0].confidence_cap_reason == "generation_probability_cap"
 
 
 def test_generate_valid_single_decision_json_accepts_decisions_wrapper():
@@ -269,3 +272,38 @@ def test_validate_and_normalize_keeps_structured_trade_fields():
     assert decisions[0].target_price == 110.0
     assert decisions[0].invalidation_price == 96.0
     assert decisions[0].reward_risk_ratio == 2.5
+    assert decisions[0].raw_confidence == 0.9
+    assert decisions[0].calibrated_confidence == 0.9
+    assert decisions[0].estimated_win_probability is None
+
+
+def test_validate_and_normalize_keeps_optional_confidence_audit_fields():
+    config = TradingConfig(min_confidence=0.6, min_reward_risk_ratio=1.5)
+    engine = DecisionEngine(config, DummyLogger(), confidence_calibrator=IdentityCalibrator())
+    payload = {
+        "decisions": [
+            {
+                "symbol": "AAA",
+                "action": "long",
+                "confidence": 0.74,
+                "allocation": 0.5,
+                "estimated_win_probability": 0.56,
+                "expected_upside_pct": 6.0,
+                "expected_downside_pct": 2.5,
+                "expected_value_pct": 2.26,
+                "risk_reward": 2.4,
+                "evidence_count": 4,
+                "confidence_cap_reason": "weak downside evidence",
+            },
+        ]
+    }
+
+    decisions = engine._validate_and_normalize(payload)
+
+    assert decisions[0].estimated_win_probability == 0.56
+    assert decisions[0].expected_upside_pct == 6.0
+    assert decisions[0].expected_downside_pct == 2.5
+    assert decisions[0].expected_value_pct == 2.26
+    assert decisions[0].risk_reward == 2.4
+    assert decisions[0].evidence_count == 4
+    assert decisions[0].confidence_cap_reason == "weak downside evidence"

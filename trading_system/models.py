@@ -70,12 +70,21 @@ class TradeDecision:
     action: str
     confidence: float
     allocation: float
+    raw_confidence: float | None = None
+    calibrated_confidence: float | None = None
     expected_move_pct: float | None = None
     target_price: float | None = None
     invalidation_price: float | None = None
     time_horizon: str | None = None
     catalyst: str | None = None
     reward_risk_ratio: float | None = None
+    estimated_win_probability: float | None = None
+    expected_upside_pct: float | None = None
+    expected_downside_pct: float | None = None
+    expected_value_pct: float | None = None
+    risk_reward: float | None = None
+    evidence_count: int | None = None
+    confidence_cap_reason: str | None = None
 
 
 @dataclass(slots=True)

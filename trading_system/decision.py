@@ -102,6 +102,13 @@ class DecisionEngine:
                   "action": "long|short|skip",
                   "confidence": 0.50-0.99,
                   "allocation": 0.0-0.15,
+                  "estimated_win_probability": 0.0-1.0,
+                  "expected_upside_pct": float,
+                  "expected_downside_pct": float,
+                  "expected_value_pct": float,
+                  "risk_reward": float,
+                  "evidence_count": int,
+                  "confidence_cap_reason": "str|null",
                   "target_price": float,
                   "invalidation_price": float,
                   "reward_risk_ratio": float,
@@ -156,6 +163,13 @@ class DecisionEngine:
               "symbol": "{debate.symbol}",
               "action": "long|short|skip",
               "confidence": 0.0,
+              "estimated_win_probability": 0.0,
+              "expected_upside_pct": 0.0,
+              "expected_downside_pct": 0.0,
+              "expected_value_pct": 0.0,
+              "risk_reward": 0.0,
+              "evidence_count": 0,
+              "confidence_cap_reason": null,
               "target_price": 0.0,
               "invalidation_price": 0.0,
               "reward_risk_ratio": 0.0,
@@ -230,8 +244,14 @@ class DecisionEngine:
             if action not in {"long", "short", "skip"}:
                 raise DecisionError(f"Invalid action {action}")
             symbol = str(item["symbol"]).upper()
-            raw_confidence = clamp(min(float(item["confidence"]), confidence_cap), 0.0, 1.0)
-            calibrated_confidence = self._calibrate_confidence(symbol, action, raw_confidence)
+            raw_confidence = clamp(float(item["confidence"]), 0.0, 1.0)
+            capped_confidence = min(raw_confidence, confidence_cap)
+            calibrated_confidence = self._calibrate_confidence(symbol, action, capped_confidence)
+            confidence_cap_reason = self._confidence_cap_reason(
+                item.get("confidence_cap_reason"),
+                raw_confidence=raw_confidence,
+                capped_confidence=capped_confidence,
+            )
             target_price = self._optional_float(item.get("target_price"))
             invalidation_price = self._optional_float(item.get("invalidation_price"))
             reward_risk_ratio = self._reward_risk_ratio(
@@ -253,12 +273,23 @@ class DecisionEngine:
                     action=action,
                     confidence=calibrated_confidence,
                     allocation=clamp(float(item.get("allocation", 0.0)), 0.0, 1.0),
+                    raw_confidence=raw_confidence,
+                    calibrated_confidence=calibrated_confidence,
                     expected_move_pct=self._optional_float(item.get("expected_move_pct")),
                     target_price=target_price,
                     invalidation_price=invalidation_price,
                     time_horizon=self._optional_text(item.get("time_horizon")),
                     catalyst=self._optional_text(item.get("catalyst")),
                     reward_risk_ratio=reward_risk_ratio,
+                    estimated_win_probability=self._optional_float(
+                        item.get("estimated_win_probability")
+                    ),
+                    expected_upside_pct=self._optional_float(item.get("expected_upside_pct")),
+                    expected_downside_pct=self._optional_float(item.get("expected_downside_pct")),
+                    expected_value_pct=self._optional_float(item.get("expected_value_pct")),
+                    risk_reward=self._optional_float(item.get("risk_reward")),
+                    evidence_count=self._optional_int(item.get("evidence_count")),
+                    confidence_cap_reason=confidence_cap_reason,
                 )
             )
 
@@ -289,6 +320,29 @@ class DecisionEngine:
             return None
         text = str(value).strip()
         return text or None
+
+    @staticmethod
+    def _optional_int(value: object) -> int | None:
+        if value is None:
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
+
+    def _confidence_cap_reason(
+        self,
+        explicit_reason: object,
+        *,
+        raw_confidence: float,
+        capped_confidence: float,
+    ) -> str | None:
+        reason = self._optional_text(explicit_reason)
+        if reason:
+            return reason
+        if capped_confidence < raw_confidence:
+            return "generation_probability_cap"
+        return None
 
     @staticmethod
     def _reward_risk_ratio(
@@ -337,10 +391,23 @@ class DecisionEngine:
                         action=action if confidence >= self.config.min_confidence else "skip",
                         confidence=confidence if confidence >= self.config.min_confidence else 0.0,
                         allocation=0.0,
+                        raw_confidence=raw_confidence,
+                        calibrated_confidence=confidence,
                         target_price=target_price,
                         invalidation_price=invalidation_price,
                         reward_risk_ratio=reward_risk_ratio,
                         catalyst=self._optional_text(payload.get("reason") or payload.get("reasoning_rebuttal")),
+                        estimated_win_probability=self._optional_float(
+                            payload.get("estimated_win_probability")
+                        ),
+                        expected_upside_pct=self._optional_float(payload.get("expected_upside_pct")),
+                        expected_downside_pct=self._optional_float(payload.get("expected_downside_pct")),
+                        expected_value_pct=self._optional_float(payload.get("expected_value_pct")),
+                        risk_reward=self._optional_float(payload.get("risk_reward")),
+                        evidence_count=self._optional_int(payload.get("evidence_count")),
+                        confidence_cap_reason=self._optional_text(
+                            payload.get("confidence_cap_reason")
+                        ),
                     )
                 )
             except DecisionError as exc:
