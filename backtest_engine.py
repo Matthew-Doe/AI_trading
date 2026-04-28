@@ -64,6 +64,7 @@ def build_backtest_report(
         "performance": execution.get_summary(),
         "confidence_analysis": build_confidence_analysis(execution.trades),
         "tax": execution.get_tax_summary(),
+        "tax_shadow_analysis": execution.get_tax_shadow_analysis(),
         "sizing_logs": execution.sizing_logs,
         "exit_adjustment_logs": execution.exit_adjustment_logs,
         "daily_history": daily_stats,

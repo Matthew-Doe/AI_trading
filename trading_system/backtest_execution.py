@@ -48,6 +48,48 @@ class BacktestTradeRecord:
     return_pct: float = 0.0
     risk_normalized_return: float = 0.0
 
+
+@dataclass
+class TaxShadowPosition:
+    id: int
+    blocked_time: datetime
+    blocked_until: datetime
+    symbol: str
+    side: str
+    qty: int
+    entry_price: float
+    entry_time: datetime
+    stop_price: float | None = None
+    take_profit_price: float | None = None
+    highest_price: float | None = None
+    lowest_price: float | None = None
+    confidence: float = 0.0
+    allocation: float = 0.0
+    risk_notional: float = 0.0
+    stop_distance: float = 0.0
+    sizing_reason: str = ""
+
+
+@dataclass
+class TaxShadowTradeRecord:
+    id: int
+    blocked_time: datetime
+    blocked_until: datetime
+    symbol: str
+    side: str
+    entry_time: datetime
+    entry_price: float
+    exit_time: datetime
+    exit_price: float
+    exit_reason: str
+    qty: int
+    net_pnl: float
+    return_pct: float
+    mfe_pct: float
+    mae_pct: float
+    confidence: float = 0.0
+    allocation: float = 0.0
+
 class BacktestExecutionEngine:
     def __init__(
         self, 
@@ -70,6 +112,9 @@ class BacktestExecutionEngine:
         self.config = config
         self.loss_cooldowns: dict[str, datetime] = {}
         self.tax_blocked_decisions: list[dict[str, Any]] = []
+        self.tax_shadow_positions: dict[int, TaxShadowPosition] = {}
+        self.tax_shadow_trades: list[TaxShadowTradeRecord] = []
+        self._next_tax_shadow_id = 1
         self.sizing_logs: list[dict[str, Any]] = []
         self.exit_adjustment_logs: list[dict[str, Any]] = []
         self.market_data_service = market_data_service
@@ -97,6 +142,8 @@ class BacktestExecutionEngine:
     ):
         """Executes new decisions and checks existing positions for stops/targets."""
         
+        self._process_tax_shadow_positions(decisions, all_symbol_prices, current_time)
+
         # 1. Manage Existing Positions (Check Stops/Targets)
         active_symbols = {dec.symbol for dec in decisions if dec.action != "skip"}
         symbols_to_remove = []
@@ -144,6 +191,7 @@ class BacktestExecutionEngine:
             if dec.action == "skip": continue
             if dec.symbol in self.positions: continue
             if self._is_tax_blocked(dec.symbol, current_time):
+                blocked_until = self.loss_cooldowns[dec.symbol]
                 self.tax_blocked_decisions.append(
                     {
                         "time": current_time.isoformat(),
@@ -151,10 +199,18 @@ class BacktestExecutionEngine:
                         "action": dec.action,
                         "confidence": dec.confidence,
                         "allocation": dec.allocation,
-                        "blocked_until": self.loss_cooldowns[dec.symbol].isoformat(),
+                        "blocked_until": blocked_until.isoformat(),
                         "reason": "wash_sale_loss_cooldown",
                     }
                 )
+                snapshot = all_symbol_prices.get(dec.symbol)
+                if snapshot is not None:
+                    self._open_tax_shadow_position(
+                        decision=dec,
+                        snapshot=snapshot,
+                        current_time=current_time,
+                        blocked_until=blocked_until,
+                    )
                 continue
             
             snapshot = all_symbol_prices.get(dec.symbol)
@@ -425,6 +481,148 @@ class BacktestExecutionEngine:
                 days=self.wash_sale_cooldown_days
             )
 
+    def _process_tax_shadow_positions(
+        self,
+        decisions: list[TradeDecision],
+        all_symbol_prices: dict[str, MarketSnapshot],
+        current_time: datetime,
+    ) -> None:
+        active_symbols = {dec.symbol for dec in decisions if dec.action != "skip"}
+        shadows_to_remove: list[int] = []
+        for shadow_id, pos in self.tax_shadow_positions.items():
+            snapshot = all_symbol_prices.get(pos.symbol)
+            if snapshot is None:
+                continue
+            price = self._mark_price(snapshot, fallback=pos.entry_price)
+            self._update_excursions(pos, price)
+            exit_triggered = False
+            reason = ""
+
+            if pos.side == "long":
+                if pos.stop_price and price <= pos.stop_price:
+                    exit_triggered, reason = True, "stop_loss"
+                elif pos.take_profit_price and price >= pos.take_profit_price:
+                    exit_triggered, reason = True, "target_hit"
+            else:
+                if pos.stop_price and price >= pos.stop_price:
+                    exit_triggered, reason = True, "stop_loss"
+                elif pos.take_profit_price and price <= pos.take_profit_price:
+                    exit_triggered, reason = True, "target_hit"
+
+            days_held = (current_time - pos.entry_time).days
+            if not exit_triggered:
+                max_days = getattr(self.config, "backtest_max_hold_days", 7)
+                if days_held >= max_days:
+                    exit_triggered, reason = True, "extended_hold"
+                elif days_held >= getattr(self.config, "backtest_min_thesis_days", 2):
+                    unrealized_pct = self._unrealized_pct(pos, price)
+                    if unrealized_pct < 0 and pos.symbol not in active_symbols:
+                        exit_triggered, reason = True, "thesis_failed"
+
+            if exit_triggered:
+                self._close_tax_shadow_position(pos, price, current_time, reason)
+                shadows_to_remove.append(shadow_id)
+
+        for shadow_id in shadows_to_remove:
+            del self.tax_shadow_positions[shadow_id]
+
+    def _open_tax_shadow_position(
+        self,
+        *,
+        decision: TradeDecision,
+        snapshot: MarketSnapshot,
+        current_time: datetime,
+        blocked_until: datetime,
+    ) -> None:
+        price = self._entry_price(snapshot)
+        fill_price = (
+            price * (1 + self.slippage_pct)
+            if decision.action == "long"
+            else price * (1 - self.slippage_pct)
+        )
+        qty, sizing_reason, risk_notional, stop_distance = self._size_position(
+            decision=decision,
+            snapshot=snapshot,
+            fill_price=fill_price,
+            mark_price=price,
+        )
+        if qty <= 0:
+            return
+        stop_price, take_profit_price = self._planned_exit_prices(
+            decision=decision,
+            snapshot=snapshot,
+            side=decision.action,
+            mark_price=price,
+            stop_distance=stop_distance,
+        )
+        shadow_id = self._next_tax_shadow_id
+        self._next_tax_shadow_id += 1
+        self.tax_shadow_positions[shadow_id] = TaxShadowPosition(
+            id=shadow_id,
+            blocked_time=current_time,
+            blocked_until=blocked_until,
+            symbol=decision.symbol,
+            side=decision.action,
+            qty=qty,
+            entry_price=fill_price,
+            entry_time=current_time,
+            stop_price=stop_price,
+            take_profit_price=take_profit_price,
+            highest_price=price,
+            lowest_price=price,
+            confidence=decision.confidence,
+            allocation=decision.allocation or 0.0,
+            risk_notional=risk_notional,
+            stop_distance=stop_distance,
+            sizing_reason=sizing_reason,
+        )
+
+    def _close_tax_shadow_position(
+        self,
+        pos: TaxShadowPosition,
+        price: float,
+        exit_time: datetime,
+        reason: str,
+    ) -> None:
+        fill_price = (
+            price * (1 - self.slippage_pct)
+            if pos.side == "long"
+            else price * (1 + self.slippage_pct)
+        )
+        if pos.side == "long":
+            gross_pnl = (fill_price - pos.entry_price) * pos.qty
+        else:
+            gross_pnl = (pos.entry_price - fill_price) * pos.qty
+        self.tax_shadow_trades.append(
+            TaxShadowTradeRecord(
+                id=pos.id,
+                blocked_time=pos.blocked_time,
+                blocked_until=pos.blocked_until,
+                symbol=pos.symbol,
+                side=pos.side,
+                entry_time=pos.entry_time,
+                entry_price=pos.entry_price,
+                exit_time=exit_time,
+                exit_price=fill_price,
+                exit_reason=reason,
+                qty=pos.qty,
+                net_pnl=round(gross_pnl, 2),
+                return_pct=self._return_pct(pos=pos, net_pnl=gross_pnl),
+                mfe_pct=self._mfe_pct(pos),
+                mae_pct=self._mae_pct(pos),
+                confidence=pos.confidence,
+                allocation=pos.allocation,
+            )
+        )
+
+    @staticmethod
+    def _unrealized_pct(pos: BacktestPosition | TaxShadowPosition, price: float) -> float:
+        if not pos.entry_price:
+            return 0.0
+        if pos.side == "long":
+            return (price - pos.entry_price) / pos.entry_price
+        return (pos.entry_price - price) / pos.entry_price
+
     def _is_tax_blocked(self, symbol: str, current_time: datetime) -> bool:
         blocked_until = self.loss_cooldowns.get(symbol)
         if blocked_until is None:
@@ -446,7 +644,7 @@ class BacktestExecutionEngine:
         }
 
     @staticmethod
-    def _mfe_pct(pos: BacktestPosition) -> float:
+    def _mfe_pct(pos: BacktestPosition | TaxShadowPosition) -> float:
         if not pos.entry_price:
             return 0.0
         if pos.side == "long":
@@ -454,7 +652,7 @@ class BacktestExecutionEngine:
         return round((pos.entry_price - (pos.lowest_price or pos.entry_price)) / pos.entry_price, 4)
 
     @staticmethod
-    def _mae_pct(pos: BacktestPosition) -> float:
+    def _mae_pct(pos: BacktestPosition | TaxShadowPosition) -> float:
         if not pos.entry_price:
             return 0.0
         if pos.side == "long":
@@ -462,7 +660,7 @@ class BacktestExecutionEngine:
         return round((pos.entry_price - (pos.highest_price or pos.entry_price)) / pos.entry_price, 4)
 
     @staticmethod
-    def _return_pct(*, pos: BacktestPosition, net_pnl: float) -> float:
+    def _return_pct(*, pos: BacktestPosition | TaxShadowPosition, net_pnl: float) -> float:
         notional = abs(pos.entry_price * pos.qty)
         if notional <= 0:
             return 0.0
@@ -605,3 +803,95 @@ class BacktestExecutionEngine:
                 )
 
         return matches
+
+    def get_tax_shadow_analysis(self) -> dict[str, Any]:
+        closed = self.tax_shadow_trades
+        wins = [trade for trade in closed if trade.net_pnl > 0]
+        by_symbol: dict[str, dict[str, Any]] = {}
+        for blocked in self.tax_blocked_decisions:
+            symbol = blocked["symbol"]
+            by_symbol.setdefault(
+                symbol,
+                {
+                    "symbol": symbol,
+                    "blocked_count": 0,
+                    "closed_count": 0,
+                    "open_count": 0,
+                    "missed_pnl_estimate": 0.0,
+                    "average_return_pct": 0.0,
+                    "win_rate": 0.0,
+                },
+            )["blocked_count"] += 1
+        for pos in self.tax_shadow_positions.values():
+            by_symbol.setdefault(
+                pos.symbol,
+                {
+                    "symbol": pos.symbol,
+                    "blocked_count": 0,
+                    "closed_count": 0,
+                    "open_count": 0,
+                    "missed_pnl_estimate": 0.0,
+                    "average_return_pct": 0.0,
+                    "win_rate": 0.0,
+                },
+            )["open_count"] += 1
+        for trade in closed:
+            summary = by_symbol.setdefault(
+                trade.symbol,
+                {
+                    "symbol": trade.symbol,
+                    "blocked_count": 0,
+                    "closed_count": 0,
+                    "open_count": 0,
+                    "missed_pnl_estimate": 0.0,
+                    "average_return_pct": 0.0,
+                    "win_rate": 0.0,
+                },
+            )
+            summary["closed_count"] += 1
+            summary["missed_pnl_estimate"] += trade.net_pnl
+
+        for symbol, summary in by_symbol.items():
+            symbol_trades = [trade for trade in closed if trade.symbol == symbol]
+            symbol_wins = [trade for trade in symbol_trades if trade.net_pnl > 0]
+            summary["missed_pnl_estimate"] = round(summary["missed_pnl_estimate"], 2)
+            summary["average_return_pct"] = (
+                round(sum(trade.return_pct for trade in symbol_trades) / len(symbol_trades), 4)
+                if symbol_trades
+                else 0.0
+            )
+            summary["win_rate"] = (
+                round(len(symbol_wins) / len(symbol_trades), 4)
+                if symbol_trades
+                else 0.0
+            )
+
+        return {
+            "blocked_entry_count": len(self.tax_blocked_decisions),
+            "closed_shadow_count": len(closed),
+            "open_shadow_count": len(self.tax_shadow_positions),
+            "win_rate": round(len(wins) / len(closed), 4) if closed else 0.0,
+            "average_return_pct": (
+                round(sum(trade.return_pct for trade in closed) / len(closed), 4)
+                if closed
+                else 0.0
+            ),
+            "missed_pnl_estimate": round(sum(trade.net_pnl for trade in closed), 2),
+            "average_mfe_pct": (
+                round(sum(trade.mfe_pct for trade in closed) / len(closed), 4)
+                if closed
+                else 0.0
+            ),
+            "average_mae_pct": (
+                round(sum(trade.mae_pct for trade in closed) / len(closed), 4)
+                if closed
+                else 0.0
+            ),
+            "by_symbol": sorted(
+                by_symbol.values(),
+                key=lambda item: (item["blocked_count"], item["missed_pnl_estimate"]),
+                reverse=True,
+            ),
+            "closed_shadow_trades": [trade.__dict__ for trade in closed],
+            "open_shadow_trades": [pos.__dict__ for pos in self.tax_shadow_positions.values()],
+        }

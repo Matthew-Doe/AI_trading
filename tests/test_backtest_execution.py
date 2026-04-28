@@ -158,6 +158,8 @@ def test_backtest_execution_blocks_rebuy_after_loss_for_wash_sale_cooldown():
     assert "AAPL" not in engine.positions
     assert len(engine.tax_blocked_decisions) == 1
     assert engine.tax_blocked_decisions[0]["reason"] == "wash_sale_loss_cooldown"
+    assert len(engine.tax_shadow_positions) == 1
+    assert engine.cash == 9900.0
 
     after_cooldown = next_day + timedelta(days=31)
     engine.process_decisions(
@@ -176,6 +178,65 @@ def test_backtest_execution_blocks_rebuy_after_loss_for_wash_sale_cooldown():
     )
 
     assert "AAPL" in engine.positions
+
+
+def test_tax_shadow_trade_closes_without_affecting_real_portfolio_state():
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        wash_sale_cooldown_days=31,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=120.0,
+                invalidation_price=95.0,
+            )
+        ],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=110.0,
+                invalidation_price=80.0,
+            )
+        ],
+        {"AAPL": 90.0},
+        start + timedelta(days=1),
+    )
+    cash_after_block = engine.cash
+    equity_after_block = engine.equity
+
+    engine.process_decisions([], {"AAPL": 112.0}, start + timedelta(days=2))
+
+    assert engine.cash == cash_after_block
+    assert engine.equity == equity_after_block
+    assert engine.positions == {}
+    assert len(engine.trades) == 1
+    assert len(engine.tax_shadow_trades) == 1
+    assert engine.tax_shadow_trades[0].exit_reason == "target_hit"
+
+    analysis = engine.get_tax_shadow_analysis()
+
+    assert analysis["blocked_entry_count"] == 1
+    assert analysis["closed_shadow_count"] == 1
+    assert analysis["open_shadow_count"] == 0
+    assert analysis["win_rate"] == 1.0
+    assert analysis["average_return_pct"] == 0.2444
+    assert analysis["missed_pnl_estimate"] == 242.0
+    assert analysis["by_symbol"][0]["symbol"] == "AAPL"
 
 
 def test_backtest_tax_summary_estimates_wash_sale_rebuy_loss_deferral():

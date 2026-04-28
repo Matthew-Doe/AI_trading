@@ -34,6 +34,7 @@ def test_build_backtest_report_documents_assumptions_and_limitations(tmp_path):
     assert "not point-in-time" in metadata["known_limitations"][0]
     assert report["tax"]["wash_sale_cooldown_days"] == 31
     assert "confidence_analysis" in report
+    assert "tax_shadow_analysis" in report
 
 
 def test_confidence_analysis_handles_empty_trades():
