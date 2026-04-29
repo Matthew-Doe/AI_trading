@@ -339,17 +339,30 @@ class BacktestExecutionEngine:
             qty = int(target_notional / fill_price)
             return qty, f"legacy_allocation alloc={alloc:.4f}", 0.0, 0.0
 
+        confidence_multiplier = self._confidence_size_multiplier(decision)
+        if confidence_multiplier <= 0:
+            return (
+                0,
+                (
+                    "confidence_sizing skipped "
+                    f"confidence={decision.confidence:.4f} multiplier={confidence_multiplier:.4f}"
+                ),
+                0.0,
+                0.0,
+            )
+
         stop_distance = max(
             snapshot.indicators.atr14 * config.stop_atr_multiple,
             mark_price * 0.01,
         )
-        risk_budget = self.equity * config.max_risk_per_trade
+        risk_budget = self.equity * config.max_risk_per_trade * confidence_multiplier
         risk_qty = int(risk_budget / stop_distance) if stop_distance > 0 else 0
-        allocation = decision.allocation or config.max_single_trade_pct
+        base_allocation = decision.allocation or config.max_single_trade_pct
+        allocation = base_allocation * confidence_multiplier
         alloc_notional = self.equity * allocation
         alloc_qty = int(alloc_notional / fill_price) if fill_price > 0 else 0
-        max_trade_pct = config.max_single_trade_pct
-        max_trade_notional = self.equity * config.max_single_trade_pct
+        max_trade_pct = config.max_single_trade_pct * confidence_multiplier
+        max_trade_notional = self.equity * config.max_single_trade_pct * confidence_multiplier
         cap_basis = "equity"
 
         if (
@@ -357,12 +370,17 @@ class BacktestExecutionEngine:
             and self.equity > 0
             and self.cash / self.equity >= config.cash_rich_available_cash_threshold
         ):
-            max_trade_pct = config.cash_rich_trade_pct
-            max_trade_notional = self.cash * config.cash_rich_trade_pct
+            max_trade_pct = config.cash_rich_trade_pct * confidence_multiplier
+            max_trade_notional = self.cash * config.cash_rich_trade_pct * confidence_multiplier
             cap_basis = "available_cash"
+        high_confidence_threshold = (
+            config.confidence_full_size_threshold
+            if getattr(config, "enable_confidence_sizing_experiment", False)
+            else config.high_confidence_threshold
+        )
         if (
             decision.action == "long"
-            and decision.confidence >= config.high_confidence_threshold
+            and decision.confidence >= high_confidence_threshold
             and self.cash > 0
         ):
             max_trade_pct = max(max_trade_pct, config.high_confidence_trade_pct)
@@ -389,9 +407,21 @@ class BacktestExecutionEngine:
             f"binding={','.join(binding)} allocation={allocation:.4f} "
             f"risk_qty={risk_qty} alloc_qty={alloc_qty} max_trade_qty={max_trade_qty} "
             f"cash_qty={cash_qty} max_position_qty={max_position_qty} "
-            f"cap_pct={max_trade_pct:.4f} cap_basis={cap_basis}"
+            f"cap_pct={max_trade_pct:.4f} cap_basis={cap_basis} "
+            f"confidence_multiplier={confidence_multiplier:.4f}"
         )
         return qty, sizing_reason, qty * stop_distance, stop_distance
+
+    def _confidence_size_multiplier(self, decision: TradeDecision) -> float:
+        config = self.config
+        if config is None or not getattr(config, "enable_confidence_sizing_experiment", False):
+            return 1.0
+        confidence = decision.confidence or 0.0
+        if confidence >= config.confidence_full_size_threshold:
+            return 1.0
+        if confidence >= config.confidence_mid_size_floor:
+            return max(0.0, config.confidence_mid_size_multiplier)
+        return max(0.0, config.confidence_low_size_multiplier)
 
     def _planned_exit_prices(
         self,

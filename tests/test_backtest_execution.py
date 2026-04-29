@@ -1,8 +1,37 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, UTC
+from trading_system.config import TradingConfig
 from trading_system.backtest_execution import BacktestExecutionEngine, BacktestPosition
 from trading_system.models import IndicatorSnapshot, PremarketSnapshot, SymbolMarketData, TradeDecision
+
+
+def _symbol_data(symbol: str = "AAPL", price: float = 100.0, atr: float = 1.0) -> SymbolMarketData:
+    return SymbolMarketData(
+        symbol=symbol,
+        market_cap=None,
+        close=price,
+        high_20d=price * 1.1,
+        low_20d=price * 0.9,
+        volume=1_000_000,
+        indicators=IndicatorSnapshot(
+            atr14=atr,
+            rsi14=55.0,
+            sma20=price,
+            sma50=price,
+            sma200=price,
+            volatility20=0.2,
+            avg_volume20=1_000_000,
+        ),
+        premarket=PremarketSnapshot(
+            latest_price=price,
+            gap_pct=0.0,
+            volume=50_000,
+            timestamp="2026-01-02T09:30:00+00:00",
+        ),
+        price_summary="",
+    )
+
 
 def test_backtest_execution_long_entry_and_exit():
     engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.01) # High slippage for testing
@@ -49,6 +78,66 @@ def test_backtest_execution_long_entry_and_exit():
     assert engine.trades[0].return_pct == 0.0574
     assert engine.trades[0].risk_normalized_return == 0.0
     assert engine.cash == 10071.1
+
+
+def test_confidence_sizing_experiment_halves_mid_confidence_size():
+    config = TradingConfig(
+        enable_confidence_sizing_experiment=True,
+        max_single_trade_pct=0.10,
+        cash_rich_available_cash_threshold=2.0,
+        max_position_weight=0.50,
+    )
+    now = datetime(2026, 1, 2, tzinfo=UTC)
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.80, allocation=0.10)],
+        {"AAPL": _symbol_data()},
+        now,
+    )
+
+    assert engine.positions["AAPL"].qty == 5
+    assert "confidence_multiplier=0.5000" in engine.positions["AAPL"].sizing_reason
+
+
+def test_confidence_sizing_experiment_skips_below_floor_confidence():
+    config = TradingConfig(
+        enable_confidence_sizing_experiment=True,
+        max_single_trade_pct=0.10,
+        cash_rich_available_cash_threshold=2.0,
+        max_position_weight=0.50,
+    )
+    now = datetime(2026, 1, 2, tzinfo=UTC)
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.69, allocation=0.10)],
+        {"AAPL": _symbol_data()},
+        now,
+    )
+
+    assert engine.positions == {}
+
+
+def test_confidence_sizing_experiment_uses_full_size_for_high_confidence():
+    config = TradingConfig(
+        enable_confidence_sizing_experiment=True,
+        max_single_trade_pct=0.10,
+        high_confidence_trade_pct=0.20,
+        cash_rich_available_cash_threshold=2.0,
+        max_position_weight=0.50,
+    )
+    now = datetime(2026, 1, 2, tzinfo=UTC)
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.90, allocation=0.20)],
+        {"AAPL": _symbol_data()},
+        now,
+    )
+
+    assert engine.positions["AAPL"].qty == 20
+    assert "cap_basis=high_confidence_cash" in engine.positions["AAPL"].sizing_reason
 
 def test_backtest_execution_short_stop_loss():
     engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.01)

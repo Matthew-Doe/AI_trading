@@ -134,6 +134,21 @@ class TradingConfig:
     enable_tax_loss_size_cooldown_tiers: bool = _parse_bool_env(
         "ENABLE_TAX_LOSS_SIZE_COOLDOWN_TIERS"
     )
+    enable_confidence_sizing_experiment: bool = _parse_bool_env(
+        "ENABLE_CONFIDENCE_SIZING_EXPERIMENT"
+    )
+    confidence_full_size_threshold: float = float(
+        os.getenv("CONFIDENCE_FULL_SIZE_THRESHOLD", "0.90")
+    )
+    confidence_mid_size_floor: float = float(
+        os.getenv("CONFIDENCE_MID_SIZE_FLOOR", "0.70")
+    )
+    confidence_mid_size_multiplier: float = float(
+        os.getenv("CONFIDENCE_MID_SIZE_MULTIPLIER", "0.50")
+    )
+    confidence_low_size_multiplier: float = float(
+        os.getenv("CONFIDENCE_LOW_SIZE_MULTIPLIER", "0.00")
+    )
     enable_tax_adjusted_ev_reentry: bool = _parse_bool_env(
         "ENABLE_TAX_ADJUSTED_EV_REENTRY"
     )

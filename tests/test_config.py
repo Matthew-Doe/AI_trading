@@ -66,6 +66,7 @@ def test_trading_config_defaults_confidence_actionable_move_pct(monkeypatch):
 def test_behavior_experiment_flags_default_disabled(monkeypatch):
     for name in (
         "ENABLE_TAX_LOSS_SIZE_COOLDOWN_TIERS",
+        "ENABLE_CONFIDENCE_SIZING_EXPERIMENT",
         "ENABLE_TAX_ADJUSTED_EV_REENTRY",
         "ENABLE_PROFIT_PROTECTION_BANDS",
         "ENABLE_PARTIAL_PROFIT_TAKING",
@@ -77,6 +78,11 @@ def test_behavior_experiment_flags_default_disabled(monkeypatch):
     config = _fresh_trading_config()()
 
     assert config.enable_tax_loss_size_cooldown_tiers is False
+    assert config.enable_confidence_sizing_experiment is False
+    assert config.confidence_full_size_threshold == 0.90
+    assert config.confidence_mid_size_floor == 0.70
+    assert config.confidence_mid_size_multiplier == 0.50
+    assert config.confidence_low_size_multiplier == 0.00
     assert config.enable_tax_adjusted_ev_reentry is False
     assert config.enable_profit_protection_bands is False
     assert config.enable_partial_profit_taking is False
@@ -86,6 +92,11 @@ def test_behavior_experiment_flags_default_disabled(monkeypatch):
 
 def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     monkeypatch.setenv("ENABLE_TAX_LOSS_SIZE_COOLDOWN_TIERS", "true")
+    monkeypatch.setenv("ENABLE_CONFIDENCE_SIZING_EXPERIMENT", "true")
+    monkeypatch.setenv("CONFIDENCE_FULL_SIZE_THRESHOLD", "0.91")
+    monkeypatch.setenv("CONFIDENCE_MID_SIZE_FLOOR", "0.72")
+    monkeypatch.setenv("CONFIDENCE_MID_SIZE_MULTIPLIER", "0.40")
+    monkeypatch.setenv("CONFIDENCE_LOW_SIZE_MULTIPLIER", "0.10")
     monkeypatch.setenv("ENABLE_TAX_ADJUSTED_EV_REENTRY", "true")
     monkeypatch.setenv("ENABLE_PROFIT_PROTECTION_BANDS", "true")
     monkeypatch.setenv("ENABLE_PARTIAL_PROFIT_TAKING", "true")
@@ -95,6 +106,11 @@ def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     config = _fresh_trading_config()()
 
     assert config.enable_tax_loss_size_cooldown_tiers is True
+    assert config.enable_confidence_sizing_experiment is True
+    assert config.confidence_full_size_threshold == 0.91
+    assert config.confidence_mid_size_floor == 0.72
+    assert config.confidence_mid_size_multiplier == 0.40
+    assert config.confidence_low_size_multiplier == 0.10
     assert config.enable_tax_adjusted_ev_reentry is True
     assert config.enable_profit_protection_bands is True
     assert config.enable_partial_profit_taking is True
