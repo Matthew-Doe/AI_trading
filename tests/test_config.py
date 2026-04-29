@@ -84,6 +84,9 @@ def test_behavior_experiment_flags_default_disabled(monkeypatch):
     assert config.confidence_mid_size_multiplier == 0.50
     assert config.confidence_low_size_multiplier == 0.00
     assert config.enable_tax_adjusted_ev_reentry is False
+    assert config.tax_reentry_min_confidence == 0.90
+    assert config.tax_reentry_min_expected_value_pct == 2.00
+    assert config.tax_reentry_size_multiplier == 0.50
     assert config.enable_profit_protection_bands is False
     assert config.enable_partial_profit_taking is False
     assert config.partial_profit_take_fraction == 0.60
@@ -102,6 +105,9 @@ def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     monkeypatch.setenv("CONFIDENCE_MID_SIZE_MULTIPLIER", "0.40")
     monkeypatch.setenv("CONFIDENCE_LOW_SIZE_MULTIPLIER", "0.10")
     monkeypatch.setenv("ENABLE_TAX_ADJUSTED_EV_REENTRY", "true")
+    monkeypatch.setenv("TAX_REENTRY_MIN_CONFIDENCE", "0.92")
+    monkeypatch.setenv("TAX_REENTRY_MIN_EXPECTED_VALUE_PCT", "3.00")
+    monkeypatch.setenv("TAX_REENTRY_SIZE_MULTIPLIER", "0.25")
     monkeypatch.setenv("ENABLE_PROFIT_PROTECTION_BANDS", "true")
     monkeypatch.setenv("ENABLE_PARTIAL_PROFIT_TAKING", "true")
     monkeypatch.setenv("PARTIAL_PROFIT_TAKE_FRACTION", "0.50")
@@ -120,6 +126,9 @@ def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     assert config.confidence_mid_size_multiplier == 0.40
     assert config.confidence_low_size_multiplier == 0.10
     assert config.enable_tax_adjusted_ev_reentry is True
+    assert config.tax_reentry_min_confidence == 0.92
+    assert config.tax_reentry_min_expected_value_pct == 3.00
+    assert config.tax_reentry_size_multiplier == 0.25
     assert config.enable_profit_protection_bands is True
     assert config.enable_partial_profit_taking is True
     assert config.partial_profit_take_fraction == 0.50

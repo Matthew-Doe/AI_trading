@@ -152,6 +152,15 @@ class TradingConfig:
     enable_tax_adjusted_ev_reentry: bool = _parse_bool_env(
         "ENABLE_TAX_ADJUSTED_EV_REENTRY"
     )
+    tax_reentry_min_confidence: float = float(
+        os.getenv("TAX_REENTRY_MIN_CONFIDENCE", "0.90")
+    )
+    tax_reentry_min_expected_value_pct: float = float(
+        os.getenv("TAX_REENTRY_MIN_EXPECTED_VALUE_PCT", "2.00")
+    )
+    tax_reentry_size_multiplier: float = float(
+        os.getenv("TAX_REENTRY_SIZE_MULTIPLIER", "0.50")
+    )
     enable_profit_protection_bands: bool = _parse_bool_env(
         "ENABLE_PROFIT_PROTECTION_BANDS"
     )

@@ -394,6 +394,110 @@ def test_backtest_execution_blocks_rebuy_after_loss_for_wash_sale_cooldown():
     assert "AAPL" in engine.positions
 
 
+def test_tax_adjusted_reentry_allows_high_ev_downsized_trade():
+    config = TradingConfig(
+        enable_tax_adjusted_ev_reentry=True,
+        tax_reentry_min_confidence=0.90,
+        tax_reentry_min_expected_value_pct=2.0,
+        tax_reentry_size_multiplier=0.50,
+    )
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        wash_sale_cooldown_days=31,
+        config=config,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=120.0,
+                invalidation_price=95.0,
+            )
+        ],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.95,
+                allocation=0.1,
+                expected_value_pct=3.5,
+                target_price=120.0,
+                invalidation_price=80.0,
+            )
+        ],
+        {"AAPL": 90.0},
+        start + timedelta(days=1),
+    )
+
+    assert "AAPL" in engine.positions
+    assert engine.positions["AAPL"].qty == 5
+    assert engine.positions["AAPL"].allocation == 0.05
+    assert "tax_adjusted_reentry=true" in engine.positions["AAPL"].sizing_reason
+    assert engine.tax_blocked_decisions[-1]["reason"] == "tax_adjusted_ev_reentry_allowed"
+    assert engine.tax_blocked_decisions[-1]["adjusted_allocation"] == 0.05
+    assert len(engine.tax_shadow_positions) == 0
+
+
+def test_tax_adjusted_reentry_still_blocks_low_ev_trade():
+    config = TradingConfig(
+        enable_tax_adjusted_ev_reentry=True,
+        tax_reentry_min_confidence=0.90,
+        tax_reentry_min_expected_value_pct=2.0,
+        tax_reentry_size_multiplier=0.50,
+    )
+    engine = BacktestExecutionEngine(
+        initial_cash=10000.0,
+        slippage_pct=0.0,
+        wash_sale_cooldown_days=31,
+        config=config,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=120.0,
+                invalidation_price=95.0,
+            )
+        ],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.95,
+                allocation=0.1,
+                expected_value_pct=1.5,
+                target_price=120.0,
+                invalidation_price=80.0,
+            )
+        ],
+        {"AAPL": 90.0},
+        start + timedelta(days=1),
+    )
+
+    assert "AAPL" not in engine.positions
+    assert engine.tax_blocked_decisions[-1]["reason"] == "wash_sale_loss_cooldown"
+    assert len(engine.tax_shadow_positions) == 1
+
+
 def test_tax_shadow_trade_closes_without_affecting_real_portfolio_state():
     engine = BacktestExecutionEngine(
         initial_cash=10000.0,

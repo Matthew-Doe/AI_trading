@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import datetime, timedelta
 from typing import Any
 
@@ -236,28 +236,48 @@ class BacktestExecutionEngine:
         for dec in decisions:
             if dec.action == "skip": continue
             if dec.symbol in self.positions: continue
+            tax_reentry = False
             if self._is_tax_blocked(dec.symbol, current_time):
                 blocked_until = self.loss_cooldowns[dec.symbol]
-                self.tax_blocked_decisions.append(
-                    {
-                        "time": current_time.isoformat(),
-                        "symbol": dec.symbol,
-                        "action": dec.action,
-                        "confidence": dec.confidence,
-                        "allocation": dec.allocation,
-                        "blocked_until": blocked_until.isoformat(),
-                        "reason": "wash_sale_loss_cooldown",
-                    }
-                )
-                snapshot = all_symbol_prices.get(dec.symbol)
-                if snapshot is not None:
-                    self._open_tax_shadow_position(
-                        decision=dec,
-                        snapshot=snapshot,
-                        current_time=current_time,
-                        blocked_until=blocked_until,
+                tax_adjusted_decision = self._tax_adjusted_reentry_decision(dec)
+                if tax_adjusted_decision is not None:
+                    self.tax_blocked_decisions.append(
+                        {
+                            "time": current_time.isoformat(),
+                            "symbol": dec.symbol,
+                            "action": dec.action,
+                            "confidence": dec.confidence,
+                            "allocation": dec.allocation,
+                            "expected_value_pct": dec.expected_value_pct,
+                            "blocked_until": blocked_until.isoformat(),
+                            "reason": "tax_adjusted_ev_reentry_allowed",
+                            "adjusted_allocation": tax_adjusted_decision.allocation,
+                        }
                     )
-                continue
+                    dec = tax_adjusted_decision
+                    tax_reentry = True
+                else:
+                    self.tax_blocked_decisions.append(
+                        {
+                            "time": current_time.isoformat(),
+                            "symbol": dec.symbol,
+                            "action": dec.action,
+                            "confidence": dec.confidence,
+                            "allocation": dec.allocation,
+                            "expected_value_pct": dec.expected_value_pct,
+                            "blocked_until": blocked_until.isoformat(),
+                            "reason": "wash_sale_loss_cooldown",
+                        }
+                    )
+                    snapshot = all_symbol_prices.get(dec.symbol)
+                    if snapshot is not None:
+                        self._open_tax_shadow_position(
+                            decision=dec,
+                            snapshot=snapshot,
+                            current_time=current_time,
+                            blocked_until=blocked_until,
+                        )
+                    continue
             
             snapshot = all_symbol_prices.get(dec.symbol)
             if snapshot is None: continue
@@ -274,6 +294,8 @@ class BacktestExecutionEngine:
                 mark_price=price,
             )
             if qty <= 0: continue
+            if tax_reentry:
+                sizing_reason = f"{sizing_reason} tax_adjusted_reentry=true"
             stop_price, take_profit_price = self._planned_exit_prices(
                 decision=dec,
                 snapshot=snapshot,
@@ -914,6 +936,42 @@ class BacktestExecutionEngine:
             return True
         del self.loss_cooldowns[symbol]
         return False
+
+    def _tax_adjusted_reentry_decision(self, decision: TradeDecision) -> TradeDecision | None:
+        config = self.config
+        if not getattr(config, "enable_tax_adjusted_ev_reentry", False):
+            return None
+        if decision.confidence < getattr(config, "tax_reentry_min_confidence", 0.90):
+            return None
+        expected_value_pct = self._decision_expected_value_pct(decision)
+        if expected_value_pct < getattr(config, "tax_reentry_min_expected_value_pct", 2.0):
+            return None
+        multiplier = max(0.0, min(1.0, getattr(config, "tax_reentry_size_multiplier", 0.50)))
+        if multiplier <= 0:
+            return None
+        base_allocation = decision.allocation or getattr(config, "max_single_trade_pct", 0.01)
+        return replace(decision, allocation=base_allocation * multiplier)
+
+    @staticmethod
+    def _decision_expected_value_pct(decision: TradeDecision) -> float:
+        if decision.expected_value_pct is not None:
+            return decision.expected_value_pct
+        if (
+            decision.estimated_win_probability is not None
+            and decision.expected_upside_pct is not None
+            and decision.expected_downside_pct is not None
+        ):
+            win_probability = decision.estimated_win_probability
+            if win_probability > 1:
+                win_probability /= 100.0
+            return (
+                win_probability * decision.expected_upside_pct
+                - (1 - win_probability) * abs(decision.expected_downside_pct)
+            )
+        expected_move_pct = decision.expected_move_pct
+        if expected_move_pct is None:
+            return 0.0
+        return expected_move_pct * 100 if abs(expected_move_pct) <= 1 else expected_move_pct
 
     def get_summary(self) -> dict[str, Any]:
         net_pnl = sum(t.net_pnl for t in self.trades)
