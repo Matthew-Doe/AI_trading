@@ -223,6 +223,76 @@ def test_conditional_hold_extension_exits_when_adverse_move_is_too_large():
     assert engine.exit_adjustment_logs == []
 
 
+def test_partial_profit_taking_closes_fraction_and_keeps_residual_position():
+    config = TradingConfig(
+        enable_partial_profit_taking=True,
+        partial_profit_take_fraction=0.50,
+        partial_profit_trailing_stop_pct=0.10,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=110.0,
+                invalidation_price=90.0,
+            )
+        ],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions([], {"AAPL": 112.0}, start + timedelta(days=1))
+
+    assert "AAPL" in engine.positions
+    assert engine.positions["AAPL"].qty == 5
+    assert engine.positions["AAPL"].partial_profit_taken is True
+    assert engine.positions["AAPL"].stop_price == 100.8
+    assert len(engine.trades) == 1
+    assert engine.trades[0].exit_reason == "partial_target_hit"
+    assert engine.trades[0].qty == 5
+    assert engine.trades[0].net_pnl == 60.0
+    assert engine.cash == 9560.0
+
+
+def test_partial_profit_taking_residual_closes_on_later_stop():
+    config = TradingConfig(
+        enable_partial_profit_taking=True,
+        partial_profit_take_fraction=0.50,
+        partial_profit_trailing_stop_pct=0.10,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [
+            TradeDecision(
+                symbol="AAPL",
+                action="long",
+                confidence=0.9,
+                allocation=0.1,
+                target_price=110.0,
+                invalidation_price=90.0,
+            )
+        ],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions([], {"AAPL": 112.0}, start + timedelta(days=1))
+    engine.process_decisions([], {"AAPL": 100.0}, start + timedelta(days=2))
+
+    assert "AAPL" not in engine.positions
+    assert [trade.exit_reason for trade in engine.trades] == [
+        "partial_target_hit",
+        "breakeven_stop",
+    ]
+    assert engine.trades[1].qty == 5
+
+
 def test_backtest_execution_uses_simulated_open_for_new_entries():
     engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.01)
     now = datetime(2026, 3, 2, tzinfo=UTC)

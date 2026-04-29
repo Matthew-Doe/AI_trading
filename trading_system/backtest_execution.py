@@ -25,6 +25,7 @@ class BacktestPosition:
     confidence: float = 0.0
     allocation: float = 0.0
     thesis_failure_deferrals: int = 0
+    partial_profit_taken: bool = False
 
 @dataclass
 class BacktestTradeRecord:
@@ -200,12 +201,18 @@ class BacktestExecutionEngine:
                 if pos.stop_price and price <= pos.stop_price:
                     exit_triggered, reason = True, "breakeven_stop" if pos.stop_price >= pos.entry_price else "stop_loss"
                 elif pos.take_profit_price and price >= pos.take_profit_price:
-                    exit_triggered, reason = True, "target_hit"
+                    if self._take_partial_profit(pos, price, current_time):
+                        exit_triggered, reason = False, ""
+                    else:
+                        exit_triggered, reason = True, "target_hit"
             else: # short
                 if pos.stop_price and price >= pos.stop_price:
                     exit_triggered, reason = True, "breakeven_stop" if pos.stop_price <= pos.entry_price else "stop_loss"
                 elif pos.take_profit_price and price <= pos.take_profit_price:
-                    exit_triggered, reason = True, "target_hit"
+                    if self._take_partial_profit(pos, price, current_time):
+                        exit_triggered, reason = False, ""
+                    else:
+                        exit_triggered, reason = True, "target_hit"
 
             days_held = (current_time - pos.entry_time).days
             if not exit_triggered:
@@ -592,6 +599,97 @@ class BacktestExecutionEngine:
             self.loss_cooldowns[pos.symbol] = exit_time + timedelta(
                 days=self.wash_sale_cooldown_days
             )
+
+    def _take_partial_profit(
+        self,
+        pos: BacktestPosition,
+        price: float,
+        exit_time: datetime,
+    ) -> bool:
+        config = self.config
+        if not getattr(config, "enable_partial_profit_taking", False):
+            return False
+        if pos.partial_profit_taken or pos.qty <= 1:
+            return False
+        fraction = min(0.95, max(0.05, getattr(config, "partial_profit_take_fraction", 0.60)))
+        qty_to_close = int(pos.qty * fraction)
+        qty_to_close = max(1, qty_to_close)
+        if qty_to_close >= pos.qty:
+            return False
+
+        original_qty = pos.qty
+        fill_price = (
+            price * (1 - self.slippage_pct)
+            if pos.side == "long"
+            else price * (1 + self.slippage_pct)
+        )
+        if pos.side == "long":
+            proceeds = qty_to_close * fill_price
+            gross_pnl = (fill_price - pos.entry_price) * qty_to_close
+        else:
+            gross_pnl = (pos.entry_price - fill_price) * qty_to_close
+            proceeds = (qty_to_close * pos.entry_price) + gross_pnl
+        self.cash += proceeds
+
+        total_costs = (abs(pos.entry_price - (pos.entry_price / (1 + self.slippage_pct))) * qty_to_close) + (
+            abs(fill_price - (fill_price / (1 - self.slippage_pct))) * qty_to_close
+        )
+        net_pnl = gross_pnl - total_costs
+        risk_notional = pos.risk_notional * (qty_to_close / original_qty) if original_qty else 0.0
+        record = BacktestTradeRecord(
+            symbol=pos.symbol,
+            side=pos.side,
+            entry_time=pos.entry_time,
+            entry_price=pos.entry_price,
+            exit_time=exit_time,
+            exit_price=fill_price,
+            exit_reason="partial_target_hit",
+            qty=qty_to_close,
+            gross_pnl=gross_pnl,
+            net_pnl=net_pnl,
+            costs=total_costs,
+            holding_period_days=(exit_time - pos.entry_time).days,
+            sizing_reason=pos.sizing_reason,
+            risk_notional=risk_notional,
+            mfe_pct=self._mfe_pct(pos),
+            mae_pct=self._mae_pct(pos),
+            confidence=pos.confidence,
+            allocation=pos.allocation,
+            return_pct=round(net_pnl / abs(pos.entry_price * qty_to_close), 4)
+            if pos.entry_price and qty_to_close
+            else 0.0,
+            risk_normalized_return=self._risk_normalized_return(
+                net_pnl=net_pnl,
+                risk_notional=risk_notional,
+            ),
+        )
+        self.trades.append(record)
+        self._start_exit_counterfactual(record)
+
+        pos.qty -= qty_to_close
+        pos.risk_notional = max(0.0, pos.risk_notional - risk_notional)
+        pos.partial_profit_taken = True
+        old_stop = pos.stop_price
+        trailing_pct = max(0.0, getattr(config, "partial_profit_trailing_stop_pct", 0.03))
+        if pos.side == "long":
+            trailing_stop = price * (1 - trailing_pct)
+            pos.stop_price = max(pos.stop_price or 0.0, pos.entry_price, trailing_stop)
+        else:
+            trailing_stop = price * (1 + trailing_pct)
+            pos.stop_price = min(pos.stop_price or float("inf"), pos.entry_price, trailing_stop)
+        self.exit_adjustment_logs.append(
+            {
+                "time": exit_time.isoformat(),
+                "symbol": pos.symbol,
+                "action": "partial_target_hit",
+                "qty_closed": qty_to_close,
+                "qty_remaining": pos.qty,
+                "old_stop": old_stop,
+                "new_stop": pos.stop_price,
+                "fill_price": round(fill_price, 4),
+            }
+        )
+        return True
 
     def _start_exit_counterfactual(self, trade: BacktestTradeRecord) -> None:
         if trade.exit_time is None or trade.exit_price is None or trade.exit_reason is None:

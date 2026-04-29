@@ -158,6 +158,12 @@ class TradingConfig:
     enable_partial_profit_taking: bool = _parse_bool_env(
         "ENABLE_PARTIAL_PROFIT_TAKING"
     )
+    partial_profit_take_fraction: float = float(
+        os.getenv("PARTIAL_PROFIT_TAKE_FRACTION", "0.60")
+    )
+    partial_profit_trailing_stop_pct: float = float(
+        os.getenv("PARTIAL_PROFIT_TRAILING_STOP_PCT", "0.03")
+    )
     enable_conditional_hold_extension: bool = _parse_bool_env(
         "ENABLE_CONDITIONAL_HOLD_EXTENSION"
     )

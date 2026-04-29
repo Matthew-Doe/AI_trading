@@ -86,6 +86,8 @@ def test_behavior_experiment_flags_default_disabled(monkeypatch):
     assert config.enable_tax_adjusted_ev_reentry is False
     assert config.enable_profit_protection_bands is False
     assert config.enable_partial_profit_taking is False
+    assert config.partial_profit_take_fraction == 0.60
+    assert config.partial_profit_trailing_stop_pct == 0.03
     assert config.enable_conditional_hold_extension is False
     assert config.conditional_hold_extension_observations == 3
     assert config.conditional_hold_max_adverse_pct == 0.04
@@ -102,6 +104,8 @@ def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     monkeypatch.setenv("ENABLE_TAX_ADJUSTED_EV_REENTRY", "true")
     monkeypatch.setenv("ENABLE_PROFIT_PROTECTION_BANDS", "true")
     monkeypatch.setenv("ENABLE_PARTIAL_PROFIT_TAKING", "true")
+    monkeypatch.setenv("PARTIAL_PROFIT_TAKE_FRACTION", "0.50")
+    monkeypatch.setenv("PARTIAL_PROFIT_TRAILING_STOP_PCT", "0.02")
     monkeypatch.setenv("ENABLE_CONDITIONAL_HOLD_EXTENSION", "true")
     monkeypatch.setenv("CONDITIONAL_HOLD_EXTENSION_OBSERVATIONS", "2")
     monkeypatch.setenv("CONDITIONAL_HOLD_MAX_ADVERSE_PCT", "0.03")
@@ -118,6 +122,8 @@ def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     assert config.enable_tax_adjusted_ev_reentry is True
     assert config.enable_profit_protection_bands is True
     assert config.enable_partial_profit_taking is True
+    assert config.partial_profit_take_fraction == 0.50
+    assert config.partial_profit_trailing_stop_pct == 0.02
     assert config.enable_conditional_hold_extension is True
     assert config.conditional_hold_extension_observations == 2
     assert config.conditional_hold_max_adverse_pct == 0.03
