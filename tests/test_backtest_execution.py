@@ -168,6 +168,61 @@ def test_backtest_execution_short_stop_loss():
     assert round(engine.equity, 1) == 9547.8
 
 
+def test_conditional_hold_extension_defers_thesis_failed_exit():
+    config = TradingConfig(
+        enable_conditional_hold_extension=True,
+        conditional_hold_extension_observations=2,
+        conditional_hold_max_adverse_pct=0.05,
+        backtest_min_thesis_days=2,
+        backtest_max_hold_days=10,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=0.1)],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions([], {"AAPL": 98.0}, start + timedelta(days=2))
+    engine.process_decisions([], {"AAPL": 97.0}, start + timedelta(days=3))
+
+    assert "AAPL" in engine.positions
+    assert engine.positions["AAPL"].thesis_failure_deferrals == 2
+    assert [log["action"] for log in engine.exit_adjustment_logs] == [
+        "defer_thesis_failure_exit",
+        "defer_thesis_failure_exit",
+    ]
+
+    engine.process_decisions([], {"AAPL": 96.5}, start + timedelta(days=4))
+
+    assert "AAPL" not in engine.positions
+    assert engine.trades[0].exit_reason == "thesis_failed"
+
+
+def test_conditional_hold_extension_exits_when_adverse_move_is_too_large():
+    config = TradingConfig(
+        enable_conditional_hold_extension=True,
+        conditional_hold_extension_observations=3,
+        conditional_hold_max_adverse_pct=0.03,
+        backtest_min_thesis_days=2,
+        backtest_max_hold_days=10,
+    )
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=0.1)],
+        {"AAPL": 100.0},
+        start,
+    )
+    engine.process_decisions([], {"AAPL": 96.0}, start + timedelta(days=2))
+
+    assert "AAPL" not in engine.positions
+    assert engine.trades[0].exit_reason == "thesis_failed"
+    assert engine.exit_adjustment_logs == []
+
+
 def test_backtest_execution_uses_simulated_open_for_new_entries():
     engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.01)
     now = datetime(2026, 3, 2, tzinfo=UTC)

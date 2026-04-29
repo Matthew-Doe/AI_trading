@@ -161,6 +161,12 @@ class TradingConfig:
     enable_conditional_hold_extension: bool = _parse_bool_env(
         "ENABLE_CONDITIONAL_HOLD_EXTENSION"
     )
+    conditional_hold_extension_observations: int = int(
+        os.getenv("CONDITIONAL_HOLD_EXTENSION_OBSERVATIONS", "3")
+    )
+    conditional_hold_max_adverse_pct: float = float(
+        os.getenv("CONDITIONAL_HOLD_MAX_ADVERSE_PCT", "0.04")
+    )
     enable_strict_thesis_failure_reasons: bool = _parse_bool_env(
         "ENABLE_STRICT_THESIS_FAILURE_REASONS"
     )

@@ -87,6 +87,8 @@ def test_behavior_experiment_flags_default_disabled(monkeypatch):
     assert config.enable_profit_protection_bands is False
     assert config.enable_partial_profit_taking is False
     assert config.enable_conditional_hold_extension is False
+    assert config.conditional_hold_extension_observations == 3
+    assert config.conditional_hold_max_adverse_pct == 0.04
     assert config.enable_strict_thesis_failure_reasons is False
 
 
@@ -101,6 +103,8 @@ def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     monkeypatch.setenv("ENABLE_PROFIT_PROTECTION_BANDS", "true")
     monkeypatch.setenv("ENABLE_PARTIAL_PROFIT_TAKING", "true")
     monkeypatch.setenv("ENABLE_CONDITIONAL_HOLD_EXTENSION", "true")
+    monkeypatch.setenv("CONDITIONAL_HOLD_EXTENSION_OBSERVATIONS", "2")
+    monkeypatch.setenv("CONDITIONAL_HOLD_MAX_ADVERSE_PCT", "0.03")
     monkeypatch.setenv("ENABLE_STRICT_THESIS_FAILURE_REASONS", "true")
 
     config = _fresh_trading_config()()
@@ -115,6 +119,8 @@ def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     assert config.enable_profit_protection_bands is True
     assert config.enable_partial_profit_taking is True
     assert config.enable_conditional_hold_extension is True
+    assert config.conditional_hold_extension_observations == 2
+    assert config.conditional_hold_max_adverse_pct == 0.03
     assert config.enable_strict_thesis_failure_reasons is True
 
 

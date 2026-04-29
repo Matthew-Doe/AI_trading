@@ -24,6 +24,7 @@ class BacktestPosition:
     stop_distance: float = 0.0
     confidence: float = 0.0
     allocation: float = 0.0
+    thesis_failure_deferrals: int = 0
 
 @dataclass
 class BacktestTradeRecord:
@@ -475,6 +476,12 @@ class BacktestExecutionEngine:
                         }
                     )
             if days_held >= min_days and unrealized_pct < 0 and pos.symbol not in active_symbols:
+                if self._defer_thesis_failure_exit(
+                    pos=pos,
+                    unrealized_pct=unrealized_pct,
+                    current_time=current_time,
+                ):
+                    return False, ""
                 return True, "thesis_failed"
             if days_held >= max_days:
                 return True, "extended_hold"
@@ -495,10 +502,46 @@ class BacktestExecutionEngine:
                         }
                     )
             if days_held >= min_days and unrealized_pct < 0 and pos.symbol not in active_symbols:
+                if self._defer_thesis_failure_exit(
+                    pos=pos,
+                    unrealized_pct=unrealized_pct,
+                    current_time=current_time,
+                ):
+                    return False, ""
                 return True, "thesis_failed"
             if days_held >= max_days:
                 return True, "extended_hold"
         return False, ""
+
+    def _defer_thesis_failure_exit(
+        self,
+        *,
+        pos: BacktestPosition,
+        unrealized_pct: float,
+        current_time: datetime,
+    ) -> bool:
+        config = self.config
+        if not getattr(config, "enable_conditional_hold_extension", False):
+            return False
+        max_adverse_pct = abs(getattr(config, "conditional_hold_max_adverse_pct", 0.04))
+        if unrealized_pct <= -max_adverse_pct:
+            return False
+        max_deferrals = max(0, getattr(config, "conditional_hold_extension_observations", 3))
+        if pos.thesis_failure_deferrals >= max_deferrals:
+            return False
+        pos.thesis_failure_deferrals += 1
+        self.exit_adjustment_logs.append(
+            {
+                "time": current_time.isoformat(),
+                "symbol": pos.symbol,
+                "action": "defer_thesis_failure_exit",
+                "deferrals": pos.thesis_failure_deferrals,
+                "max_deferrals": max_deferrals,
+                "unrealized_pct": round(unrealized_pct, 4),
+                "max_adverse_pct": round(max_adverse_pct, 4),
+            }
+        )
+        return True
 
     def _close_position(self, pos: BacktestPosition, price: float, exit_time: datetime, reason: str):
         # Exit Price with Slippage
