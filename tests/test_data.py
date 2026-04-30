@@ -1,4 +1,4 @@
-from datetime import UTC
+from datetime import UTC, datetime
 
 import pandas as pd
 
@@ -205,3 +205,107 @@ def test_alpha_vantage_daily_bars_parse_ohlcv_response(tmp_path):
     assert list(daily.columns) == ["Open", "High", "Low", "Close", "Volume"]
     assert list(daily["Close"]) == [102.0, 104.0]
     assert daily.index[0] == pd.Timestamp("2026-04-21", tz=UTC)
+
+
+def test_fetch_daily_bars_prefers_local_daily_bar_cache(tmp_path):
+    config = TradingConfig(
+        cache_dir=tmp_path / ".cache",
+        market_data_cache_dir=tmp_path / "market_bars",
+    )
+    service = MarketDataService(config, DummyLogger())
+    write_json(
+        service.daily_bar_cache_dir / "AAPL.json",
+        {
+            "saved_at": "2026-04-30T12:00:00Z",
+            "symbol": "AAPL",
+            "timeframe": "1Day",
+            "bars": [
+                {
+                    "timestamp": "2026-04-20T00:00:00+00:00",
+                    "open": 100.0,
+                    "high": 103.0,
+                    "low": 99.0,
+                    "close": 102.0,
+                    "volume": 1_000_000,
+                },
+                {
+                    "timestamp": "2026-04-21T04:00:00+00:00",
+                    "open": 102.0,
+                    "high": 105.0,
+                    "low": 101.0,
+                    "close": 104.0,
+                    "volume": 1_100_000,
+                },
+            ],
+        },
+    )
+    service._fetch_daily_bars_alpaca = lambda *args, **kwargs: (_ for _ in ()).throw(  # type: ignore[method-assign]
+        AssertionError("network should not be used")
+    )
+
+    daily = service._fetch_daily_bars(
+        "AAPL",
+        as_of_date=datetime(2026, 4, 21, tzinfo=UTC),
+    )
+
+    assert list(daily["Close"]) == [102.0, 104.0]
+    assert daily.index[-1] == pd.Timestamp("2026-04-21T04:00:00Z")
+
+
+def test_fetch_alpaca_daily_bars_bulk_paginates_and_groups_symbols(tmp_path):
+    config = TradingConfig(
+        cache_dir=tmp_path / ".cache",
+        market_data_cache_dir=tmp_path / "market_bars",
+        alpaca_api_key="key",
+        alpaca_secret_key="secret",
+    )
+    service = MarketDataService(config, DummyLogger())
+    calls = []
+
+    class FakeResponse:
+        def __init__(self, payload):
+            self.payload = payload
+
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return self.payload
+
+    responses = [
+        FakeResponse(
+            {
+                "bars": {
+                    "AAPL": [{"t": "2026-01-02T05:00:00Z", "o": 1, "h": 2, "l": 1, "c": 2, "v": 10}]
+                },
+                "next_page_token": "next",
+            }
+        ),
+        FakeResponse(
+            {
+                "bars": {
+                    "MSFT": [{"t": "2026-01-02T05:00:00Z", "o": 3, "h": 4, "l": 3, "c": 4, "v": 20}]
+                }
+            }
+        ),
+    ]
+
+    def fake_get(url, headers, params, timeout):
+        calls.append(params.copy())
+        return responses.pop(0)
+
+    service.session.get = fake_get  # type: ignore[method-assign]
+
+    bars = service.fetch_alpaca_daily_bars_bulk(
+        ["AAPL", "MSFT"],
+        start=datetime(2026, 1, 1, tzinfo=UTC),
+        end=datetime(2026, 1, 3, tzinfo=UTC),
+        feed="iex",
+    )
+
+    assert calls[0]["symbols"] == "AAPL,MSFT"
+    assert calls[0]["limit"] == 10000
+    assert "page_token" not in calls[0]
+    assert calls[1]["page_token"] == "next"
+    assert [bar["c"] for bar in bars["AAPL"]] == [2]
+    assert [bar["c"] for bar in bars["MSFT"]] == [4]

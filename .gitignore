@@ -11,6 +11,7 @@ __pycache__/
 
 logs/
 runs/
+data/market_bars/
 backtests/*
 !backtests/20260426T040610Z/
 !backtests/20260426T040610Z/**
