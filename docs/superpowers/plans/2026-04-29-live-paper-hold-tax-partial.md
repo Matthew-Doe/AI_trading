@@ -1,8 +1,17 @@
-# Live Paper Hold+Partial Implementation Plan
+# Live Paper Hold+Tax+Partial Implementation Plan
 
-**Goal:** Run the January-tested `hold+partial` strategy on a brand-new Alpaca paper account using live paper orders that mirror the backtest behavior as closely as practical.
+**Goal:** Run the January-tested `hold+tax+partial` strategy on a brand-new Alpaca paper account using live paper orders that mirror the backtest behavior as closely as practical.
 
-**Strategy Choice:** Use `hold+partial` for the first live paper rollout. Do not enable confidence sizing, tax-adjusted re-entry, or the combined `hold+tax+partial` strategy until there is enough paper-live evidence to justify another controlled comparison.
+**Strategy Choice:** Use `hold+tax+partial` for the first live paper rollout. In the completed January comparison it produced the strongest combination of net P/L, profit factor, median return, and concentration:
+
+- final equity: `$107,135.80`
+- net P/L: `+$5,026.97`
+- win rate: `59.72%`
+- profit factor: `2.5552`
+- trades: `72`
+- top-symbol profit share: `25.34%`
+
+Do not enable confidence sizing for this rollout. The live paper strategy should combine conditional thesis-failure hold, partial target exits, and tax-adjusted re-entry using the same constraints that were tested in January.
 
 **Core Principle:** Make the live paper system behave like the backtest. Entries happen around the simulated open-entry window, exits are reviewed on a scheduled close-style pass, stops and targets are managed by the strategy rather than by intraday broker brackets, and larger trades do not require Telegram approval.
 
@@ -15,7 +24,8 @@
 - The strategy is paper-only. It should refuse to run against live Alpaca endpoints.
 - `ENABLE_CONDITIONAL_HOLD_EXTENSION=true`.
 - `ENABLE_PARTIAL_PROFIT_TAKING=true`.
-- `ENABLE_TAX_ADJUSTED_EV_REENTRY=false`.
+- `ENABLE_TAX_ADJUSTED_EV_REENTRY=true`.
+- Tax-adjusted re-entry must remain constrained by minimum confidence, minimum expected value, and reduced re-entry sizing.
 - Larger-trade approval should be bypassed in this paper backtest-style mode. The live sizing path should follow the same caps used by the backtest, not ask for permission.
 - Use managed daily review exits, not Alpaca bracket orders, when matching backtest behavior is the priority.
 
@@ -25,8 +35,8 @@
 
 - `trading_system/config.py`: add live paper strategy flags, time-of-day settings, and paper-account safety guards.
 - `.env.example`: document the exact environment variables for this mode.
-- `trading_system/live_strategy_state.py`: add persistent JSON state for live positions, partial exits, and thesis-failure deferrals.
-- `trading_system/execution.py`: adapt Alpaca order planning and held-position management to support backtest-style `hold+partial`.
+- `trading_system/live_strategy_state.py`: add persistent JSON state for live positions, partial exits, thesis-failure deferrals, and tax cooldown/re-entry notes.
+- `trading_system/execution.py`: adapt Alpaca order planning and held-position management to support backtest-style `hold+tax+partial`.
 - `trading_system/main.py`: route live runs through entry or exit-review phases.
 - `trading_system/scheduler.py`: support separate entry and exit-review schedules.
 - Tests under `tests/`: cover config parsing, persistent state, execution behavior, phase routing, and paper safety checks.
@@ -38,11 +48,15 @@
 Add a disabled-by-default live paper mode with explicit strategy selection:
 
 - `ENABLE_LIVE_PAPER_BACKTEST_STYLE`
-- `LIVE_PAPER_STRATEGY=hold_partial`
+- `LIVE_PAPER_STRATEGY=hold_tax_partial`
 - `REQUIRE_EMPTY_PAPER_ACCOUNT`
 - `ALLOW_LIVE_LARGE_TRADE_APPROVAL=false`
 - `LIVE_ENTRY_REVIEW_TIME_ET`
 - `LIVE_EXIT_REVIEW_TIME_ET`
+- `ENABLE_TAX_ADJUSTED_EV_REENTRY=true`
+- `TAX_REENTRY_MIN_CONFIDENCE=0.90`
+- `TAX_REENTRY_MIN_EXPECTED_VALUE_PCT=2.00`
+- `TAX_REENTRY_SIZE_MULTIPLIER=0.50`
 
 Validate time settings as `HH:MM`. Keep defaults conservative: entry review shortly after the market opens and exit review near the close.
 
@@ -76,6 +90,8 @@ Track:
 - whether partial profit has already been taken
 - partial-exit quantity
 - thesis-failure deferral count
+- tax cooldown status and blocked-until timestamp when a loss exit creates a cooldown
+- tax-adjusted re-entry marker when a blocked trade is allowed by the EV rule
 - latest update timestamp
 
 State responsibilities:
@@ -83,6 +99,8 @@ State responsibilities:
 - record new entries after successful order placement or confirmed fill
 - mark partial exits
 - increment or reset thesis-failure deferrals
+- record tax cooldowns created by loss exits
+- record when a tax-adjusted EV re-entry is allowed and at what reduced size
 - clear closed positions
 - reconcile state against actual Alpaca positions
 
@@ -162,12 +180,35 @@ Checkpoint:
 
 ---
 
-## Phase 6: Entry And Exit Review Routing
+## Phase 6: Tax-Adjusted Re-Entry
+
+Port the January-tested tax re-entry behavior into live paper order planning.
+
+Keep normal tax cooldown blocking in place. When a symbol is blocked by the wash-sale cooldown, allow a reduced-size re-entry only if:
+
+- tax-adjusted re-entry is enabled
+- confidence is at or above the configured threshold
+- expected value is at or above the configured threshold
+- the reduced allocation still passes normal cash, risk, and position-size constraints
+
+The re-entry must be logged distinctly from normal entries so weekly review can tell whether tax-adjusted re-entry helped or hurt.
+
+This is still a paper-trading approximation, not broker-grade tax-lot accounting. The plan should keep the existing limitation visible in reports.
+
+Checkpoint:
+
+- tests cover blocked trade, allowed tax-adjusted re-entry, rejected low-confidence re-entry, rejected low-EV re-entry, and reduced-size sizing
+- reports distinguish normal entries from tax-adjusted re-entries
+- commit tax re-entry changes
+
+---
+
+## Phase 7: Entry And Exit Review Routing
 
 Split live paper runs into two phases:
 
 - `entry_review`: select symbols, run debate/decision, plan new entries, submit entry orders
-- `exit_review`: inspect held positions, apply stop/target/partial/hold-extension logic, submit exit or partial-exit orders
+- `exit_review`: inspect held positions, apply stop/target/partial/hold-extension/tax-cooldown logic, submit exit or partial-exit orders
 
 The scheduler should support both phases at separate times. Manual CLI runs should also be able to select a phase so testing does not depend on wall-clock time.
 
@@ -184,7 +225,7 @@ Checkpoint:
 
 ---
 
-## Phase 7: Paper Dry Run
+## Phase 8: Paper Dry Run
 
 Before placing paper orders, run with order execution disabled.
 
@@ -192,9 +233,10 @@ Verify:
 
 - correct Alpaca account is detected as paper
 - account is empty
-- selected strategy is `hold_partial`
+- selected strategy is `hold_tax_partial`
 - larger-trade approval is disabled
 - entry plans look like backtest-style sizing
+- tax-adjusted re-entry settings are enabled and logged
 - exit-review phase handles no-position state cleanly
 - reports are written and readable
 
@@ -206,17 +248,17 @@ Checkpoint:
 
 ---
 
-## Phase 8: Paper Launch
+## Phase 9: Paper Launch
 
 Enable paper order execution only after dry-run verification.
 
 First launch should use:
 
 - brand-new paper account
-- `hold_partial`
+- `hold_tax_partial`
 - conditional hold enabled
 - partial target exits enabled
-- tax-adjusted re-entry disabled
+- tax-adjusted re-entry enabled with January-tested thresholds
 - confidence sizing disabled
 - large-trade approval disabled
 - conservative account size matching backtest assumptions
@@ -240,6 +282,7 @@ Checkpoint:
 - Entry sizing follows backtest-style constraints.
 - Conditional thesis-failure hold works and persists across restarts.
 - Partial target exits work and persist across restarts.
+- Tax-adjusted re-entry works only when confidence, EV, and reduced-size constraints pass.
 - Entry and exit-review phases can run independently.
 - Dry-run and paper-order reports are written.
 - Tests pass before launch.
