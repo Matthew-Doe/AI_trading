@@ -38,6 +38,9 @@ class MarketDataService:
             "fallback_used": False,
         }
         self.rate_limiter = RateLimiter(self.config.max_requests_per_minute, 60)
+        self.alpha_vantage_rate_limiter = RateLimiter(
+            self.config.alpha_vantage_calls_per_minute, 60
+        )
         self.session.headers.update(
             {
                 "User-Agent": (
@@ -381,6 +384,14 @@ class MarketDataService:
             except Exception as exc:  # noqa: BLE001
                 self.logger.warning("Alpaca daily bars failed for %s: %s", symbol, exc)
 
+        if self.config.alpha_vantage_api_key:
+            try:
+                daily = self._fetch_daily_bars_alpha_vantage(symbol, end=end)
+                if not daily.empty:
+                    return daily
+            except Exception as exc:  # noqa: BLE001
+                self.logger.warning("Alpha Vantage daily bars failed for %s: %s", symbol, exc)
+
         daily = self._yf_download(
             tickers=symbol,
             start=start.strftime("%Y-%m-%d"),
@@ -437,6 +448,60 @@ class MarketDataService:
         frame["Timestamp"] = pd.to_datetime(frame["Timestamp"], utc=True)
         frame = frame.set_index("Timestamp")[["Open", "High", "Low", "Close", "Volume"]]
         return frame
+
+    def _fetch_daily_bars_alpha_vantage(self, symbol: str, end: datetime) -> pd.DataFrame:
+        self.alpha_vantage_rate_limiter.acquire()
+        response = self.session.get(
+            "https://www.alphavantage.co/query",
+            params={
+                "function": "TIME_SERIES_DAILY",
+                "symbol": symbol,
+                "outputsize": "full",
+                "apikey": self.config.alpha_vantage_api_key,
+            },
+            timeout=self.config.request_timeout_seconds,
+        )
+        response.raise_for_status()
+        payload = response.json()
+        if "Error Message" in payload:
+            raise DataIngestionError(str(payload["Error Message"]))
+        if "Note" in payload:
+            raise DataIngestionError(str(payload["Note"]))
+        if "Information" in payload:
+            raise DataIngestionError(str(payload["Information"]))
+
+        series = payload.get("Time Series (Daily)")
+        if not isinstance(series, dict) or not series:
+            raise DataIngestionError(f"No Alpha Vantage daily data returned for {symbol}")
+
+        rows: list[dict[str, float | datetime]] = []
+        end_utc = end if end.tzinfo else end.replace(tzinfo=UTC)
+        for date_text, values in series.items():
+            if not isinstance(values, dict):
+                continue
+            timestamp = datetime.strptime(date_text, "%Y-%m-%d").replace(tzinfo=UTC)
+            if timestamp > end_utc.astimezone(UTC):
+                continue
+            try:
+                rows.append(
+                    {
+                        "Timestamp": timestamp,
+                        "Open": float(values["1. open"]),
+                        "High": float(values["2. high"]),
+                        "Low": float(values["3. low"]),
+                        "Close": float(values["4. close"]),
+                        "Volume": float(values["5. volume"]),
+                    }
+                )
+            except (KeyError, TypeError, ValueError):
+                continue
+
+        if not rows:
+            raise DataIngestionError(f"No usable Alpha Vantage daily data returned for {symbol}")
+
+        frame = pd.DataFrame(rows)
+        frame = frame.sort_values("Timestamp").set_index("Timestamp")
+        return frame[["Open", "High", "Low", "Close", "Volume"]].dropna().tail(220)
 
     def _fetch_premarket_snapshot(
         self, symbol: str, last_close: float, as_of_date: datetime | None = None

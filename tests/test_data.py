@@ -1,3 +1,7 @@
+from datetime import UTC
+
+import pandas as pd
+
 from trading_system.config import TradingConfig
 from trading_system.data import MarketDataService
 from trading_system.main import load_mock_universe
@@ -146,3 +150,58 @@ def test_cached_market_data_is_rechecked_for_quality(tmp_path):
 
     assert checked.is_tradeable is False
     assert "extreme_20d_return" in checked.data_quality_flags
+
+
+def test_alpha_vantage_daily_bars_parse_ohlcv_response(tmp_path):
+    config = TradingConfig(
+        cache_dir=tmp_path / ".cache",
+        alpha_vantage_api_key="demo-key",
+    )
+    service = MarketDataService(config, DummyLogger())
+
+    class FakeResponse:
+        def raise_for_status(self):
+            pass
+
+        def json(self):
+            return {
+                "Time Series (Daily)": {
+                    "2026-04-22": {
+                        "1. open": "101.00",
+                        "2. high": "105.00",
+                        "3. low": "100.00",
+                        "4. close": "104.00",
+                        "5. volume": "1234567",
+                    },
+                    "2026-04-21": {
+                        "1. open": "100.00",
+                        "2. high": "103.00",
+                        "3. low": "99.00",
+                        "4. close": "102.00",
+                        "5. volume": "7654321",
+                    },
+                }
+            }
+
+    captured_params = {}
+
+    def fake_get(url, params, timeout):
+        captured_params.update(params)
+        return FakeResponse()
+
+    service.session.get = fake_get  # type: ignore[method-assign]
+
+    daily = service._fetch_daily_bars_alpha_vantage(
+        "AAPL",
+        end=pd.Timestamp("2026-04-22", tz=UTC).to_pydatetime(),
+    )
+
+    assert captured_params == {
+        "function": "TIME_SERIES_DAILY",
+        "symbol": "AAPL",
+        "outputsize": "full",
+        "apikey": "demo-key",
+    }
+    assert list(daily.columns) == ["Open", "High", "Low", "Close", "Volume"]
+    assert list(daily["Close"]) == [102.0, 104.0]
+    assert daily.index[0] == pd.Timestamp("2026-04-21", tz=UTC)

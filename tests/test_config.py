@@ -63,6 +63,16 @@ def test_trading_config_defaults_confidence_actionable_move_pct(monkeypatch):
     assert config.confidence_actionable_move_pct == 0.02
 
 
+def test_trading_config_reads_alpha_vantage_settings(monkeypatch):
+    monkeypatch.setenv("ALPHA_VANTAGE_API_KEY", "demo-key")
+    monkeypatch.setenv("ALPHA_VANTAGE_CALLS_PER_MINUTE", "5")
+
+    config = _fresh_trading_config()()
+
+    assert config.alpha_vantage_api_key == "demo-key"
+    assert config.alpha_vantage_calls_per_minute == 5
+
+
 def test_behavior_experiment_flags_default_disabled(monkeypatch):
     for name in (
         "ENABLE_TAX_LOSS_SIZE_COOLDOWN_TIERS",
