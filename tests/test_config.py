@@ -275,3 +275,29 @@ def test_point_in_time_universe_snapshot_fails_closed_without_snapshot(tmp_path)
         assert "No point-in-time universe snapshot" in str(exc)
     else:
         raise AssertionError("missing snapshot should fail closed")
+
+
+def test_bias_safe_historical_premarket_snapshot_does_not_use_full_day_volume():
+    config = TradingConfig(backtest_bias_safe_mode=True)
+    service = MarketDataService.__new__(MarketDataService)
+    service.config = config
+    service.logger = DummyLogger()
+    service._fetch_daily_bars = lambda symbol, as_of_date=None: pd.DataFrame(  # type: ignore[method-assign]
+        {
+            "Open": [99.0, 102.0],
+            "High": [101.0, 105.0],
+            "Low": [98.0, 100.0],
+            "Close": [100.0, 104.0],
+            "Volume": [1_000_000, 9_000_000],
+        },
+        index=pd.to_datetime(["2026-01-01T21:00:00Z", "2026-01-02T21:00:00Z"], utc=True),
+    )
+
+    snapshot = service._fetch_premarket_snapshot(
+        "AAPL",
+        last_close=100.0,
+        as_of_date=datetime(2026, 1, 2),
+    )
+
+    assert snapshot.latest_price == 102.0
+    assert snapshot.volume is None

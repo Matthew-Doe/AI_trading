@@ -49,6 +49,12 @@ class BacktestTradeRecord:
     allocation: float = 0.0
     return_pct: float = 0.0
     risk_normalized_return: float = 0.0
+    trade_id: str | None = None
+    decision_id: str | None = None
+    parent_trade_id: str | None = None
+    intraday_data_missing: bool = False
+    friction_cost: float = 0.0
+    partial_fill: bool = False
 
 
 @dataclass
@@ -157,6 +163,15 @@ class BacktestExecutionEngine:
         self.sizing_logs: list[dict[str, Any]] = []
         self.exit_adjustment_logs: list[dict[str, Any]] = []
         self.market_data_service = market_data_service
+        self.universe_metadata: dict[str, Any] = {}
+        self.max_calibration_outcome_timestamp_used: str | None = None
+        self.missing_intraday_bar_count = 0
+        self.stale_cache_count = 0
+        self.friction_summary: dict[str, float | int] = {
+            "total_friction_cost": 0.0,
+            "partial_fill_count": 0,
+            "skipped_fill_count": 0,
+        }
 
     def update_equity(self, current_prices: dict[str, MarketSnapshot]):
         """Calculates current portfolio value based on latest prices."""
@@ -196,8 +211,25 @@ class BacktestExecutionEngine:
             
             exit_triggered = False
             reason = ""
+            exit_price = price
+            intraday_data_missing = False
+
+            path_exit = self._conservative_daily_path_exit(pos, snapshot)
+            if path_exit is not None:
+                if path_exit["reason"] == "target_hit" and self._take_partial_profit(
+                    pos,
+                    path_exit["price"],
+                    current_time,
+                ):
+                    exit_triggered = False
+                    reason = ""
+                else:
+                    exit_triggered = True
+                    reason = path_exit["reason"]
+                    exit_price = path_exit["price"]
+                    intraday_data_missing = True
             
-            if pos.side == "long":
+            if not exit_triggered and pos.side == "long":
                 if pos.stop_price and price <= pos.stop_price:
                     exit_triggered, reason = True, "breakeven_stop" if pos.stop_price >= pos.entry_price else "stop_loss"
                 elif pos.take_profit_price and price >= pos.take_profit_price:
@@ -205,7 +237,7 @@ class BacktestExecutionEngine:
                         exit_triggered, reason = False, ""
                     else:
                         exit_triggered, reason = True, "target_hit"
-            else: # short
+            elif not exit_triggered: # short
                 if pos.stop_price and price >= pos.stop_price:
                     exit_triggered, reason = True, "breakeven_stop" if pos.stop_price <= pos.entry_price else "stop_loss"
                 elif pos.take_profit_price and price <= pos.take_profit_price:
@@ -223,9 +255,16 @@ class BacktestExecutionEngine:
                     active_symbols=active_symbols,
                     days_held=days_held,
                 )
+                exit_price = price
 
             if exit_triggered:
-                self._close_position(pos, price, current_time, reason)
+                self._close_position(
+                    pos,
+                    exit_price,
+                    current_time,
+                    reason,
+                    intraday_data_missing=intraday_data_missing,
+                )
                 symbols_to_remove.append(symbol)
         
         for s in symbols_to_remove:
@@ -284,7 +323,11 @@ class BacktestExecutionEngine:
             price = self._entry_price(snapshot)
 
             # Entry Price explicitly includes slippage
-            fill_price = price * (1 + self.slippage_pct) if dec.action == "long" else price * (1 - self.slippage_pct)
+            fill_price, entry_friction_cost_per_share = self._entry_fill_price(
+                side=dec.action,
+                mark_price=price,
+                snapshot=snapshot,
+            )
             
             # Position Sizing
             qty, sizing_reason, risk_notional, stop_distance = self._size_position(
@@ -293,7 +336,16 @@ class BacktestExecutionEngine:
                 fill_price=fill_price,
                 mark_price=price,
             )
+            qty, partial_fill = self._apply_liquidity_cap(qty, snapshot)
+            if partial_fill:
+                self.friction_summary["partial_fill_count"] = int(self.friction_summary["partial_fill_count"]) + 1
+                sizing_reason = f"{sizing_reason} partial_fill=true"
             if qty <= 0: continue
+            friction_cost = round(entry_friction_cost_per_share * qty, 4)
+            self.friction_summary["total_friction_cost"] = round(
+                float(self.friction_summary["total_friction_cost"]) + friction_cost,
+                4,
+            )
             if tax_reentry:
                 sizing_reason = f"{sizing_reason} tax_adjusted_reentry=true"
             stop_price, take_profit_price = self._planned_exit_prices(
@@ -336,6 +388,8 @@ class BacktestExecutionEngine:
                     "stop_price": stop_price,
                     "take_profit_price": take_profit_price,
                     "reason": sizing_reason,
+                    "partial_fill": partial_fill,
+                    "friction_cost": friction_cost,
                 }
             )
             self.update_equity(all_symbol_prices) # Immediate equity update
@@ -348,11 +402,57 @@ class BacktestExecutionEngine:
             return fallback
         return float(snapshot)
 
-    @staticmethod
-    def _entry_price(snapshot: MarketSnapshot) -> float:
+    def _entry_price(self, snapshot: MarketSnapshot) -> float:
         if isinstance(snapshot, SymbolMarketData):
+            mode = getattr(self.config, "backtest_entry_timing_mode", "legacy") if self.config else "legacy"
+            if mode == "previous_close_decision_next_open_fill":
+                return float(snapshot.close)
+            if mode == "open_plus_delay_fill":
+                delayed = snapshot.raw_metrics.get("delayed_fill_price")
+                if delayed:
+                    return float(delayed)
+                return float(snapshot.premarket.latest_price or snapshot.close)
+            if mode == "next_day_open_fill":
+                return float(snapshot.raw_metrics.get("next_open", snapshot.close))
             return float(snapshot.premarket.latest_price or snapshot.close)
         return float(snapshot)
+
+    def _entry_fill_price(
+        self,
+        *,
+        side: str,
+        mark_price: float,
+        snapshot: MarketSnapshot,
+    ) -> tuple[float, float]:
+        if getattr(self.config, "backtest_friction_model", "basic") != "realistic":
+            fill_price = mark_price * (1 + self.slippage_pct) if side == "long" else mark_price * (1 - self.slippage_pct)
+            return fill_price, abs(fill_price - mark_price)
+
+        spread_pct = 0.0
+        gap_pct = 0.0
+        volatility = 0.0
+        if isinstance(snapshot, SymbolMarketData):
+            spread_pct = float(snapshot.raw_metrics.get("spread_pct", 0.002) or 0.0)
+            gap_pct = abs(float(snapshot.premarket.gap_pct or 0.0))
+            volatility = float(snapshot.indicators.volatility20 or 0.0)
+        adverse_pct = (spread_pct / 2) + self.slippage_pct + min(0.02, gap_pct * 0.10) + min(0.01, volatility * 0.005)
+        if side == "long":
+            fill_price = mark_price * (1 + adverse_pct)
+        else:
+            fill_price = mark_price * (1 - adverse_pct)
+        return fill_price, abs(fill_price - mark_price)
+
+    def _apply_liquidity_cap(self, qty: int, snapshot: MarketSnapshot) -> tuple[int, bool]:
+        if qty <= 0 or getattr(self.config, "backtest_friction_model", "basic") != "realistic":
+            return qty, False
+        if not isinstance(snapshot, SymbolMarketData):
+            return qty, False
+        cap = int(max(0.0, snapshot.volume) * 0.10)
+        if cap <= 0:
+            return 0, True
+        if qty > cap:
+            return cap, True
+        return qty, False
 
     def _size_position(
         self,
@@ -470,6 +570,39 @@ class BacktestExecutionEngine:
             return round(max(0.01, mark_price - stop_distance), 2), round(mark_price + reward_distance, 2)
         return round(mark_price + stop_distance, 2), round(max(0.01, mark_price - reward_distance), 2)
 
+    def _conservative_daily_path_exit(
+        self,
+        pos: BacktestPosition,
+        snapshot: MarketSnapshot,
+    ) -> dict[str, Any] | None:
+        if getattr(self.config, "backtest_intraday_exit_mode", "daily_close") != "daily_high_low_conservative":
+            return None
+        if not isinstance(snapshot, SymbolMarketData):
+            return None
+        high = snapshot.raw_metrics.get("daily_high")
+        low = snapshot.raw_metrics.get("daily_low")
+        if high is None or low is None:
+            return None
+        high = float(high)
+        low = float(low)
+        if pos.side == "long":
+            stop_touched = pos.stop_price is not None and low <= pos.stop_price
+            target_touched = pos.take_profit_price is not None and high >= pos.take_profit_price
+            if stop_touched:
+                reason = "breakeven_stop" if pos.stop_price >= pos.entry_price else "stop_loss"
+                return {"reason": reason, "price": pos.stop_price}
+            if target_touched:
+                return {"reason": "target_hit", "price": pos.take_profit_price}
+        else:
+            stop_touched = pos.stop_price is not None and high >= pos.stop_price
+            target_touched = pos.take_profit_price is not None and low <= pos.take_profit_price
+            if stop_touched:
+                reason = "breakeven_stop" if pos.stop_price <= pos.entry_price else "stop_loss"
+                return {"reason": reason, "price": pos.stop_price}
+            if target_touched:
+                return {"reason": "target_hit", "price": pos.take_profit_price}
+        return None
+
     @staticmethod
     def _update_excursions(pos: BacktestPosition, price: float) -> None:
         pos.highest_price = price if pos.highest_price is None else max(pos.highest_price, price)
@@ -572,7 +705,15 @@ class BacktestExecutionEngine:
         )
         return True
 
-    def _close_position(self, pos: BacktestPosition, price: float, exit_time: datetime, reason: str):
+    def _close_position(
+        self,
+        pos: BacktestPosition,
+        price: float,
+        exit_time: datetime,
+        reason: str,
+        *,
+        intraday_data_missing: bool = False,
+    ):
         # Exit Price with Slippage
         fill_price = price * (1 - self.slippage_pct) if pos.side == "long" else price * (1 + self.slippage_pct)
         
@@ -614,6 +755,8 @@ class BacktestExecutionEngine:
                 net_pnl=gross_pnl - total_costs,
                 risk_notional=pos.risk_notional,
             ),
+            intraday_data_missing=intraday_data_missing,
+            friction_cost=round(total_costs, 4),
         )
         self.trades.append(record)
         self._start_exit_counterfactual(record)

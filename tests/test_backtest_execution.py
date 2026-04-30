@@ -33,6 +33,100 @@ def _symbol_data(symbol: str = "AAPL", price: float = 100.0, atr: float = 1.0) -
     )
 
 
+def test_bias_safe_previous_close_entry_ignores_open_print():
+    config = TradingConfig(
+        backtest_entry_timing_mode="previous_close_decision_next_open_fill",
+        max_single_trade_pct=0.10,
+        cash_rich_available_cash_threshold=2.0,
+        max_position_weight=0.50,
+    )
+    symbol_data = _symbol_data(price=100.0)
+    symbol_data.premarket.latest_price = 110.0
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.8, allocation=0.1)],
+        {"AAPL": symbol_data},
+        datetime(2026, 1, 2, tzinfo=UTC),
+    )
+
+    assert engine.positions["AAPL"].entry_price == 100.0
+
+
+def test_open_plus_delay_fill_uses_delayed_price_not_decision_open():
+    config = TradingConfig(
+        backtest_entry_timing_mode="open_plus_delay_fill",
+        max_single_trade_pct=0.10,
+        cash_rich_available_cash_threshold=2.0,
+        max_position_weight=0.50,
+    )
+    symbol_data = _symbol_data(price=100.0)
+    symbol_data.premarket.latest_price = 101.0
+    symbol_data.raw_metrics["delayed_fill_price"] = 103.0
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.8, allocation=0.1)],
+        {"AAPL": symbol_data},
+        datetime(2026, 1, 2, tzinfo=UTC),
+    )
+
+    assert engine.positions["AAPL"].entry_price == 103.0
+
+
+def test_conservative_daily_high_low_exit_chooses_stop_when_stop_and_target_touched():
+    config = TradingConfig(backtest_intraday_exit_mode="daily_high_low_conservative")
+    start = datetime(2026, 1, 2, tzinfo=UTC)
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+    engine.positions["AAPL"] = BacktestPosition(
+        symbol="AAPL",
+        qty=10,
+        entry_price=100.0,
+        entry_time=start,
+        side="long",
+        stop_price=95.0,
+        take_profit_price=110.0,
+    )
+    engine.cash = 9000.0
+    snapshot = _symbol_data(price=105.0)
+    snapshot.raw_metrics["daily_high"] = 112.0
+    snapshot.raw_metrics["daily_low"] = 94.0
+
+    engine.process_decisions([], {"AAPL": snapshot}, start + timedelta(days=1))
+
+    assert "AAPL" not in engine.positions
+    assert engine.trades[0].exit_reason == "stop_loss"
+    assert engine.trades[0].exit_price == 95.0
+    assert engine.trades[0].intraday_data_missing is True
+
+
+def test_realistic_friction_caps_quantity_to_liquidity_and_records_cost():
+    config = TradingConfig(
+        backtest_friction_model="realistic",
+        max_single_trade_pct=0.50,
+        cash_rich_trade_pct=0.50,
+        cash_rich_available_cash_threshold=0.0,
+        max_position_weight=1.0,
+    )
+    snapshot = _symbol_data(price=10.0)
+    snapshot.volume = 100
+    snapshot.raw_metrics["spread_pct"] = 0.02
+    engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.0, config=config)
+
+    engine.process_decisions(
+        [TradeDecision(symbol="AAPL", action="long", confidence=0.9, allocation=0.5)],
+        {"AAPL": snapshot},
+        datetime(2026, 1, 2, tzinfo=UTC),
+    )
+
+    position = engine.positions["AAPL"]
+    assert position.qty == 10
+    assert position.entry_price > 10.0
+    assert "partial_fill=true" in position.sizing_reason
+    assert engine.friction_summary["partial_fill_count"] == 1
+    assert engine.friction_summary["total_friction_cost"] > 0
+
+
 def test_backtest_execution_long_entry_and_exit():
     engine = BacktestExecutionEngine(initial_cash=10000.0, slippage_pct=0.01) # High slippage for testing
     now = datetime.now(UTC)

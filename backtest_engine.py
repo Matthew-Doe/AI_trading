@@ -34,6 +34,7 @@ def build_backtest_report(
     status: str,
     run_at: datetime | None = None,
 ) -> dict:
+    bias_controls = build_bias_controls(config=config, execution=execution)
     return {
         "metadata": {
             "run_at": (run_at or datetime.now(UTC)).isoformat(),
@@ -61,6 +62,7 @@ def build_backtest_report(
                 "Tax estimates are same-symbol wash-sale approximations, not broker tax-lot accounting.",
             ],
         },
+        "bias_controls": bias_controls,
         "performance": execution.get_summary(),
         "confidence_analysis": build_confidence_analysis(execution.trades),
         "tax": execution.get_tax_summary(),
@@ -70,6 +72,61 @@ def build_backtest_report(
         "exit_adjustment_logs": execution.exit_adjustment_logs,
         "daily_history": daily_stats,
         "all_trades": [dataclass_to_dict(t) for t in execution.trades],
+    }
+
+
+def build_bias_controls(*, config: TradingConfig, execution: BacktestExecutionEngine) -> dict:
+    universe_metadata = getattr(execution, "universe_metadata", {}) or {}
+    point_in_time = config.backtest_universe_mode == "point_in_time"
+    fallback_used = bool(universe_metadata.get("fallback_used", False))
+    snapshot_date = universe_metadata.get("snapshot_date")
+    warnings: list[str] = []
+    if not getattr(config, "backtest_bias_safe_mode", False):
+        warnings.append("bias_safe_mode_disabled")
+    if point_in_time and not snapshot_date:
+        warnings.append("missing_point_in_time_universe_snapshot")
+    if not point_in_time:
+        warnings.append("point_in_time_universe_disabled")
+    if fallback_used:
+        warnings.append("current_universe_fallback_used")
+    if config.backtest_calibration_mode not in {"off", "walk_forward"}:
+        warnings.append("unsafe_calibration_mode")
+    if config.backtest_entry_timing_mode not in {
+        "previous_close_decision_next_open_fill",
+        "open_plus_delay_fill",
+        "next_day_open_fill",
+    }:
+        warnings.append("unsafe_entry_timing_mode")
+    if config.backtest_intraday_exit_mode == "daily_close":
+        warnings.append("daily_close_only_exits")
+    if config.backtest_friction_model == "none":
+        warnings.append("friction_disabled")
+
+    return {
+        "bias_safe_mode": bool(getattr(config, "backtest_bias_safe_mode", False)),
+        "point_in_time_universe_enabled": point_in_time,
+        "universe_mode": config.backtest_universe_mode,
+        "universe_snapshot_date": snapshot_date,
+        "universe_symbol_count": universe_metadata.get("symbol_count", 0),
+        "current_universe_fallback_used": fallback_used,
+        "calibration_mode": config.backtest_calibration_mode,
+        "maximum_calibration_outcome_timestamp_used": getattr(
+            execution, "max_calibration_outcome_timestamp_used", None
+        ),
+        "entry_timing_mode": config.backtest_entry_timing_mode,
+        "entry_delay_minutes": config.backtest_entry_delay_minutes,
+        "intraday_exit_mode": config.backtest_intraday_exit_mode,
+        "friction_model": config.backtest_friction_model,
+        "total_friction_cost": getattr(execution, "friction_summary", {}).get(
+            "total_friction_cost", 0.0
+        ),
+        "partial_fill_count": getattr(execution, "friction_summary", {}).get(
+            "partial_fill_count", 0
+        ),
+        "missing_intraday_bar_count": getattr(execution, "missing_intraday_bar_count", 0),
+        "stale_cache_count": getattr(execution, "stale_cache_count", 0),
+        "acceptance_warnings": warnings,
+        "acceptance_grade": not warnings,
     }
 
 
@@ -258,6 +315,10 @@ def run_backtest():
 
             # 2. Build Universe
             universe = market_data.build_universe(as_of_date=day)
+            execution.universe_metadata = getattr(market_data, "last_universe_metadata", {})
+            execution.max_calibration_outcome_timestamp_used = getattr(
+                calibrator, "max_outcome_timestamp_used", None
+            )
             selected = selector.select(universe, config.candidate_count)
             write_json(day_path / "selected_symbols.json", selected)
             

@@ -38,6 +38,44 @@ def test_build_backtest_report_documents_assumptions_and_limitations(tmp_path):
     assert "exit_counterfactuals" in report
 
 
+def test_build_backtest_report_includes_bias_controls_and_acceptance_warnings(tmp_path):
+    config = TradingConfig(
+        run_dir=tmp_path / "runs",
+        log_dir=tmp_path / "logs",
+        backtest_bias_safe_mode=True,
+        backtest_universe_mode="point_in_time",
+        backtest_calibration_mode="walk_forward",
+        backtest_entry_timing_mode="previous_close_decision_next_open_fill",
+        backtest_intraday_exit_mode="daily_high_low_conservative",
+        backtest_friction_model="realistic",
+    )
+    execution = BacktestExecutionEngine(initial_cash=100000.0, config=config)
+    execution.friction_summary["total_friction_cost"] = 12.5
+    execution.missing_intraday_bar_count = 3
+
+    report = build_backtest_report(
+        config=config,
+        execution=execution,
+        daily_stats=[],
+        initial_cash=100000.0,
+        start_date="2026-03-01",
+        end_date="2026-04-20",
+        status="completed",
+        run_at=datetime(2026, 4, 26, tzinfo=UTC),
+    )
+
+    controls = report["bias_controls"]
+    assert controls["bias_safe_mode"] is True
+    assert controls["point_in_time_universe_enabled"] is True
+    assert controls["calibration_mode"] == "walk_forward"
+    assert controls["entry_timing_mode"] == "previous_close_decision_next_open_fill"
+    assert controls["intraday_exit_mode"] == "daily_high_low_conservative"
+    assert controls["friction_model"] == "realistic"
+    assert controls["total_friction_cost"] == 12.5
+    assert "missing_point_in_time_universe_snapshot" in controls["acceptance_warnings"]
+    assert controls["acceptance_grade"] is False
+
+
 def test_confidence_analysis_handles_empty_trades():
     analysis = build_confidence_analysis([])
 

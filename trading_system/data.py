@@ -457,7 +457,9 @@ class MarketDataService:
             return PremarketSnapshot(
                 latest_price=open_price,
                 gap_pct=gap_pct,
-                volume=safe_float(day_t["Volume"]) * 0.05, # Simulated low premarket volume
+                volume=None
+                if getattr(self.config, "backtest_bias_safe_mode", False)
+                else safe_float(day_t["Volume"]) * 0.05,
                 timestamp=as_of_date.isoformat(),
             )
 
