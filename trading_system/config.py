@@ -59,6 +59,8 @@ class TradingConfig:
     alpaca_paper_base_url: str = os.getenv(
         "ALPACA_PAPER_BASE_URL", "https://paper-api.alpaca.markets"
     )
+    alpha_vantage_api_key: str = os.getenv("ALPHA_VANTAGE_API_KEY", "").strip()
+    alpha_vantage_calls_per_minute: int = int(os.getenv("ALPHA_VANTAGE_CALLS_PER_MINUTE", "5"))
     llm_provider: str = os.getenv("LLM_PROVIDER", "ollama").strip().lower()
     llm_debate_model: str = os.getenv("LLM_DEBATE_MODEL", "").strip()
     llm_decision_model: str = os.getenv("LLM_DECISION_MODEL", "").strip()
