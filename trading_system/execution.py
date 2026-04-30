@@ -529,6 +529,7 @@ class AlpacaExecutionEngine:
                         "telegram_approval_required": plan.telegram_approval_required,
                         "telegram_approval_granted": plan.telegram_approval_granted,
                         "reason": "Open order already exists for symbol.",
+                        **self._empty_broker_lifecycle_payload(plan),
                     }
                 )
                 continue
@@ -548,6 +549,7 @@ class AlpacaExecutionEngine:
                     "max_trade_pct": plan.max_trade_pct,
                     "telegram_approval_required": plan.telegram_approval_required,
                     "telegram_approval_granted": plan.telegram_approval_granted,
+                    **self._broker_lifecycle_payload(plan, order),
                 }
                 self.logger.info("Submitted order for %s qty=%s side=%s", plan.symbol, plan.qty, plan.side)
             else:
@@ -561,6 +563,7 @@ class AlpacaExecutionEngine:
                     "max_trade_pct": plan.max_trade_pct,
                     "telegram_approval_required": plan.telegram_approval_required,
                     "telegram_approval_granted": plan.telegram_approval_granted,
+                    **self._empty_broker_lifecycle_payload(plan),
                 }
                 self.logger.info("Dry-run order for %s qty=%s side=%s", plan.symbol, plan.qty, plan.side)
             results.append(payload)
@@ -585,6 +588,49 @@ class AlpacaExecutionEngine:
             self.telegram.send_trade_summary(run_id=self.run_id, order_plan=plan, payload=payload)
 
         return results
+
+    @staticmethod
+    def _empty_broker_lifecycle_payload(plan: OrderPlan) -> dict[str, object]:
+        return {
+            "broker_order_id": None,
+            "client_order_id": None,
+            "submitted_at": None,
+            "broker_status": None,
+            "filled_qty": 0,
+            "average_fill_price": None,
+            "limit_price": getattr(plan, "entry_limit_price", None),
+            "stop_price": getattr(plan, "stop_price", None),
+            "take_profit_price": getattr(plan, "take_profit_price", None),
+            "rejection_reason": None,
+            "cancel_reason": None,
+            "raw_broker_response": {},
+        }
+
+    @staticmethod
+    def _broker_lifecycle_payload(plan: OrderPlan, order) -> dict[str, object]:
+        order_id = str(getattr(order, "id", "")) or None
+        filled_qty = getattr(order, "filled_qty", None)
+        try:
+            filled_qty_value = float(filled_qty) if filled_qty is not None else 0
+        except (TypeError, ValueError):
+            filled_qty_value = 0
+        return {
+            "broker_order_id": order_id,
+            "client_order_id": str(getattr(order, "client_order_id", "")) or None,
+            "submitted_at": str(getattr(order, "submitted_at", "")) or None,
+            "broker_status": str(getattr(order, "status", "")) or None,
+            "filled_qty": filled_qty_value,
+            "average_fill_price": getattr(order, "filled_avg_price", None),
+            "limit_price": getattr(plan, "entry_limit_price", None),
+            "stop_price": getattr(plan, "stop_price", None),
+            "take_profit_price": getattr(plan, "take_profit_price", None),
+            "rejection_reason": getattr(order, "rejected_reason", None),
+            "cancel_reason": getattr(order, "cancel_reason", None),
+            "raw_broker_response": {
+                "id": order_id,
+                "status": str(getattr(order, "status", "")) or None,
+            },
+        }
 
     def _is_tax_loss_blocked(self, symbol: str) -> bool:
         tax_state = getattr(self, "tax_state", None)

@@ -63,6 +63,10 @@ def build_backtest_report(
             ],
         },
         "bias_controls": bias_controls,
+        "audit_event_file": str(execution.audit_event_path)
+        if getattr(execution, "audit_event_path", None)
+        else None,
+        "audit_event_count": getattr(execution, "audit_event_count", 0),
         "performance": execution.get_summary(),
         "confidence_analysis": build_confidence_analysis(execution.trades),
         "tax": execution.get_tax_summary(),
@@ -285,6 +289,7 @@ def run_backtest():
     )
     
     backtest_root = ensure_dir(Path("backtests") / datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ"))
+    execution.audit_event_path = backtest_root / "trade_audit_events.jsonl"
     
     nyse = mcal.get_calendar("NYSE")
     schedule = nyse.schedule(start_date=args.start, end_date=args.end)

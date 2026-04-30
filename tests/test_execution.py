@@ -350,6 +350,39 @@ def test_submit_orders_records_skip_when_open_order_exists():
     assert "Open order already exists" in results[0]["reason"]
 
 
+def test_submit_orders_dry_run_includes_broker_lifecycle_fields():
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(execute_orders=False)
+    engine.logger = DummyLogger()
+    engine.client = FakeTradingClient()
+    engine.telegram = FakeTelegramNotifier(approved=False)
+    engine.run_id = "test-run"
+    engine.tax_state = TaxLossCooldownState.__new__(TaxLossCooldownState)
+    engine.tax_blocked_orders = []
+
+    results = engine.submit_orders(
+        [
+            OrderPlan(
+                symbol="AAPL",
+                side="long",
+                qty=3,
+                notional=390.0,
+                confidence=0.91,
+                allocation=0.1,
+                reason="test",
+                entry_limit_price=131.0,
+            )
+        ]
+    )
+
+    assert results[0]["broker_order_id"] is None
+    assert results[0]["client_order_id"] is None
+    assert results[0]["submitted_at"] is None
+    assert results[0]["filled_qty"] == 0
+    assert results[0]["average_fill_price"] is None
+    assert results[0]["limit_price"] == 131.0
+
+
 def test_live_tax_loss_cooldown_blocks_new_long_entries(tmp_path):
     engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
     engine.config = TradingConfig(

@@ -5,6 +5,7 @@ from trading_system.main import (
     mock_decisions,
 )
 from trading_system.reporting import write_run_report
+from trading_system.trade_audit import load_audit_events
 
 
 def test_write_run_report_creates_json_and_html(tmp_path):
@@ -35,3 +36,42 @@ def test_write_run_report_creates_json_and_html(tmp_path):
     assert (tmp_path / "report.html").exists()
     assert payload["data_quality_warnings"][0]["symbol"] == selected[0].symbol
     assert "Trading Run Report" in (tmp_path / "report.html").read_text(encoding="utf-8")
+
+
+def test_write_run_report_writes_broker_audit_events(tmp_path):
+    selected = load_mock_universe()[:3]
+    debates = mock_debates(selected)
+    decisions = mock_decisions(debates)
+    order_plans = build_mock_order_plans(decisions, selected)
+    execution_results = [
+        {
+            "symbol": order_plans[0].symbol,
+            "status": "dry_run",
+            "qty": order_plans[0].qty,
+            "side": order_plans[0].side,
+            "broker_order_id": None,
+            "client_order_id": None,
+            "filled_qty": 0,
+            "average_fill_price": None,
+        }
+    ]
+
+    payload = write_run_report(
+        run_path=tmp_path,
+        selected_symbols=selected,
+        debates=debates,
+        decisions=decisions,
+        pending_order_reviews=[],
+        held_position_signals=[],
+        order_plans=order_plans,
+        execution_results=execution_results,
+        llm_usage={"totals": {"call_count": 0, "total_tokens": 0}},
+        run_metrics={"elapsed_human": "1.00s"},
+    )
+
+    events = load_audit_events(tmp_path / "trade_audit_events.jsonl")
+    assert len(events) == 1
+    assert events[0].event_type == "broker_order_update"
+    assert events[0].symbol == order_plans[0].symbol
+    assert payload["audit_event_file"] == "trade_audit_events.jsonl"
+    assert payload["audit_event_count"] == 1

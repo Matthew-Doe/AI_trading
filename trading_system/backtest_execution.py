@@ -5,6 +5,13 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from trading_system.models import OrderPlan, TradeDecision, SymbolMarketData
+from trading_system.trade_audit import (
+    AuditEvent,
+    append_audit_event,
+    stable_decision_id,
+    stable_event_id,
+    stable_trade_id,
+)
 
 MarketSnapshot = float | SymbolMarketData
 
@@ -26,6 +33,11 @@ class BacktestPosition:
     allocation: float = 0.0
     thesis_failure_deferrals: int = 0
     partial_profit_taken: bool = False
+    trade_id: str | None = None
+    decision_id: str | None = None
+    decision_snapshot: dict[str, Any] = field(default_factory=dict)
+    market_snapshot: dict[str, Any] = field(default_factory=dict)
+    regime_snapshot: dict[str, Any] = field(default_factory=dict)
 
 @dataclass
 class BacktestTradeRecord:
@@ -55,6 +67,10 @@ class BacktestTradeRecord:
     intraday_data_missing: bool = False
     friction_cost: float = 0.0
     partial_fill: bool = False
+    decision_snapshot: dict[str, Any] = field(default_factory=dict)
+    market_snapshot: dict[str, Any] = field(default_factory=dict)
+    exit_market_snapshot: dict[str, Any] = field(default_factory=dict)
+    regime_snapshot: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -163,6 +179,8 @@ class BacktestExecutionEngine:
         self.sizing_logs: list[dict[str, Any]] = []
         self.exit_adjustment_logs: list[dict[str, Any]] = []
         self.market_data_service = market_data_service
+        self.audit_event_path = None
+        self.audit_event_count = 0
         self.universe_metadata: dict[str, Any] = {}
         self.max_calibration_outcome_timestamp_used: str | None = None
         self.missing_intraday_bar_count = 0
@@ -360,6 +378,8 @@ class BacktestExecutionEngine:
             cost = (qty * fill_price)
             self.cash -= cost
             self.positions[dec.symbol] = BacktestPosition(
+                trade_id=stable_trade_id(dec.symbol, dec.action, current_time, stable_decision_id(dec, current_time)),
+                decision_id=stable_decision_id(dec, current_time),
                 symbol=dec.symbol,
                 qty=qty,
                 entry_price=fill_price,
@@ -374,6 +394,24 @@ class BacktestExecutionEngine:
                 stop_distance=stop_distance,
                 confidence=dec.confidence,
                 allocation=dec.allocation or 0.0,
+                decision_snapshot=self._decision_snapshot(dec),
+                market_snapshot=self._market_snapshot(snapshot),
+                regime_snapshot=self._regime_snapshot(snapshot),
+            )
+            self._append_audit_event(
+                event_type="entry_filled",
+                timestamp=current_time,
+                trade_id=self.positions[dec.symbol].trade_id,
+                decision_id=self.positions[dec.symbol].decision_id,
+                symbol=dec.symbol,
+                payload={
+                    "side": dec.action,
+                    "qty": qty,
+                    "fill_price": round(fill_price, 4),
+                    "confidence": dec.confidence,
+                    "allocation": dec.allocation,
+                    "sizing_reason": sizing_reason,
+                },
             )
             self.sizing_logs.append(
                 {
@@ -453,6 +491,96 @@ class BacktestExecutionEngine:
         if qty > cap:
             return cap, True
         return qty, False
+
+    def _append_audit_event(
+        self,
+        *,
+        event_type: str,
+        timestamp: datetime,
+        trade_id: str | None,
+        decision_id: str | None,
+        symbol: str,
+        payload: dict[str, Any],
+    ) -> None:
+        if self.audit_event_path is None or trade_id is None:
+            return
+        event = AuditEvent(
+            event_id=stable_event_id(event_type, trade_id, timestamp, payload),
+            event_type=event_type,
+            timestamp=timestamp.isoformat(),
+            trade_id=trade_id,
+            decision_id=decision_id,
+            symbol=symbol,
+            payload=payload,
+        )
+        append_audit_event(self.audit_event_path, event)
+        self.audit_event_count += 1
+
+    @staticmethod
+    def _decision_snapshot(decision: TradeDecision) -> dict[str, Any]:
+        return {
+            "action": decision.action,
+            "confidence": decision.confidence,
+            "raw_confidence": decision.raw_confidence,
+            "calibrated_confidence": decision.calibrated_confidence,
+            "allocation": decision.allocation,
+            "estimated_win_probability": decision.estimated_win_probability,
+            "expected_upside_pct": decision.expected_upside_pct,
+            "expected_downside_pct": decision.expected_downside_pct,
+            "expected_value_pct": decision.expected_value_pct,
+            "risk_reward": decision.risk_reward,
+            "evidence_count": decision.evidence_count,
+            "confidence_cap_reason": decision.confidence_cap_reason,
+            "target_price": decision.target_price,
+            "invalidation_price": decision.invalidation_price,
+        }
+
+    @staticmethod
+    def _market_snapshot(snapshot: MarketSnapshot) -> dict[str, Any]:
+        if isinstance(snapshot, SymbolMarketData):
+            return {
+                "symbol": snapshot.symbol,
+                "close": snapshot.close,
+                "volume": snapshot.volume,
+                "premarket_gap_pct": snapshot.premarket.gap_pct,
+                "premarket_volume": snapshot.premarket.volume,
+                "price_change_5d": snapshot.raw_metrics.get("price_change_5d"),
+                "price_change_20d": snapshot.raw_metrics.get("price_change_20d"),
+                "volume_ratio": snapshot.raw_metrics.get("volume_ratio"),
+            }
+        return {"price": float(snapshot)}
+
+    @staticmethod
+    def _regime_snapshot(snapshot: MarketSnapshot) -> dict[str, Any]:
+        if not isinstance(snapshot, SymbolMarketData):
+            return {
+                "trend_regime": "unknown",
+                "volatility_regime": "unknown",
+                "gap_regime": "unknown",
+                "volume_regime": "unknown",
+                "symbol_momentum_regime": "unknown",
+                "tags": [],
+            }
+        trend = "uptrend" if snapshot.close >= snapshot.indicators.sma50 else "downtrend"
+        volatility = "high" if snapshot.indicators.volatility20 >= 0.5 else "normal"
+        gap = "gap_up" if (snapshot.premarket.gap_pct or 0.0) > 0.01 else "gap_down" if (snapshot.premarket.gap_pct or 0.0) < -0.01 else "flat"
+        volume_ratio = float(snapshot.raw_metrics.get("volume_ratio", 1.0) or 1.0)
+        volume = "high_volume" if volume_ratio >= 1.5 else "normal_volume"
+        momentum = "positive" if float(snapshot.raw_metrics.get("price_change_5d", 0.0) or 0.0) >= 0 else "negative"
+        tags: list[str] = []
+        if snapshot.indicators.rsi14 >= 70:
+            tags.append("overbought")
+        if snapshot.indicators.rsi14 <= 30:
+            tags.append("oversold")
+        tags.append("above_sma50" if snapshot.close >= snapshot.indicators.sma50 else "below_sma50")
+        return {
+            "trend_regime": trend,
+            "volatility_regime": volatility,
+            "gap_regime": gap,
+            "volume_regime": volume,
+            "symbol_momentum_regime": momentum,
+            "tags": tags,
+        }
 
     def _size_position(
         self,
@@ -757,8 +885,27 @@ class BacktestExecutionEngine:
             ),
             intraday_data_missing=intraday_data_missing,
             friction_cost=round(total_costs, 4),
+            trade_id=pos.trade_id,
+            decision_id=pos.decision_id,
+            decision_snapshot=pos.decision_snapshot,
+            market_snapshot=pos.market_snapshot,
+            exit_market_snapshot=self._market_snapshot(price),
+            regime_snapshot=pos.regime_snapshot,
         )
         self.trades.append(record)
+        self._append_audit_event(
+            event_type="full_exit_filled",
+            timestamp=exit_time,
+            trade_id=pos.trade_id,
+            decision_id=pos.decision_id,
+            symbol=pos.symbol,
+            payload={
+                "reason": reason,
+                "qty": pos.qty,
+                "fill_price": round(fill_price, 4),
+                "net_pnl": round(record.net_pnl, 2),
+            },
+        )
         self._start_exit_counterfactual(record)
         if record.net_pnl < 0 and self.wash_sale_cooldown_days:
             self.loss_cooldowns[pos.symbol] = exit_time + timedelta(
@@ -827,8 +974,28 @@ class BacktestExecutionEngine:
                 net_pnl=net_pnl,
                 risk_notional=risk_notional,
             ),
+            trade_id=pos.trade_id,
+            decision_id=pos.decision_id,
+            parent_trade_id=pos.trade_id,
+            friction_cost=round(total_costs, 4),
+            decision_snapshot=pos.decision_snapshot,
+            market_snapshot=pos.market_snapshot,
+            exit_market_snapshot=self._market_snapshot(price),
+            regime_snapshot=pos.regime_snapshot,
         )
         self.trades.append(record)
+        self._append_audit_event(
+            event_type="partial_exit_filled",
+            timestamp=exit_time,
+            trade_id=pos.trade_id,
+            decision_id=pos.decision_id,
+            symbol=pos.symbol,
+            payload={
+                "qty": qty_to_close,
+                "fill_price": round(fill_price, 4),
+                "net_pnl": round(net_pnl, 2),
+            },
+        )
         self._start_exit_counterfactual(record)
 
         pos.qty -= qty_to_close

@@ -13,6 +13,7 @@ from trading_system.models import (
     TradeDecision,
 )
 from trading_system.utils import dataclass_to_dict, write_json
+from trading_system.trade_audit import AuditEvent, append_audit_event, stable_event_id
 
 
 def build_run_report_payload(
@@ -81,6 +82,10 @@ def write_run_report(
         llm_usage=llm_usage,
         run_metrics=run_metrics,
     )
+    audit_path = run_path / "trade_audit_events.jsonl"
+    audit_event_count = write_broker_audit_events(audit_path, execution_results)
+    payload["audit_event_file"] = audit_path.name
+    payload["audit_event_count"] = audit_event_count
     write_json(run_path / "report.json", payload)
     (run_path / "report.html").write_text(_render_html(payload), encoding="utf-8")
     
@@ -94,6 +99,42 @@ def write_run_report(
     )
     
     return payload
+
+
+def write_broker_audit_events(path: Path, execution_results: list[dict]) -> int:
+    count = 0
+    for index, result in enumerate(execution_results):
+        if "broker_order_id" not in result and "client_order_id" not in result:
+            continue
+        symbol = str(result.get("symbol", "")).upper()
+        timestamp = str(result.get("submitted_at") or result.get("timestamp") or "")
+        if not timestamp:
+            timestamp = f"report-event-{index}"
+        trade_id = str(result.get("trade_id") or f"live_{symbol}_{index}")
+        payload = {
+            "status": result.get("status"),
+            "broker_order_id": result.get("broker_order_id"),
+            "client_order_id": result.get("client_order_id"),
+            "side": result.get("side"),
+            "qty": result.get("qty"),
+            "filled_qty": result.get("filled_qty"),
+            "average_fill_price": result.get("average_fill_price"),
+            "raw_broker_response": result.get("raw_broker_response", {}),
+        }
+        append_audit_event(
+            path,
+            AuditEvent(
+                event_id=stable_event_id("broker_order_update", trade_id, timestamp, payload),
+                event_type="broker_order_update",
+                timestamp=timestamp,
+                trade_id=trade_id,
+                decision_id=result.get("decision_id"),
+                symbol=symbol,
+                payload=payload,
+            ),
+        )
+        count += 1
+    return count
 
 
 def write_ai_debug_log(

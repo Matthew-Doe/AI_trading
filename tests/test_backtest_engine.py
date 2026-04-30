@@ -76,6 +76,27 @@ def test_build_backtest_report_includes_bias_controls_and_acceptance_warnings(tm
     assert controls["acceptance_grade"] is False
 
 
+def test_build_backtest_report_references_audit_event_file(tmp_path):
+    config = TradingConfig(run_dir=tmp_path / "runs", log_dir=tmp_path / "logs")
+    execution = BacktestExecutionEngine(initial_cash=100000.0)
+    execution.audit_event_path = tmp_path / "trade_audit_events.jsonl"
+    execution.audit_event_count = 2
+
+    report = build_backtest_report(
+        config=config,
+        execution=execution,
+        daily_stats=[],
+        initial_cash=100000.0,
+        start_date="2026-03-01",
+        end_date="2026-04-20",
+        status="completed",
+        run_at=datetime(2026, 4, 26, tzinfo=UTC),
+    )
+
+    assert report["audit_event_file"] == str(execution.audit_event_path)
+    assert report["audit_event_count"] == 2
+
+
 def test_confidence_analysis_handles_empty_trades():
     analysis = build_confidence_analysis([])
 
