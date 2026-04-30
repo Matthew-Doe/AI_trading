@@ -7,6 +7,17 @@ def analyze_report(report_path):
     with open(report_path) as f:
         data = json.load(f)
 
+    bias_controls = data.get("bias_controls", {})
+    if bias_controls:
+        print(
+            "Bias controls: "
+            f"acceptance_grade={bias_controls.get('acceptance_grade')} "
+            f"universe={bias_controls.get('universe_mode')} "
+            f"calibration={bias_controls.get('calibration_mode')} "
+            f"entry={bias_controls.get('entry_timing_mode')} "
+            f"friction={bias_controls.get('friction_model')}"
+        )
+
     confidence_analysis = data.get("confidence_analysis")
     if confidence_analysis:
         print(f"Total trades: {confidence_analysis['trade_count']}")

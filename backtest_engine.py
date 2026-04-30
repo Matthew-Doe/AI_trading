@@ -33,6 +33,8 @@ def build_backtest_report(
     end_date: str,
     status: str,
     run_at: datetime | None = None,
+    strategy: str = "default",
+    window_label: str = "unspecified",
 ) -> dict:
     bias_controls = build_bias_controls(config=config, execution=execution)
     return {
@@ -44,6 +46,8 @@ def build_backtest_report(
             "start_date": start_date,
             "end_date": end_date,
             "status": status,
+            "strategy": strategy,
+            "window_label": window_label,
             "universe_source": "current_companiesmarketcap_snapshot",
             "entry_price_rule": "simulated_open_or_close_with_slippage",
             "exit_price_rule": "daily_close_stop_target_or_staged_thesis_exit",
@@ -132,6 +136,26 @@ def build_bias_controls(*, config: TradingConfig, execution: BacktestExecutionEn
         "acceptance_warnings": warnings,
         "acceptance_grade": not warnings,
     }
+
+
+def write_live_paper_readiness_if_accepted(*, config: TradingConfig, report: dict) -> bool:
+    metadata = report.get("metadata", {})
+    controls = report.get("bias_controls", {})
+    if metadata.get("window_label") != "holdout":
+        return False
+    if not controls.get("acceptance_grade"):
+        return False
+    readiness = {
+        "strategy": metadata.get("strategy"),
+        "window_label": metadata.get("window_label"),
+        "accepted_at": datetime.now(UTC).isoformat(),
+        "acceptance_grade": True,
+        "acceptance_warnings": controls.get("acceptance_warnings", []),
+        "report_start_date": metadata.get("start_date"),
+        "report_end_date": metadata.get("end_date"),
+    }
+    write_json(Path(config.live_paper_readiness_path), readiness)
+    return True
 
 
 CONFIDENCE_BUCKETS = (
@@ -272,10 +296,30 @@ def run_backtest():
     parser.add_argument("--end", default="2026-04-20", help="Date to end simulation")
     parser.add_argument("--limit", type=int, default=1000)
     parser.add_argument("--initial-cash", type=float, default=100000.0)
+    parser.add_argument("--strategy", default="default")
+    parser.add_argument("--window-label", default="unspecified", choices=("train", "holdout", "exploratory", "unspecified"))
+    parser.add_argument("--bias-safe", action="store_true", help="Enable bias-safe backtest mode for this run.")
+    parser.add_argument("--calibration-mode", choices=("walk_forward", "off"))
+    parser.add_argument("--universe-mode", choices=("current", "point_in_time"))
+    parser.add_argument("--entry-timing-mode")
+    parser.add_argument("--intraday-exit-mode")
+    parser.add_argument("--friction-model")
     args = parser.parse_args()
 
     config = TradingConfig()
     config.llm_provider = "ollama" 
+    if args.bias_safe:
+        config.backtest_bias_safe_mode = True
+    if args.calibration_mode:
+        config.backtest_calibration_mode = args.calibration_mode
+    if args.universe_mode:
+        config.backtest_universe_mode = args.universe_mode
+    if args.entry_timing_mode:
+        config.backtest_entry_timing_mode = args.entry_timing_mode
+    if args.intraday_exit_mode:
+        config.backtest_intraday_exit_mode = args.intraday_exit_mode
+    if args.friction_model:
+        config.backtest_friction_model = args.friction_model
     
     logger = get_logger(Path("logs"), "backtest")
     market_data = MarketDataService(config, logger)
@@ -405,6 +449,8 @@ def run_backtest():
                 start_date=args.start,
                 end_date=args.end,
                 status="in_progress",
+                strategy=args.strategy,
+                window_label=args.window_label,
             )
             write_json(backtest_root / "backtest_report.json", report)
 
@@ -421,8 +467,11 @@ def run_backtest():
         start_date=args.start,
         end_date=args.end,
         status="completed",
+        strategy=args.strategy,
+        window_label=args.window_label,
     )
     write_json(backtest_root / "backtest_report.json", report)
+    write_live_paper_readiness_if_accepted(config=config, report=report)
     summary = report["performance"]
     print(f"\nBacktest finished.")
     print(f"Final Equity: ${summary['final_equity']:,.2f}")

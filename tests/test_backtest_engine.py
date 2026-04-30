@@ -3,6 +3,7 @@ from __future__ import annotations
 from datetime import UTC, datetime
 
 from backtest_engine import build_backtest_report
+from backtest_engine import write_live_paper_readiness_if_accepted
 from backtest_engine import build_confidence_analysis
 from trading_system.config import TradingConfig
 from trading_system.backtest_execution import BacktestExecutionEngine, BacktestTradeRecord
@@ -95,6 +96,23 @@ def test_build_backtest_report_references_audit_event_file(tmp_path):
 
     assert report["audit_event_file"] == str(execution.audit_event_path)
     assert report["audit_event_count"] == 2
+
+
+def test_live_paper_readiness_file_written_only_for_accepted_holdout(tmp_path):
+    config = TradingConfig(live_paper_readiness_path=str(tmp_path / "readiness.json"))
+    accepted = {
+        "metadata": {"strategy": "hold_tax_partial", "window_label": "holdout"},
+        "bias_controls": {"acceptance_grade": True, "acceptance_warnings": []},
+    }
+    rejected = {
+        "metadata": {"strategy": "hold_tax_partial", "window_label": "train"},
+        "bias_controls": {"acceptance_grade": True, "acceptance_warnings": []},
+    }
+
+    assert write_live_paper_readiness_if_accepted(config=config, report=rejected) is False
+    assert not (tmp_path / "readiness.json").exists()
+    assert write_live_paper_readiness_if_accepted(config=config, report=accepted) is True
+    assert (tmp_path / "readiness.json").exists()
 
 
 def test_confidence_analysis_handles_empty_trades():
