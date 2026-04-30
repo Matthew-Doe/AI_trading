@@ -283,6 +283,50 @@ def test_live_backtest_style_partial_exit_only_once(tmp_path):
     assert second is None
 
 
+def test_live_backtest_style_held_position_plans_use_state_review(tmp_path):
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        enable_live_paper_backtest_style=True,
+        enable_partial_profit_taking=True,
+        partial_profit_take_fraction=0.5,
+    )
+    engine.state_store = LiveStrategyStateStore(tmp_path / "state.json")
+    engine.state_store.record_entry(
+        LivePositionState(
+            symbol="AAPL",
+            side="long",
+            quantity=10,
+            entry_price=100.0,
+            stop_price=95.0,
+            take_profit_price=110.0,
+            entry_timestamp="2026-01-02T14:30:00+00:00",
+        )
+    )
+    selected = load_mock_universe()
+    selected_by_symbol = {item.symbol: item for item in selected}
+    selected_by_symbol["AAPL"].close = 112.0
+
+    plans = engine.build_held_position_order_plans(
+        [
+            SimpleNamespace(
+                symbol="AAPL",
+                signal="hold",
+                reason="aligned",
+                current_side="long",
+                current_qty=10,
+                delta_qty=0,
+                confidence=0.8,
+                max_trade_pct=0.0,
+            )
+        ],
+        selected,
+    )
+
+    assert len(plans) == 1
+    assert plans[0].qty == 5
+    assert "partial_exit=true" in plans[0].reason
+
+
 def test_buy_more_signal_uses_cash_rich_cap_when_available_cash_is_high():
     engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
     engine.config = TradingConfig(
@@ -616,3 +660,39 @@ def test_submit_orders_records_live_tax_loss_cooldown(tmp_path):
     assert results[0]["status"] == "submitted"
     assert results[0]["tax_loss_cooldown"]["symbol"] == "AAPL"
     assert engine.tax_state.is_blocked("AAPL")
+
+
+def test_live_backtest_style_submit_records_entry_state(tmp_path):
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        run_dir=tmp_path,
+        execute_orders=True,
+        enable_live_paper_backtest_style=True,
+    )
+    engine.logger = DummyLogger()
+    engine.client = FakeTradingClient()
+    engine.telegram = FakeTelegramNotifier(approved=False)
+    engine.run_id = "test-run"
+    engine.tax_state = TaxLossCooldownState(tmp_path / "tax_loss_cooldowns.json")
+    engine.tax_blocked_orders = []
+    engine.state_store = LiveStrategyStateStore(tmp_path / "live_strategy_state.json")
+
+    engine.submit_orders(
+        [
+            OrderPlan(
+                symbol="AAPL",
+                side="long",
+                qty=10,
+                notional=1000.0,
+                confidence=0.9,
+                allocation=0.1,
+                reason="entry",
+                entry_limit_price=101.0,
+                stop_price=95.0,
+                take_profit_price=110.0,
+            )
+        ]
+    )
+
+    assert engine.state_store.positions["AAPL"].quantity == 10
+    assert engine.state_store.positions["AAPL"].stop_price == 95.0

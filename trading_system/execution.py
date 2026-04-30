@@ -29,7 +29,7 @@ from trading_system.models import (
 from trading_system.tax_state import TaxLossCooldownState
 from trading_system.telegram import TelegramNotifier
 from trading_system.utils import read_json
-from trading_system.live_strategy_state import LiveStrategyStateStore
+from trading_system.live_strategy_state import LivePositionState, LiveStrategyStateStore
 
 
 class ExecutionError(RuntimeError):
@@ -523,6 +523,15 @@ class AlpacaExecutionEngine:
             market_data = symbol_map.get(signal.symbol)
             if market_data is None:
                 continue
+            if self.config.enable_live_paper_backtest_style:
+                plan = self.review_live_backtest_style_position(
+                    signal.symbol,
+                    current_price=market_data.close,
+                    thesis_failed=signal.signal == "sell",
+                )
+                if plan is not None:
+                    plans.append(plan)
+                continue
             if signal.signal == "hold":
                 continue
             qty = abs(signal.delta_qty) if signal.signal == "buy_more" else signal.current_qty
@@ -722,6 +731,23 @@ class AlpacaExecutionEngine:
                     "Recorded tax-loss cooldown for %s until %s",
                     plan.symbol,
                     entry["blocked_until"],
+                )
+            if (
+                self.config.enable_live_paper_backtest_style
+                and self.config.execute_orders
+                and plan.side in {"long", "short"}
+                and payload.get("status") not in {"rejected", "canceled", "skipped_open_order"}
+            ):
+                self.state_store.record_entry(
+                    LivePositionState(
+                        symbol=plan.symbol,
+                        side=plan.side,
+                        quantity=plan.qty,
+                        entry_price=plan.entry_limit_price or (plan.notional / plan.qty),
+                        stop_price=plan.stop_price,
+                        take_profit_price=plan.take_profit_price,
+                        entry_timestamp=str(payload.get("submitted_at") or datetime.now(UTC).isoformat()),
+                    )
                 )
             self.telegram.send_trade_summary(run_id=self.run_id, order_plan=plan, payload=payload)
 
