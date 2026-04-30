@@ -229,7 +229,7 @@ class MarketDataService:
                 "name": item.get("name", f"{item['symbol']} snapshot"),
                 "market_cap": item.get("market_cap"),
             }
-            for item in symbols[: self.config.top_universe_size]
+            for item in symbols
             if item.get("symbol")
         ]
         seen_symbols = {item["symbol"] for item in companies}

@@ -283,6 +283,34 @@ def test_point_in_time_universe_snapshot_selects_latest_on_or_before_date(tmp_pa
     assert service.last_universe_metadata["fallback_used"] is False
 
 
+def test_point_in_time_universe_snapshot_does_not_truncate_snapshot_symbols(tmp_path):
+    snapshot_dir = tmp_path / "snapshots"
+    snapshot_dir.mkdir()
+    symbols = [
+        {"symbol": f"SYM{index}", "name": f"Symbol {index}", "market_cap": None}
+        for index in range(12)
+    ]
+    (snapshot_dir / "2025-10-01.json").write_text(
+        __import__("json").dumps({"source": "test", "symbols": symbols}),
+        encoding="utf-8",
+    )
+    config = TradingConfig(
+        backtest_universe_mode="point_in_time",
+        backtest_universe_snapshot_dir=str(snapshot_dir),
+        top_universe_size=5,
+        index_proxy_symbols=(),
+    )
+    service = MarketDataService.__new__(MarketDataService)
+    service.config = config
+    service.logger = DummyLogger()
+
+    companies = service._build_symbol_universe(as_of_date=datetime(2025, 10, 15))
+
+    assert len(companies) == 12
+    assert companies[-1]["symbol"] == "SYM11"
+    assert service.last_universe_metadata["symbol_count"] == 12
+
+
 def test_point_in_time_universe_snapshot_fails_closed_without_snapshot(tmp_path):
     config = TradingConfig(
         backtest_universe_mode="point_in_time",
