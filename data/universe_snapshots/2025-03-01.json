@@ -1,0 +1,2530 @@
+{
+  "notes": [
+    "Point-in-time S&P 500 membership universe, not a largest-market-cap ranking.",
+    "Historical market caps are unavailable from this source and are stored as null.",
+    "Ticker dots are normalized to hyphens to match the backtest data loader."
+  ],
+  "snapshot_kind": "sp500_point_in_time_membership",
+  "source": "fja05680/sp500 S&P 500 Historical Components & Changes(01-17-2026).csv",
+  "source_license": "MIT",
+  "source_row_date": "2024-12-23",
+  "source_url": "https://github.com/fja05680/sp500",
+  "symbols": [
+    {
+      "market_cap": null,
+      "name": "A S&P 500 constituent",
+      "symbol": "A"
+    },
+    {
+      "market_cap": null,
+      "name": "AAPL S&P 500 constituent",
+      "symbol": "AAPL"
+    },
+    {
+      "market_cap": null,
+      "name": "ABBV S&P 500 constituent",
+      "symbol": "ABBV"
+    },
+    {
+      "market_cap": null,
+      "name": "ABNB S&P 500 constituent",
+      "symbol": "ABNB"
+    },
+    {
+      "market_cap": null,
+      "name": "ABT S&P 500 constituent",
+      "symbol": "ABT"
+    },
+    {
+      "market_cap": null,
+      "name": "ACGL S&P 500 constituent",
+      "symbol": "ACGL"
+    },
+    {
+      "market_cap": null,
+      "name": "ACN S&P 500 constituent",
+      "symbol": "ACN"
+    },
+    {
+      "market_cap": null,
+      "name": "ADBE S&P 500 constituent",
+      "symbol": "ADBE"
+    },
+    {
+      "market_cap": null,
+      "name": "ADI S&P 500 constituent",
+      "symbol": "ADI"
+    },
+    {
+      "market_cap": null,
+      "name": "ADM S&P 500 constituent",
+      "symbol": "ADM"
+    },
+    {
+      "market_cap": null,
+      "name": "ADP S&P 500 constituent",
+      "symbol": "ADP"
+    },
+    {
+      "market_cap": null,
+      "name": "ADSK S&P 500 constituent",
+      "symbol": "ADSK"
+    },
+    {
+      "market_cap": null,
+      "name": "AEE S&P 500 constituent",
+      "symbol": "AEE"
+    },
+    {
+      "market_cap": null,
+      "name": "AEP S&P 500 constituent",
+      "symbol": "AEP"
+    },
+    {
+      "market_cap": null,
+      "name": "AES S&P 500 constituent",
+      "symbol": "AES"
+    },
+    {
+      "market_cap": null,
+      "name": "AFL S&P 500 constituent",
+      "symbol": "AFL"
+    },
+    {
+      "market_cap": null,
+      "name": "AIG S&P 500 constituent",
+      "symbol": "AIG"
+    },
+    {
+      "market_cap": null,
+      "name": "AIZ S&P 500 constituent",
+      "symbol": "AIZ"
+    },
+    {
+      "market_cap": null,
+      "name": "AJG S&P 500 constituent",
+      "symbol": "AJG"
+    },
+    {
+      "market_cap": null,
+      "name": "AKAM S&P 500 constituent",
+      "symbol": "AKAM"
+    },
+    {
+      "market_cap": null,
+      "name": "ALB S&P 500 constituent",
+      "symbol": "ALB"
+    },
+    {
+      "market_cap": null,
+      "name": "ALGN S&P 500 constituent",
+      "symbol": "ALGN"
+    },
+    {
+      "market_cap": null,
+      "name": "ALL S&P 500 constituent",
+      "symbol": "ALL"
+    },
+    {
+      "market_cap": null,
+      "name": "ALLE S&P 500 constituent",
+      "symbol": "ALLE"
+    },
+    {
+      "market_cap": null,
+      "name": "AMAT S&P 500 constituent",
+      "symbol": "AMAT"
+    },
+    {
+      "market_cap": null,
+      "name": "AMCR S&P 500 constituent",
+      "symbol": "AMCR"
+    },
+    {
+      "market_cap": null,
+      "name": "AMD S&P 500 constituent",
+      "symbol": "AMD"
+    },
+    {
+      "market_cap": null,
+      "name": "AME S&P 500 constituent",
+      "symbol": "AME"
+    },
+    {
+      "market_cap": null,
+      "name": "AMGN S&P 500 constituent",
+      "symbol": "AMGN"
+    },
+    {
+      "market_cap": null,
+      "name": "AMP S&P 500 constituent",
+      "symbol": "AMP"
+    },
+    {
+      "market_cap": null,
+      "name": "AMT S&P 500 constituent",
+      "symbol": "AMT"
+    },
+    {
+      "market_cap": null,
+      "name": "AMZN S&P 500 constituent",
+      "symbol": "AMZN"
+    },
+    {
+      "market_cap": null,
+      "name": "ANET S&P 500 constituent",
+      "symbol": "ANET"
+    },
+    {
+      "market_cap": null,
+      "name": "ANSS S&P 500 constituent",
+      "symbol": "ANSS"
+    },
+    {
+      "market_cap": null,
+      "name": "AON S&P 500 constituent",
+      "symbol": "AON"
+    },
+    {
+      "market_cap": null,
+      "name": "AOS S&P 500 constituent",
+      "symbol": "AOS"
+    },
+    {
+      "market_cap": null,
+      "name": "APA S&P 500 constituent",
+      "symbol": "APA"
+    },
+    {
+      "market_cap": null,
+      "name": "APD S&P 500 constituent",
+      "symbol": "APD"
+    },
+    {
+      "market_cap": null,
+      "name": "APH S&P 500 constituent",
+      "symbol": "APH"
+    },
+    {
+      "market_cap": null,
+      "name": "APO S&P 500 constituent",
+      "symbol": "APO"
+    },
+    {
+      "market_cap": null,
+      "name": "APTV S&P 500 constituent",
+      "symbol": "APTV"
+    },
+    {
+      "market_cap": null,
+      "name": "ARE S&P 500 constituent",
+      "symbol": "ARE"
+    },
+    {
+      "market_cap": null,
+      "name": "ATO S&P 500 constituent",
+      "symbol": "ATO"
+    },
+    {
+      "market_cap": null,
+      "name": "AVB S&P 500 constituent",
+      "symbol": "AVB"
+    },
+    {
+      "market_cap": null,
+      "name": "AVGO S&P 500 constituent",
+      "symbol": "AVGO"
+    },
+    {
+      "market_cap": null,
+      "name": "AVY S&P 500 constituent",
+      "symbol": "AVY"
+    },
+    {
+      "market_cap": null,
+      "name": "AWK S&P 500 constituent",
+      "symbol": "AWK"
+    },
+    {
+      "market_cap": null,
+      "name": "AXON S&P 500 constituent",
+      "symbol": "AXON"
+    },
+    {
+      "market_cap": null,
+      "name": "AXP S&P 500 constituent",
+      "symbol": "AXP"
+    },
+    {
+      "market_cap": null,
+      "name": "AZO S&P 500 constituent",
+      "symbol": "AZO"
+    },
+    {
+      "market_cap": null,
+      "name": "BA S&P 500 constituent",
+      "symbol": "BA"
+    },
+    {
+      "market_cap": null,
+      "name": "BAC S&P 500 constituent",
+      "symbol": "BAC"
+    },
+    {
+      "market_cap": null,
+      "name": "BALL S&P 500 constituent",
+      "symbol": "BALL"
+    },
+    {
+      "market_cap": null,
+      "name": "BAX S&P 500 constituent",
+      "symbol": "BAX"
+    },
+    {
+      "market_cap": null,
+      "name": "BBY S&P 500 constituent",
+      "symbol": "BBY"
+    },
+    {
+      "market_cap": null,
+      "name": "BDX S&P 500 constituent",
+      "symbol": "BDX"
+    },
+    {
+      "market_cap": null,
+      "name": "BEN S&P 500 constituent",
+      "symbol": "BEN"
+    },
+    {
+      "market_cap": null,
+      "name": "BF-B S&P 500 constituent",
+      "symbol": "BF-B"
+    },
+    {
+      "market_cap": null,
+      "name": "BG S&P 500 constituent",
+      "symbol": "BG"
+    },
+    {
+      "market_cap": null,
+      "name": "BIIB S&P 500 constituent",
+      "symbol": "BIIB"
+    },
+    {
+      "market_cap": null,
+      "name": "BK S&P 500 constituent",
+      "symbol": "BK"
+    },
+    {
+      "market_cap": null,
+      "name": "BKNG S&P 500 constituent",
+      "symbol": "BKNG"
+    },
+    {
+      "market_cap": null,
+      "name": "BKR S&P 500 constituent",
+      "symbol": "BKR"
+    },
+    {
+      "market_cap": null,
+      "name": "BLDR S&P 500 constituent",
+      "symbol": "BLDR"
+    },
+    {
+      "market_cap": null,
+      "name": "BLK S&P 500 constituent",
+      "symbol": "BLK"
+    },
+    {
+      "market_cap": null,
+      "name": "BMY S&P 500 constituent",
+      "symbol": "BMY"
+    },
+    {
+      "market_cap": null,
+      "name": "BR S&P 500 constituent",
+      "symbol": "BR"
+    },
+    {
+      "market_cap": null,
+      "name": "BRK-B S&P 500 constituent",
+      "symbol": "BRK-B"
+    },
+    {
+      "market_cap": null,
+      "name": "BRO S&P 500 constituent",
+      "symbol": "BRO"
+    },
+    {
+      "market_cap": null,
+      "name": "BSX S&P 500 constituent",
+      "symbol": "BSX"
+    },
+    {
+      "market_cap": null,
+      "name": "BWA S&P 500 constituent",
+      "symbol": "BWA"
+    },
+    {
+      "market_cap": null,
+      "name": "BX S&P 500 constituent",
+      "symbol": "BX"
+    },
+    {
+      "market_cap": null,
+      "name": "BXP S&P 500 constituent",
+      "symbol": "BXP"
+    },
+    {
+      "market_cap": null,
+      "name": "C S&P 500 constituent",
+      "symbol": "C"
+    },
+    {
+      "market_cap": null,
+      "name": "CAG S&P 500 constituent",
+      "symbol": "CAG"
+    },
+    {
+      "market_cap": null,
+      "name": "CAH S&P 500 constituent",
+      "symbol": "CAH"
+    },
+    {
+      "market_cap": null,
+      "name": "CARR S&P 500 constituent",
+      "symbol": "CARR"
+    },
+    {
+      "market_cap": null,
+      "name": "CAT S&P 500 constituent",
+      "symbol": "CAT"
+    },
+    {
+      "market_cap": null,
+      "name": "CB S&P 500 constituent",
+      "symbol": "CB"
+    },
+    {
+      "market_cap": null,
+      "name": "CBOE S&P 500 constituent",
+      "symbol": "CBOE"
+    },
+    {
+      "market_cap": null,
+      "name": "CBRE S&P 500 constituent",
+      "symbol": "CBRE"
+    },
+    {
+      "market_cap": null,
+      "name": "CCI S&P 500 constituent",
+      "symbol": "CCI"
+    },
+    {
+      "market_cap": null,
+      "name": "CCL S&P 500 constituent",
+      "symbol": "CCL"
+    },
+    {
+      "market_cap": null,
+      "name": "CDNS S&P 500 constituent",
+      "symbol": "CDNS"
+    },
+    {
+      "market_cap": null,
+      "name": "CDW S&P 500 constituent",
+      "symbol": "CDW"
+    },
+    {
+      "market_cap": null,
+      "name": "CE S&P 500 constituent",
+      "symbol": "CE"
+    },
+    {
+      "market_cap": null,
+      "name": "CEG S&P 500 constituent",
+      "symbol": "CEG"
+    },
+    {
+      "market_cap": null,
+      "name": "CF S&P 500 constituent",
+      "symbol": "CF"
+    },
+    {
+      "market_cap": null,
+      "name": "CFG S&P 500 constituent",
+      "symbol": "CFG"
+    },
+    {
+      "market_cap": null,
+      "name": "CHD S&P 500 constituent",
+      "symbol": "CHD"
+    },
+    {
+      "market_cap": null,
+      "name": "CHRW S&P 500 constituent",
+      "symbol": "CHRW"
+    },
+    {
+      "market_cap": null,
+      "name": "CHTR S&P 500 constituent",
+      "symbol": "CHTR"
+    },
+    {
+      "market_cap": null,
+      "name": "CI S&P 500 constituent",
+      "symbol": "CI"
+    },
+    {
+      "market_cap": null,
+      "name": "CINF S&P 500 constituent",
+      "symbol": "CINF"
+    },
+    {
+      "market_cap": null,
+      "name": "CL S&P 500 constituent",
+      "symbol": "CL"
+    },
+    {
+      "market_cap": null,
+      "name": "CLX S&P 500 constituent",
+      "symbol": "CLX"
+    },
+    {
+      "market_cap": null,
+      "name": "CMCSA S&P 500 constituent",
+      "symbol": "CMCSA"
+    },
+    {
+      "market_cap": null,
+      "name": "CME S&P 500 constituent",
+      "symbol": "CME"
+    },
+    {
+      "market_cap": null,
+      "name": "CMG S&P 500 constituent",
+      "symbol": "CMG"
+    },
+    {
+      "market_cap": null,
+      "name": "CMI S&P 500 constituent",
+      "symbol": "CMI"
+    },
+    {
+      "market_cap": null,
+      "name": "CMS S&P 500 constituent",
+      "symbol": "CMS"
+    },
+    {
+      "market_cap": null,
+      "name": "CNC S&P 500 constituent",
+      "symbol": "CNC"
+    },
+    {
+      "market_cap": null,
+      "name": "CNP S&P 500 constituent",
+      "symbol": "CNP"
+    },
+    {
+      "market_cap": null,
+      "name": "COF S&P 500 constituent",
+      "symbol": "COF"
+    },
+    {
+      "market_cap": null,
+      "name": "COO S&P 500 constituent",
+      "symbol": "COO"
+    },
+    {
+      "market_cap": null,
+      "name": "COP S&P 500 constituent",
+      "symbol": "COP"
+    },
+    {
+      "market_cap": null,
+      "name": "COR S&P 500 constituent",
+      "symbol": "COR"
+    },
+    {
+      "market_cap": null,
+      "name": "COST S&P 500 constituent",
+      "symbol": "COST"
+    },
+    {
+      "market_cap": null,
+      "name": "CPAY S&P 500 constituent",
+      "symbol": "CPAY"
+    },
+    {
+      "market_cap": null,
+      "name": "CPB S&P 500 constituent",
+      "symbol": "CPB"
+    },
+    {
+      "market_cap": null,
+      "name": "CPRT S&P 500 constituent",
+      "symbol": "CPRT"
+    },
+    {
+      "market_cap": null,
+      "name": "CPT S&P 500 constituent",
+      "symbol": "CPT"
+    },
+    {
+      "market_cap": null,
+      "name": "CRL S&P 500 constituent",
+      "symbol": "CRL"
+    },
+    {
+      "market_cap": null,
+      "name": "CRM S&P 500 constituent",
+      "symbol": "CRM"
+    },
+    {
+      "market_cap": null,
+      "name": "CRWD S&P 500 constituent",
+      "symbol": "CRWD"
+    },
+    {
+      "market_cap": null,
+      "name": "CSCO S&P 500 constituent",
+      "symbol": "CSCO"
+    },
+    {
+      "market_cap": null,
+      "name": "CSGP S&P 500 constituent",
+      "symbol": "CSGP"
+    },
+    {
+      "market_cap": null,
+      "name": "CSX S&P 500 constituent",
+      "symbol": "CSX"
+    },
+    {
+      "market_cap": null,
+      "name": "CTAS S&P 500 constituent",
+      "symbol": "CTAS"
+    },
+    {
+      "market_cap": null,
+      "name": "CTRA S&P 500 constituent",
+      "symbol": "CTRA"
+    },
+    {
+      "market_cap": null,
+      "name": "CTSH S&P 500 constituent",
+      "symbol": "CTSH"
+    },
+    {
+      "market_cap": null,
+      "name": "CTVA S&P 500 constituent",
+      "symbol": "CTVA"
+    },
+    {
+      "market_cap": null,
+      "name": "CVS S&P 500 constituent",
+      "symbol": "CVS"
+    },
+    {
+      "market_cap": null,
+      "name": "CVX S&P 500 constituent",
+      "symbol": "CVX"
+    },
+    {
+      "market_cap": null,
+      "name": "CZR S&P 500 constituent",
+      "symbol": "CZR"
+    },
+    {
+      "market_cap": null,
+      "name": "D S&P 500 constituent",
+      "symbol": "D"
+    },
+    {
+      "market_cap": null,
+      "name": "DAL S&P 500 constituent",
+      "symbol": "DAL"
+    },
+    {
+      "market_cap": null,
+      "name": "DAY S&P 500 constituent",
+      "symbol": "DAY"
+    },
+    {
+      "market_cap": null,
+      "name": "DD S&P 500 constituent",
+      "symbol": "DD"
+    },
+    {
+      "market_cap": null,
+      "name": "DE S&P 500 constituent",
+      "symbol": "DE"
+    },
+    {
+      "market_cap": null,
+      "name": "DECK S&P 500 constituent",
+      "symbol": "DECK"
+    },
+    {
+      "market_cap": null,
+      "name": "DELL S&P 500 constituent",
+      "symbol": "DELL"
+    },
+    {
+      "market_cap": null,
+      "name": "DFS S&P 500 constituent",
+      "symbol": "DFS"
+    },
+    {
+      "market_cap": null,
+      "name": "DG S&P 500 constituent",
+      "symbol": "DG"
+    },
+    {
+      "market_cap": null,
+      "name": "DGX S&P 500 constituent",
+      "symbol": "DGX"
+    },
+    {
+      "market_cap": null,
+      "name": "DHI S&P 500 constituent",
+      "symbol": "DHI"
+    },
+    {
+      "market_cap": null,
+      "name": "DHR S&P 500 constituent",
+      "symbol": "DHR"
+    },
+    {
+      "market_cap": null,
+      "name": "DIS S&P 500 constituent",
+      "symbol": "DIS"
+    },
+    {
+      "market_cap": null,
+      "name": "DLR S&P 500 constituent",
+      "symbol": "DLR"
+    },
+    {
+      "market_cap": null,
+      "name": "DLTR S&P 500 constituent",
+      "symbol": "DLTR"
+    },
+    {
+      "market_cap": null,
+      "name": "DOC S&P 500 constituent",
+      "symbol": "DOC"
+    },
+    {
+      "market_cap": null,
+      "name": "DOV S&P 500 constituent",
+      "symbol": "DOV"
+    },
+    {
+      "market_cap": null,
+      "name": "DOW S&P 500 constituent",
+      "symbol": "DOW"
+    },
+    {
+      "market_cap": null,
+      "name": "DPZ S&P 500 constituent",
+      "symbol": "DPZ"
+    },
+    {
+      "market_cap": null,
+      "name": "DRI S&P 500 constituent",
+      "symbol": "DRI"
+    },
+    {
+      "market_cap": null,
+      "name": "DTE S&P 500 constituent",
+      "symbol": "DTE"
+    },
+    {
+      "market_cap": null,
+      "name": "DUK S&P 500 constituent",
+      "symbol": "DUK"
+    },
+    {
+      "market_cap": null,
+      "name": "DVA S&P 500 constituent",
+      "symbol": "DVA"
+    },
+    {
+      "market_cap": null,
+      "name": "DVN S&P 500 constituent",
+      "symbol": "DVN"
+    },
+    {
+      "market_cap": null,
+      "name": "DXCM S&P 500 constituent",
+      "symbol": "DXCM"
+    },
+    {
+      "market_cap": null,
+      "name": "EA S&P 500 constituent",
+      "symbol": "EA"
+    },
+    {
+      "market_cap": null,
+      "name": "EBAY S&P 500 constituent",
+      "symbol": "EBAY"
+    },
+    {
+      "market_cap": null,
+      "name": "ECL S&P 500 constituent",
+      "symbol": "ECL"
+    },
+    {
+      "market_cap": null,
+      "name": "ED S&P 500 constituent",
+      "symbol": "ED"
+    },
+    {
+      "market_cap": null,
+      "name": "EFX S&P 500 constituent",
+      "symbol": "EFX"
+    },
+    {
+      "market_cap": null,
+      "name": "EG S&P 500 constituent",
+      "symbol": "EG"
+    },
+    {
+      "market_cap": null,
+      "name": "EIX S&P 500 constituent",
+      "symbol": "EIX"
+    },
+    {
+      "market_cap": null,
+      "name": "EL S&P 500 constituent",
+      "symbol": "EL"
+    },
+    {
+      "market_cap": null,
+      "name": "ELV S&P 500 constituent",
+      "symbol": "ELV"
+    },
+    {
+      "market_cap": null,
+      "name": "EMN S&P 500 constituent",
+      "symbol": "EMN"
+    },
+    {
+      "market_cap": null,
+      "name": "EMR S&P 500 constituent",
+      "symbol": "EMR"
+    },
+    {
+      "market_cap": null,
+      "name": "ENPH S&P 500 constituent",
+      "symbol": "ENPH"
+    },
+    {
+      "market_cap": null,
+      "name": "EOG S&P 500 constituent",
+      "symbol": "EOG"
+    },
+    {
+      "market_cap": null,
+      "name": "EPAM S&P 500 constituent",
+      "symbol": "EPAM"
+    },
+    {
+      "market_cap": null,
+      "name": "EQIX S&P 500 constituent",
+      "symbol": "EQIX"
+    },
+    {
+      "market_cap": null,
+      "name": "EQR S&P 500 constituent",
+      "symbol": "EQR"
+    },
+    {
+      "market_cap": null,
+      "name": "EQT S&P 500 constituent",
+      "symbol": "EQT"
+    },
+    {
+      "market_cap": null,
+      "name": "ERIE S&P 500 constituent",
+      "symbol": "ERIE"
+    },
+    {
+      "market_cap": null,
+      "name": "ES S&P 500 constituent",
+      "symbol": "ES"
+    },
+    {
+      "market_cap": null,
+      "name": "ESS S&P 500 constituent",
+      "symbol": "ESS"
+    },
+    {
+      "market_cap": null,
+      "name": "ETN S&P 500 constituent",
+      "symbol": "ETN"
+    },
+    {
+      "market_cap": null,
+      "name": "ETR S&P 500 constituent",
+      "symbol": "ETR"
+    },
+    {
+      "market_cap": null,
+      "name": "EVRG S&P 500 constituent",
+      "symbol": "EVRG"
+    },
+    {
+      "market_cap": null,
+      "name": "EW S&P 500 constituent",
+      "symbol": "EW"
+    },
+    {
+      "market_cap": null,
+      "name": "EXC S&P 500 constituent",
+      "symbol": "EXC"
+    },
+    {
+      "market_cap": null,
+      "name": "EXPD S&P 500 constituent",
+      "symbol": "EXPD"
+    },
+    {
+      "market_cap": null,
+      "name": "EXPE S&P 500 constituent",
+      "symbol": "EXPE"
+    },
+    {
+      "market_cap": null,
+      "name": "EXR S&P 500 constituent",
+      "symbol": "EXR"
+    },
+    {
+      "market_cap": null,
+      "name": "F S&P 500 constituent",
+      "symbol": "F"
+    },
+    {
+      "market_cap": null,
+      "name": "FANG S&P 500 constituent",
+      "symbol": "FANG"
+    },
+    {
+      "market_cap": null,
+      "name": "FAST S&P 500 constituent",
+      "symbol": "FAST"
+    },
+    {
+      "market_cap": null,
+      "name": "FCX S&P 500 constituent",
+      "symbol": "FCX"
+    },
+    {
+      "market_cap": null,
+      "name": "FDS S&P 500 constituent",
+      "symbol": "FDS"
+    },
+    {
+      "market_cap": null,
+      "name": "FDX S&P 500 constituent",
+      "symbol": "FDX"
+    },
+    {
+      "market_cap": null,
+      "name": "FE S&P 500 constituent",
+      "symbol": "FE"
+    },
+    {
+      "market_cap": null,
+      "name": "FFIV S&P 500 constituent",
+      "symbol": "FFIV"
+    },
+    {
+      "market_cap": null,
+      "name": "FI S&P 500 constituent",
+      "symbol": "FI"
+    },
+    {
+      "market_cap": null,
+      "name": "FICO S&P 500 constituent",
+      "symbol": "FICO"
+    },
+    {
+      "market_cap": null,
+      "name": "FIS S&P 500 constituent",
+      "symbol": "FIS"
+    },
+    {
+      "market_cap": null,
+      "name": "FITB S&P 500 constituent",
+      "symbol": "FITB"
+    },
+    {
+      "market_cap": null,
+      "name": "FMC S&P 500 constituent",
+      "symbol": "FMC"
+    },
+    {
+      "market_cap": null,
+      "name": "FOX S&P 500 constituent",
+      "symbol": "FOX"
+    },
+    {
+      "market_cap": null,
+      "name": "FOXA S&P 500 constituent",
+      "symbol": "FOXA"
+    },
+    {
+      "market_cap": null,
+      "name": "FRT S&P 500 constituent",
+      "symbol": "FRT"
+    },
+    {
+      "market_cap": null,
+      "name": "FSLR S&P 500 constituent",
+      "symbol": "FSLR"
+    },
+    {
+      "market_cap": null,
+      "name": "FTNT S&P 500 constituent",
+      "symbol": "FTNT"
+    },
+    {
+      "market_cap": null,
+      "name": "FTV S&P 500 constituent",
+      "symbol": "FTV"
+    },
+    {
+      "market_cap": null,
+      "name": "GD S&P 500 constituent",
+      "symbol": "GD"
+    },
+    {
+      "market_cap": null,
+      "name": "GDDY S&P 500 constituent",
+      "symbol": "GDDY"
+    },
+    {
+      "market_cap": null,
+      "name": "GE S&P 500 constituent",
+      "symbol": "GE"
+    },
+    {
+      "market_cap": null,
+      "name": "GEHC S&P 500 constituent",
+      "symbol": "GEHC"
+    },
+    {
+      "market_cap": null,
+      "name": "GEN S&P 500 constituent",
+      "symbol": "GEN"
+    },
+    {
+      "market_cap": null,
+      "name": "GEV S&P 500 constituent",
+      "symbol": "GEV"
+    },
+    {
+      "market_cap": null,
+      "name": "GILD S&P 500 constituent",
+      "symbol": "GILD"
+    },
+    {
+      "market_cap": null,
+      "name": "GIS S&P 500 constituent",
+      "symbol": "GIS"
+    },
+    {
+      "market_cap": null,
+      "name": "GL S&P 500 constituent",
+      "symbol": "GL"
+    },
+    {
+      "market_cap": null,
+      "name": "GLW S&P 500 constituent",
+      "symbol": "GLW"
+    },
+    {
+      "market_cap": null,
+      "name": "GM S&P 500 constituent",
+      "symbol": "GM"
+    },
+    {
+      "market_cap": null,
+      "name": "GNRC S&P 500 constituent",
+      "symbol": "GNRC"
+    },
+    {
+      "market_cap": null,
+      "name": "GOOG S&P 500 constituent",
+      "symbol": "GOOG"
+    },
+    {
+      "market_cap": null,
+      "name": "GOOGL S&P 500 constituent",
+      "symbol": "GOOGL"
+    },
+    {
+      "market_cap": null,
+      "name": "GPC S&P 500 constituent",
+      "symbol": "GPC"
+    },
+    {
+      "market_cap": null,
+      "name": "GPN S&P 500 constituent",
+      "symbol": "GPN"
+    },
+    {
+      "market_cap": null,
+      "name": "GRMN S&P 500 constituent",
+      "symbol": "GRMN"
+    },
+    {
+      "market_cap": null,
+      "name": "GS S&P 500 constituent",
+      "symbol": "GS"
+    },
+    {
+      "market_cap": null,
+      "name": "GWW S&P 500 constituent",
+      "symbol": "GWW"
+    },
+    {
+      "market_cap": null,
+      "name": "HAL S&P 500 constituent",
+      "symbol": "HAL"
+    },
+    {
+      "market_cap": null,
+      "name": "HAS S&P 500 constituent",
+      "symbol": "HAS"
+    },
+    {
+      "market_cap": null,
+      "name": "HBAN S&P 500 constituent",
+      "symbol": "HBAN"
+    },
+    {
+      "market_cap": null,
+      "name": "HCA S&P 500 constituent",
+      "symbol": "HCA"
+    },
+    {
+      "market_cap": null,
+      "name": "HD S&P 500 constituent",
+      "symbol": "HD"
+    },
+    {
+      "market_cap": null,
+      "name": "HES S&P 500 constituent",
+      "symbol": "HES"
+    },
+    {
+      "market_cap": null,
+      "name": "HIG S&P 500 constituent",
+      "symbol": "HIG"
+    },
+    {
+      "market_cap": null,
+      "name": "HII S&P 500 constituent",
+      "symbol": "HII"
+    },
+    {
+      "market_cap": null,
+      "name": "HLT S&P 500 constituent",
+      "symbol": "HLT"
+    },
+    {
+      "market_cap": null,
+      "name": "HOLX S&P 500 constituent",
+      "symbol": "HOLX"
+    },
+    {
+      "market_cap": null,
+      "name": "HON S&P 500 constituent",
+      "symbol": "HON"
+    },
+    {
+      "market_cap": null,
+      "name": "HPE S&P 500 constituent",
+      "symbol": "HPE"
+    },
+    {
+      "market_cap": null,
+      "name": "HPQ S&P 500 constituent",
+      "symbol": "HPQ"
+    },
+    {
+      "market_cap": null,
+      "name": "HRL S&P 500 constituent",
+      "symbol": "HRL"
+    },
+    {
+      "market_cap": null,
+      "name": "HSIC S&P 500 constituent",
+      "symbol": "HSIC"
+    },
+    {
+      "market_cap": null,
+      "name": "HST S&P 500 constituent",
+      "symbol": "HST"
+    },
+    {
+      "market_cap": null,
+      "name": "HSY S&P 500 constituent",
+      "symbol": "HSY"
+    },
+    {
+      "market_cap": null,
+      "name": "HUBB S&P 500 constituent",
+      "symbol": "HUBB"
+    },
+    {
+      "market_cap": null,
+      "name": "HUM S&P 500 constituent",
+      "symbol": "HUM"
+    },
+    {
+      "market_cap": null,
+      "name": "HWM S&P 500 constituent",
+      "symbol": "HWM"
+    },
+    {
+      "market_cap": null,
+      "name": "IBM S&P 500 constituent",
+      "symbol": "IBM"
+    },
+    {
+      "market_cap": null,
+      "name": "ICE S&P 500 constituent",
+      "symbol": "ICE"
+    },
+    {
+      "market_cap": null,
+      "name": "IDXX S&P 500 constituent",
+      "symbol": "IDXX"
+    },
+    {
+      "market_cap": null,
+      "name": "IEX S&P 500 constituent",
+      "symbol": "IEX"
+    },
+    {
+      "market_cap": null,
+      "name": "IFF S&P 500 constituent",
+      "symbol": "IFF"
+    },
+    {
+      "market_cap": null,
+      "name": "INCY S&P 500 constituent",
+      "symbol": "INCY"
+    },
+    {
+      "market_cap": null,
+      "name": "INTC S&P 500 constituent",
+      "symbol": "INTC"
+    },
+    {
+      "market_cap": null,
+      "name": "INTU S&P 500 constituent",
+      "symbol": "INTU"
+    },
+    {
+      "market_cap": null,
+      "name": "INVH S&P 500 constituent",
+      "symbol": "INVH"
+    },
+    {
+      "market_cap": null,
+      "name": "IP S&P 500 constituent",
+      "symbol": "IP"
+    },
+    {
+      "market_cap": null,
+      "name": "IPG S&P 500 constituent",
+      "symbol": "IPG"
+    },
+    {
+      "market_cap": null,
+      "name": "IQV S&P 500 constituent",
+      "symbol": "IQV"
+    },
+    {
+      "market_cap": null,
+      "name": "IR S&P 500 constituent",
+      "symbol": "IR"
+    },
+    {
+      "market_cap": null,
+      "name": "IRM S&P 500 constituent",
+      "symbol": "IRM"
+    },
+    {
+      "market_cap": null,
+      "name": "ISRG S&P 500 constituent",
+      "symbol": "ISRG"
+    },
+    {
+      "market_cap": null,
+      "name": "IT S&P 500 constituent",
+      "symbol": "IT"
+    },
+    {
+      "market_cap": null,
+      "name": "ITW S&P 500 constituent",
+      "symbol": "ITW"
+    },
+    {
+      "market_cap": null,
+      "name": "IVZ S&P 500 constituent",
+      "symbol": "IVZ"
+    },
+    {
+      "market_cap": null,
+      "name": "J S&P 500 constituent",
+      "symbol": "J"
+    },
+    {
+      "market_cap": null,
+      "name": "JBHT S&P 500 constituent",
+      "symbol": "JBHT"
+    },
+    {
+      "market_cap": null,
+      "name": "JBL S&P 500 constituent",
+      "symbol": "JBL"
+    },
+    {
+      "market_cap": null,
+      "name": "JCI S&P 500 constituent",
+      "symbol": "JCI"
+    },
+    {
+      "market_cap": null,
+      "name": "JKHY S&P 500 constituent",
+      "symbol": "JKHY"
+    },
+    {
+      "market_cap": null,
+      "name": "JNJ S&P 500 constituent",
+      "symbol": "JNJ"
+    },
+    {
+      "market_cap": null,
+      "name": "JNPR S&P 500 constituent",
+      "symbol": "JNPR"
+    },
+    {
+      "market_cap": null,
+      "name": "JPM S&P 500 constituent",
+      "symbol": "JPM"
+    },
+    {
+      "market_cap": null,
+      "name": "K S&P 500 constituent",
+      "symbol": "K"
+    },
+    {
+      "market_cap": null,
+      "name": "KDP S&P 500 constituent",
+      "symbol": "KDP"
+    },
+    {
+      "market_cap": null,
+      "name": "KEY S&P 500 constituent",
+      "symbol": "KEY"
+    },
+    {
+      "market_cap": null,
+      "name": "KEYS S&P 500 constituent",
+      "symbol": "KEYS"
+    },
+    {
+      "market_cap": null,
+      "name": "KHC S&P 500 constituent",
+      "symbol": "KHC"
+    },
+    {
+      "market_cap": null,
+      "name": "KIM S&P 500 constituent",
+      "symbol": "KIM"
+    },
+    {
+      "market_cap": null,
+      "name": "KKR S&P 500 constituent",
+      "symbol": "KKR"
+    },
+    {
+      "market_cap": null,
+      "name": "KLAC S&P 500 constituent",
+      "symbol": "KLAC"
+    },
+    {
+      "market_cap": null,
+      "name": "KMB S&P 500 constituent",
+      "symbol": "KMB"
+    },
+    {
+      "market_cap": null,
+      "name": "KMI S&P 500 constituent",
+      "symbol": "KMI"
+    },
+    {
+      "market_cap": null,
+      "name": "KMX S&P 500 constituent",
+      "symbol": "KMX"
+    },
+    {
+      "market_cap": null,
+      "name": "KO S&P 500 constituent",
+      "symbol": "KO"
+    },
+    {
+      "market_cap": null,
+      "name": "KR S&P 500 constituent",
+      "symbol": "KR"
+    },
+    {
+      "market_cap": null,
+      "name": "KVUE S&P 500 constituent",
+      "symbol": "KVUE"
+    },
+    {
+      "market_cap": null,
+      "name": "L S&P 500 constituent",
+      "symbol": "L"
+    },
+    {
+      "market_cap": null,
+      "name": "LDOS S&P 500 constituent",
+      "symbol": "LDOS"
+    },
+    {
+      "market_cap": null,
+      "name": "LEN S&P 500 constituent",
+      "symbol": "LEN"
+    },
+    {
+      "market_cap": null,
+      "name": "LH S&P 500 constituent",
+      "symbol": "LH"
+    },
+    {
+      "market_cap": null,
+      "name": "LHX S&P 500 constituent",
+      "symbol": "LHX"
+    },
+    {
+      "market_cap": null,
+      "name": "LII S&P 500 constituent",
+      "symbol": "LII"
+    },
+    {
+      "market_cap": null,
+      "name": "LIN S&P 500 constituent",
+      "symbol": "LIN"
+    },
+    {
+      "market_cap": null,
+      "name": "LKQ S&P 500 constituent",
+      "symbol": "LKQ"
+    },
+    {
+      "market_cap": null,
+      "name": "LLY S&P 500 constituent",
+      "symbol": "LLY"
+    },
+    {
+      "market_cap": null,
+      "name": "LMT S&P 500 constituent",
+      "symbol": "LMT"
+    },
+    {
+      "market_cap": null,
+      "name": "LNT S&P 500 constituent",
+      "symbol": "LNT"
+    },
+    {
+      "market_cap": null,
+      "name": "LOW S&P 500 constituent",
+      "symbol": "LOW"
+    },
+    {
+      "market_cap": null,
+      "name": "LRCX S&P 500 constituent",
+      "symbol": "LRCX"
+    },
+    {
+      "market_cap": null,
+      "name": "LULU S&P 500 constituent",
+      "symbol": "LULU"
+    },
+    {
+      "market_cap": null,
+      "name": "LUV S&P 500 constituent",
+      "symbol": "LUV"
+    },
+    {
+      "market_cap": null,
+      "name": "LVS S&P 500 constituent",
+      "symbol": "LVS"
+    },
+    {
+      "market_cap": null,
+      "name": "LW S&P 500 constituent",
+      "symbol": "LW"
+    },
+    {
+      "market_cap": null,
+      "name": "LYB S&P 500 constituent",
+      "symbol": "LYB"
+    },
+    {
+      "market_cap": null,
+      "name": "LYV S&P 500 constituent",
+      "symbol": "LYV"
+    },
+    {
+      "market_cap": null,
+      "name": "MA S&P 500 constituent",
+      "symbol": "MA"
+    },
+    {
+      "market_cap": null,
+      "name": "MAA S&P 500 constituent",
+      "symbol": "MAA"
+    },
+    {
+      "market_cap": null,
+      "name": "MAR S&P 500 constituent",
+      "symbol": "MAR"
+    },
+    {
+      "market_cap": null,
+      "name": "MAS S&P 500 constituent",
+      "symbol": "MAS"
+    },
+    {
+      "market_cap": null,
+      "name": "MCD S&P 500 constituent",
+      "symbol": "MCD"
+    },
+    {
+      "market_cap": null,
+      "name": "MCHP S&P 500 constituent",
+      "symbol": "MCHP"
+    },
+    {
+      "market_cap": null,
+      "name": "MCK S&P 500 constituent",
+      "symbol": "MCK"
+    },
+    {
+      "market_cap": null,
+      "name": "MCO S&P 500 constituent",
+      "symbol": "MCO"
+    },
+    {
+      "market_cap": null,
+      "name": "MDLZ S&P 500 constituent",
+      "symbol": "MDLZ"
+    },
+    {
+      "market_cap": null,
+      "name": "MDT S&P 500 constituent",
+      "symbol": "MDT"
+    },
+    {
+      "market_cap": null,
+      "name": "MET S&P 500 constituent",
+      "symbol": "MET"
+    },
+    {
+      "market_cap": null,
+      "name": "META S&P 500 constituent",
+      "symbol": "META"
+    },
+    {
+      "market_cap": null,
+      "name": "MGM S&P 500 constituent",
+      "symbol": "MGM"
+    },
+    {
+      "market_cap": null,
+      "name": "MHK S&P 500 constituent",
+      "symbol": "MHK"
+    },
+    {
+      "market_cap": null,
+      "name": "MKC S&P 500 constituent",
+      "symbol": "MKC"
+    },
+    {
+      "market_cap": null,
+      "name": "MKTX S&P 500 constituent",
+      "symbol": "MKTX"
+    },
+    {
+      "market_cap": null,
+      "name": "MLM S&P 500 constituent",
+      "symbol": "MLM"
+    },
+    {
+      "market_cap": null,
+      "name": "MMC S&P 500 constituent",
+      "symbol": "MMC"
+    },
+    {
+      "market_cap": null,
+      "name": "MMM S&P 500 constituent",
+      "symbol": "MMM"
+    },
+    {
+      "market_cap": null,
+      "name": "MNST S&P 500 constituent",
+      "symbol": "MNST"
+    },
+    {
+      "market_cap": null,
+      "name": "MO S&P 500 constituent",
+      "symbol": "MO"
+    },
+    {
+      "market_cap": null,
+      "name": "MOH S&P 500 constituent",
+      "symbol": "MOH"
+    },
+    {
+      "market_cap": null,
+      "name": "MOS S&P 500 constituent",
+      "symbol": "MOS"
+    },
+    {
+      "market_cap": null,
+      "name": "MPC S&P 500 constituent",
+      "symbol": "MPC"
+    },
+    {
+      "market_cap": null,
+      "name": "MPWR S&P 500 constituent",
+      "symbol": "MPWR"
+    },
+    {
+      "market_cap": null,
+      "name": "MRK S&P 500 constituent",
+      "symbol": "MRK"
+    },
+    {
+      "market_cap": null,
+      "name": "MRNA S&P 500 constituent",
+      "symbol": "MRNA"
+    },
+    {
+      "market_cap": null,
+      "name": "MS S&P 500 constituent",
+      "symbol": "MS"
+    },
+    {
+      "market_cap": null,
+      "name": "MSCI S&P 500 constituent",
+      "symbol": "MSCI"
+    },
+    {
+      "market_cap": null,
+      "name": "MSFT S&P 500 constituent",
+      "symbol": "MSFT"
+    },
+    {
+      "market_cap": null,
+      "name": "MSI S&P 500 constituent",
+      "symbol": "MSI"
+    },
+    {
+      "market_cap": null,
+      "name": "MTB S&P 500 constituent",
+      "symbol": "MTB"
+    },
+    {
+      "market_cap": null,
+      "name": "MTCH S&P 500 constituent",
+      "symbol": "MTCH"
+    },
+    {
+      "market_cap": null,
+      "name": "MTD S&P 500 constituent",
+      "symbol": "MTD"
+    },
+    {
+      "market_cap": null,
+      "name": "MU S&P 500 constituent",
+      "symbol": "MU"
+    },
+    {
+      "market_cap": null,
+      "name": "NCLH S&P 500 constituent",
+      "symbol": "NCLH"
+    },
+    {
+      "market_cap": null,
+      "name": "NDAQ S&P 500 constituent",
+      "symbol": "NDAQ"
+    },
+    {
+      "market_cap": null,
+      "name": "NDSN S&P 500 constituent",
+      "symbol": "NDSN"
+    },
+    {
+      "market_cap": null,
+      "name": "NEE S&P 500 constituent",
+      "symbol": "NEE"
+    },
+    {
+      "market_cap": null,
+      "name": "NEM S&P 500 constituent",
+      "symbol": "NEM"
+    },
+    {
+      "market_cap": null,
+      "name": "NFLX S&P 500 constituent",
+      "symbol": "NFLX"
+    },
+    {
+      "market_cap": null,
+      "name": "NI S&P 500 constituent",
+      "symbol": "NI"
+    },
+    {
+      "market_cap": null,
+      "name": "NKE S&P 500 constituent",
+      "symbol": "NKE"
+    },
+    {
+      "market_cap": null,
+      "name": "NOC S&P 500 constituent",
+      "symbol": "NOC"
+    },
+    {
+      "market_cap": null,
+      "name": "NOW S&P 500 constituent",
+      "symbol": "NOW"
+    },
+    {
+      "market_cap": null,
+      "name": "NRG S&P 500 constituent",
+      "symbol": "NRG"
+    },
+    {
+      "market_cap": null,
+      "name": "NSC S&P 500 constituent",
+      "symbol": "NSC"
+    },
+    {
+      "market_cap": null,
+      "name": "NTAP S&P 500 constituent",
+      "symbol": "NTAP"
+    },
+    {
+      "market_cap": null,
+      "name": "NTRS S&P 500 constituent",
+      "symbol": "NTRS"
+    },
+    {
+      "market_cap": null,
+      "name": "NUE S&P 500 constituent",
+      "symbol": "NUE"
+    },
+    {
+      "market_cap": null,
+      "name": "NVDA S&P 500 constituent",
+      "symbol": "NVDA"
+    },
+    {
+      "market_cap": null,
+      "name": "NVR S&P 500 constituent",
+      "symbol": "NVR"
+    },
+    {
+      "market_cap": null,
+      "name": "NWS S&P 500 constituent",
+      "symbol": "NWS"
+    },
+    {
+      "market_cap": null,
+      "name": "NWSA S&P 500 constituent",
+      "symbol": "NWSA"
+    },
+    {
+      "market_cap": null,
+      "name": "NXPI S&P 500 constituent",
+      "symbol": "NXPI"
+    },
+    {
+      "market_cap": null,
+      "name": "O S&P 500 constituent",
+      "symbol": "O"
+    },
+    {
+      "market_cap": null,
+      "name": "ODFL S&P 500 constituent",
+      "symbol": "ODFL"
+    },
+    {
+      "market_cap": null,
+      "name": "OKE S&P 500 constituent",
+      "symbol": "OKE"
+    },
+    {
+      "market_cap": null,
+      "name": "OMC S&P 500 constituent",
+      "symbol": "OMC"
+    },
+    {
+      "market_cap": null,
+      "name": "ON S&P 500 constituent",
+      "symbol": "ON"
+    },
+    {
+      "market_cap": null,
+      "name": "ORCL S&P 500 constituent",
+      "symbol": "ORCL"
+    },
+    {
+      "market_cap": null,
+      "name": "ORLY S&P 500 constituent",
+      "symbol": "ORLY"
+    },
+    {
+      "market_cap": null,
+      "name": "OTIS S&P 500 constituent",
+      "symbol": "OTIS"
+    },
+    {
+      "market_cap": null,
+      "name": "OXY S&P 500 constituent",
+      "symbol": "OXY"
+    },
+    {
+      "market_cap": null,
+      "name": "PANW S&P 500 constituent",
+      "symbol": "PANW"
+    },
+    {
+      "market_cap": null,
+      "name": "PARA S&P 500 constituent",
+      "symbol": "PARA"
+    },
+    {
+      "market_cap": null,
+      "name": "PAYC S&P 500 constituent",
+      "symbol": "PAYC"
+    },
+    {
+      "market_cap": null,
+      "name": "PAYX S&P 500 constituent",
+      "symbol": "PAYX"
+    },
+    {
+      "market_cap": null,
+      "name": "PCAR S&P 500 constituent",
+      "symbol": "PCAR"
+    },
+    {
+      "market_cap": null,
+      "name": "PCG S&P 500 constituent",
+      "symbol": "PCG"
+    },
+    {
+      "market_cap": null,
+      "name": "PEG S&P 500 constituent",
+      "symbol": "PEG"
+    },
+    {
+      "market_cap": null,
+      "name": "PEP S&P 500 constituent",
+      "symbol": "PEP"
+    },
+    {
+      "market_cap": null,
+      "name": "PFE S&P 500 constituent",
+      "symbol": "PFE"
+    },
+    {
+      "market_cap": null,
+      "name": "PFG S&P 500 constituent",
+      "symbol": "PFG"
+    },
+    {
+      "market_cap": null,
+      "name": "PG S&P 500 constituent",
+      "symbol": "PG"
+    },
+    {
+      "market_cap": null,
+      "name": "PGR S&P 500 constituent",
+      "symbol": "PGR"
+    },
+    {
+      "market_cap": null,
+      "name": "PH S&P 500 constituent",
+      "symbol": "PH"
+    },
+    {
+      "market_cap": null,
+      "name": "PHM S&P 500 constituent",
+      "symbol": "PHM"
+    },
+    {
+      "market_cap": null,
+      "name": "PKG S&P 500 constituent",
+      "symbol": "PKG"
+    },
+    {
+      "market_cap": null,
+      "name": "PLD S&P 500 constituent",
+      "symbol": "PLD"
+    },
+    {
+      "market_cap": null,
+      "name": "PLTR S&P 500 constituent",
+      "symbol": "PLTR"
+    },
+    {
+      "market_cap": null,
+      "name": "PM S&P 500 constituent",
+      "symbol": "PM"
+    },
+    {
+      "market_cap": null,
+      "name": "PNC S&P 500 constituent",
+      "symbol": "PNC"
+    },
+    {
+      "market_cap": null,
+      "name": "PNR S&P 500 constituent",
+      "symbol": "PNR"
+    },
+    {
+      "market_cap": null,
+      "name": "PNW S&P 500 constituent",
+      "symbol": "PNW"
+    },
+    {
+      "market_cap": null,
+      "name": "PODD S&P 500 constituent",
+      "symbol": "PODD"
+    },
+    {
+      "market_cap": null,
+      "name": "POOL S&P 500 constituent",
+      "symbol": "POOL"
+    },
+    {
+      "market_cap": null,
+      "name": "PPG S&P 500 constituent",
+      "symbol": "PPG"
+    },
+    {
+      "market_cap": null,
+      "name": "PPL S&P 500 constituent",
+      "symbol": "PPL"
+    },
+    {
+      "market_cap": null,
+      "name": "PRU S&P 500 constituent",
+      "symbol": "PRU"
+    },
+    {
+      "market_cap": null,
+      "name": "PSA S&P 500 constituent",
+      "symbol": "PSA"
+    },
+    {
+      "market_cap": null,
+      "name": "PSX S&P 500 constituent",
+      "symbol": "PSX"
+    },
+    {
+      "market_cap": null,
+      "name": "PTC S&P 500 constituent",
+      "symbol": "PTC"
+    },
+    {
+      "market_cap": null,
+      "name": "PWR S&P 500 constituent",
+      "symbol": "PWR"
+    },
+    {
+      "market_cap": null,
+      "name": "PYPL S&P 500 constituent",
+      "symbol": "PYPL"
+    },
+    {
+      "market_cap": null,
+      "name": "QCOM S&P 500 constituent",
+      "symbol": "QCOM"
+    },
+    {
+      "market_cap": null,
+      "name": "RCL S&P 500 constituent",
+      "symbol": "RCL"
+    },
+    {
+      "market_cap": null,
+      "name": "REG S&P 500 constituent",
+      "symbol": "REG"
+    },
+    {
+      "market_cap": null,
+      "name": "REGN S&P 500 constituent",
+      "symbol": "REGN"
+    },
+    {
+      "market_cap": null,
+      "name": "RF S&P 500 constituent",
+      "symbol": "RF"
+    },
+    {
+      "market_cap": null,
+      "name": "RJF S&P 500 constituent",
+      "symbol": "RJF"
+    },
+    {
+      "market_cap": null,
+      "name": "RL S&P 500 constituent",
+      "symbol": "RL"
+    },
+    {
+      "market_cap": null,
+      "name": "RMD S&P 500 constituent",
+      "symbol": "RMD"
+    },
+    {
+      "market_cap": null,
+      "name": "ROK S&P 500 constituent",
+      "symbol": "ROK"
+    },
+    {
+      "market_cap": null,
+      "name": "ROL S&P 500 constituent",
+      "symbol": "ROL"
+    },
+    {
+      "market_cap": null,
+      "name": "ROP S&P 500 constituent",
+      "symbol": "ROP"
+    },
+    {
+      "market_cap": null,
+      "name": "ROST S&P 500 constituent",
+      "symbol": "ROST"
+    },
+    {
+      "market_cap": null,
+      "name": "RSG S&P 500 constituent",
+      "symbol": "RSG"
+    },
+    {
+      "market_cap": null,
+      "name": "RTX S&P 500 constituent",
+      "symbol": "RTX"
+    },
+    {
+      "market_cap": null,
+      "name": "RVTY S&P 500 constituent",
+      "symbol": "RVTY"
+    },
+    {
+      "market_cap": null,
+      "name": "SBAC S&P 500 constituent",
+      "symbol": "SBAC"
+    },
+    {
+      "market_cap": null,
+      "name": "SBUX S&P 500 constituent",
+      "symbol": "SBUX"
+    },
+    {
+      "market_cap": null,
+      "name": "SCHW S&P 500 constituent",
+      "symbol": "SCHW"
+    },
+    {
+      "market_cap": null,
+      "name": "SHW S&P 500 constituent",
+      "symbol": "SHW"
+    },
+    {
+      "market_cap": null,
+      "name": "SJM S&P 500 constituent",
+      "symbol": "SJM"
+    },
+    {
+      "market_cap": null,
+      "name": "SLB S&P 500 constituent",
+      "symbol": "SLB"
+    },
+    {
+      "market_cap": null,
+      "name": "SMCI S&P 500 constituent",
+      "symbol": "SMCI"
+    },
+    {
+      "market_cap": null,
+      "name": "SNA S&P 500 constituent",
+      "symbol": "SNA"
+    },
+    {
+      "market_cap": null,
+      "name": "SNPS S&P 500 constituent",
+      "symbol": "SNPS"
+    },
+    {
+      "market_cap": null,
+      "name": "SO S&P 500 constituent",
+      "symbol": "SO"
+    },
+    {
+      "market_cap": null,
+      "name": "SOLV S&P 500 constituent",
+      "symbol": "SOLV"
+    },
+    {
+      "market_cap": null,
+      "name": "SPG S&P 500 constituent",
+      "symbol": "SPG"
+    },
+    {
+      "market_cap": null,
+      "name": "SPGI S&P 500 constituent",
+      "symbol": "SPGI"
+    },
+    {
+      "market_cap": null,
+      "name": "SRE S&P 500 constituent",
+      "symbol": "SRE"
+    },
+    {
+      "market_cap": null,
+      "name": "STE S&P 500 constituent",
+      "symbol": "STE"
+    },
+    {
+      "market_cap": null,
+      "name": "STLD S&P 500 constituent",
+      "symbol": "STLD"
+    },
+    {
+      "market_cap": null,
+      "name": "STT S&P 500 constituent",
+      "symbol": "STT"
+    },
+    {
+      "market_cap": null,
+      "name": "STX S&P 500 constituent",
+      "symbol": "STX"
+    },
+    {
+      "market_cap": null,
+      "name": "STZ S&P 500 constituent",
+      "symbol": "STZ"
+    },
+    {
+      "market_cap": null,
+      "name": "SW S&P 500 constituent",
+      "symbol": "SW"
+    },
+    {
+      "market_cap": null,
+      "name": "SWK S&P 500 constituent",
+      "symbol": "SWK"
+    },
+    {
+      "market_cap": null,
+      "name": "SWKS S&P 500 constituent",
+      "symbol": "SWKS"
+    },
+    {
+      "market_cap": null,
+      "name": "SYF S&P 500 constituent",
+      "symbol": "SYF"
+    },
+    {
+      "market_cap": null,
+      "name": "SYK S&P 500 constituent",
+      "symbol": "SYK"
+    },
+    {
+      "market_cap": null,
+      "name": "SYY S&P 500 constituent",
+      "symbol": "SYY"
+    },
+    {
+      "market_cap": null,
+      "name": "T S&P 500 constituent",
+      "symbol": "T"
+    },
+    {
+      "market_cap": null,
+      "name": "TAP S&P 500 constituent",
+      "symbol": "TAP"
+    },
+    {
+      "market_cap": null,
+      "name": "TDG S&P 500 constituent",
+      "symbol": "TDG"
+    },
+    {
+      "market_cap": null,
+      "name": "TDY S&P 500 constituent",
+      "symbol": "TDY"
+    },
+    {
+      "market_cap": null,
+      "name": "TECH S&P 500 constituent",
+      "symbol": "TECH"
+    },
+    {
+      "market_cap": null,
+      "name": "TEL S&P 500 constituent",
+      "symbol": "TEL"
+    },
+    {
+      "market_cap": null,
+      "name": "TER S&P 500 constituent",
+      "symbol": "TER"
+    },
+    {
+      "market_cap": null,
+      "name": "TFC S&P 500 constituent",
+      "symbol": "TFC"
+    },
+    {
+      "market_cap": null,
+      "name": "TFX S&P 500 constituent",
+      "symbol": "TFX"
+    },
+    {
+      "market_cap": null,
+      "name": "TGT S&P 500 constituent",
+      "symbol": "TGT"
+    },
+    {
+      "market_cap": null,
+      "name": "TJX S&P 500 constituent",
+      "symbol": "TJX"
+    },
+    {
+      "market_cap": null,
+      "name": "TMO S&P 500 constituent",
+      "symbol": "TMO"
+    },
+    {
+      "market_cap": null,
+      "name": "TMUS S&P 500 constituent",
+      "symbol": "TMUS"
+    },
+    {
+      "market_cap": null,
+      "name": "TPL S&P 500 constituent",
+      "symbol": "TPL"
+    },
+    {
+      "market_cap": null,
+      "name": "TPR S&P 500 constituent",
+      "symbol": "TPR"
+    },
+    {
+      "market_cap": null,
+      "name": "TRGP S&P 500 constituent",
+      "symbol": "TRGP"
+    },
+    {
+      "market_cap": null,
+      "name": "TRMB S&P 500 constituent",
+      "symbol": "TRMB"
+    },
+    {
+      "market_cap": null,
+      "name": "TROW S&P 500 constituent",
+      "symbol": "TROW"
+    },
+    {
+      "market_cap": null,
+      "name": "TRV S&P 500 constituent",
+      "symbol": "TRV"
+    },
+    {
+      "market_cap": null,
+      "name": "TSCO S&P 500 constituent",
+      "symbol": "TSCO"
+    },
+    {
+      "market_cap": null,
+      "name": "TSLA S&P 500 constituent",
+      "symbol": "TSLA"
+    },
+    {
+      "market_cap": null,
+      "name": "TSN S&P 500 constituent",
+      "symbol": "TSN"
+    },
+    {
+      "market_cap": null,
+      "name": "TT S&P 500 constituent",
+      "symbol": "TT"
+    },
+    {
+      "market_cap": null,
+      "name": "TTWO S&P 500 constituent",
+      "symbol": "TTWO"
+    },
+    {
+      "market_cap": null,
+      "name": "TXN S&P 500 constituent",
+      "symbol": "TXN"
+    },
+    {
+      "market_cap": null,
+      "name": "TXT S&P 500 constituent",
+      "symbol": "TXT"
+    },
+    {
+      "market_cap": null,
+      "name": "TYL S&P 500 constituent",
+      "symbol": "TYL"
+    },
+    {
+      "market_cap": null,
+      "name": "UAL S&P 500 constituent",
+      "symbol": "UAL"
+    },
+    {
+      "market_cap": null,
+      "name": "UBER S&P 500 constituent",
+      "symbol": "UBER"
+    },
+    {
+      "market_cap": null,
+      "name": "UDR S&P 500 constituent",
+      "symbol": "UDR"
+    },
+    {
+      "market_cap": null,
+      "name": "UHS S&P 500 constituent",
+      "symbol": "UHS"
+    },
+    {
+      "market_cap": null,
+      "name": "ULTA S&P 500 constituent",
+      "symbol": "ULTA"
+    },
+    {
+      "market_cap": null,
+      "name": "UNH S&P 500 constituent",
+      "symbol": "UNH"
+    },
+    {
+      "market_cap": null,
+      "name": "UNP S&P 500 constituent",
+      "symbol": "UNP"
+    },
+    {
+      "market_cap": null,
+      "name": "UPS S&P 500 constituent",
+      "symbol": "UPS"
+    },
+    {
+      "market_cap": null,
+      "name": "URI S&P 500 constituent",
+      "symbol": "URI"
+    },
+    {
+      "market_cap": null,
+      "name": "USB S&P 500 constituent",
+      "symbol": "USB"
+    },
+    {
+      "market_cap": null,
+      "name": "V S&P 500 constituent",
+      "symbol": "V"
+    },
+    {
+      "market_cap": null,
+      "name": "VICI S&P 500 constituent",
+      "symbol": "VICI"
+    },
+    {
+      "market_cap": null,
+      "name": "VLO S&P 500 constituent",
+      "symbol": "VLO"
+    },
+    {
+      "market_cap": null,
+      "name": "VLTO S&P 500 constituent",
+      "symbol": "VLTO"
+    },
+    {
+      "market_cap": null,
+      "name": "VMC S&P 500 constituent",
+      "symbol": "VMC"
+    },
+    {
+      "market_cap": null,
+      "name": "VRSK S&P 500 constituent",
+      "symbol": "VRSK"
+    },
+    {
+      "market_cap": null,
+      "name": "VRSN S&P 500 constituent",
+      "symbol": "VRSN"
+    },
+    {
+      "market_cap": null,
+      "name": "VRTX S&P 500 constituent",
+      "symbol": "VRTX"
+    },
+    {
+      "market_cap": null,
+      "name": "VST S&P 500 constituent",
+      "symbol": "VST"
+    },
+    {
+      "market_cap": null,
+      "name": "VTR S&P 500 constituent",
+      "symbol": "VTR"
+    },
+    {
+      "market_cap": null,
+      "name": "VTRS S&P 500 constituent",
+      "symbol": "VTRS"
+    },
+    {
+      "market_cap": null,
+      "name": "VZ S&P 500 constituent",
+      "symbol": "VZ"
+    },
+    {
+      "market_cap": null,
+      "name": "WAB S&P 500 constituent",
+      "symbol": "WAB"
+    },
+    {
+      "market_cap": null,
+      "name": "WAT S&P 500 constituent",
+      "symbol": "WAT"
+    },
+    {
+      "market_cap": null,
+      "name": "WBA S&P 500 constituent",
+      "symbol": "WBA"
+    },
+    {
+      "market_cap": null,
+      "name": "WBD S&P 500 constituent",
+      "symbol": "WBD"
+    },
+    {
+      "market_cap": null,
+      "name": "WDAY S&P 500 constituent",
+      "symbol": "WDAY"
+    },
+    {
+      "market_cap": null,
+      "name": "WDC S&P 500 constituent",
+      "symbol": "WDC"
+    },
+    {
+      "market_cap": null,
+      "name": "WEC S&P 500 constituent",
+      "symbol": "WEC"
+    },
+    {
+      "market_cap": null,
+      "name": "WELL S&P 500 constituent",
+      "symbol": "WELL"
+    },
+    {
+      "market_cap": null,
+      "name": "WFC S&P 500 constituent",
+      "symbol": "WFC"
+    },
+    {
+      "market_cap": null,
+      "name": "WM S&P 500 constituent",
+      "symbol": "WM"
+    },
+    {
+      "market_cap": null,
+      "name": "WMB S&P 500 constituent",
+      "symbol": "WMB"
+    },
+    {
+      "market_cap": null,
+      "name": "WMT S&P 500 constituent",
+      "symbol": "WMT"
+    },
+    {
+      "market_cap": null,
+      "name": "WRB S&P 500 constituent",
+      "symbol": "WRB"
+    },
+    {
+      "market_cap": null,
+      "name": "WST S&P 500 constituent",
+      "symbol": "WST"
+    },
+    {
+      "market_cap": null,
+      "name": "WTW S&P 500 constituent",
+      "symbol": "WTW"
+    },
+    {
+      "market_cap": null,
+      "name": "WY S&P 500 constituent",
+      "symbol": "WY"
+    },
+    {
+      "market_cap": null,
+      "name": "WYNN S&P 500 constituent",
+      "symbol": "WYNN"
+    },
+    {
+      "market_cap": null,
+      "name": "XEL S&P 500 constituent",
+      "symbol": "XEL"
+    },
+    {
+      "market_cap": null,
+      "name": "XOM S&P 500 constituent",
+      "symbol": "XOM"
+    },
+    {
+      "market_cap": null,
+      "name": "XYL S&P 500 constituent",
+      "symbol": "XYL"
+    },
+    {
+      "market_cap": null,
+      "name": "YUM S&P 500 constituent",
+      "symbol": "YUM"
+    },
+    {
+      "market_cap": null,
+      "name": "ZBH S&P 500 constituent",
+      "symbol": "ZBH"
+    },
+    {
+      "market_cap": null,
+      "name": "ZBRA S&P 500 constituent",
+      "symbol": "ZBRA"
+    },
+    {
+      "market_cap": null,
+      "name": "ZTS S&P 500 constituent",
+      "symbol": "ZTS"
+    }
+  ],
+  "target_date": "2025-03-01"
+}
