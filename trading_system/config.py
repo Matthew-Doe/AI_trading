@@ -52,6 +52,19 @@ def _parse_schedule_times(
     return tuple(schedule_times) if schedule_times else ((fallback_hour, fallback_minute),)
 
 
+def _parse_time_env(name: str, default: str) -> str:
+    value = os.getenv(name, default).strip()
+    try:
+        hour_text, minute_text = value.split(":", maxsplit=1)
+        hour = int(hour_text)
+        minute = int(minute_text)
+    except ValueError as exc:
+        raise ValueError(f"Invalid {name}='{value}'. Expected HH:MM.") from exc
+    if not (0 <= hour <= 23 and 0 <= minute <= 59):
+        raise ValueError(f"Invalid {name}='{value}'. Hour/minute out of range.")
+    return f"{hour:02d}:{minute:02d}"
+
+
 @dataclass(slots=True)
 class TradingConfig:
     alpaca_api_key: str = os.getenv("ALPACA_API_KEY", "")
@@ -128,6 +141,23 @@ class TradingConfig:
     backtest_wash_sale_cooldown_days: int = int(
         os.getenv("BACKTEST_WASH_SALE_COOLDOWN_DAYS", "31")
     )
+    backtest_bias_safe_mode: bool = _parse_bool_env("BACKTEST_BIAS_SAFE_MODE")
+    backtest_universe_mode: str = os.getenv("BACKTEST_UNIVERSE_MODE", "current").strip().lower()
+    backtest_universe_snapshot_dir: str = os.getenv(
+        "BACKTEST_UNIVERSE_SNAPSHOT_DIR", "data/universe_snapshots"
+    ).strip()
+    allow_current_universe_fallback: bool = _parse_bool_env("ALLOW_CURRENT_UNIVERSE_FALLBACK")
+    backtest_calibration_mode: str = os.getenv(
+        "BACKTEST_CALIBRATION_MODE", "walk_forward"
+    ).strip().lower()
+    backtest_entry_timing_mode: str = os.getenv(
+        "BACKTEST_ENTRY_TIMING_MODE", "previous_close_decision_next_open_fill"
+    ).strip().lower()
+    backtest_entry_delay_minutes: int = int(os.getenv("BACKTEST_ENTRY_DELAY_MINUTES", "15"))
+    backtest_intraday_exit_mode: str = os.getenv(
+        "BACKTEST_INTRADAY_EXIT_MODE", "daily_high_low_conservative"
+    ).strip().lower()
+    backtest_friction_model: str = os.getenv("BACKTEST_FRICTION_MODEL", "basic").strip().lower()
     backtest_min_thesis_days: int = int(os.getenv("BACKTEST_MIN_THESIS_DAYS", "2"))
     backtest_breakeven_after_days: int = int(os.getenv("BACKTEST_BREAKEVEN_AFTER_DAYS", "2"))
     backtest_max_hold_days: int = int(os.getenv("BACKTEST_MAX_HOLD_DAYS", "7"))
@@ -187,6 +217,22 @@ class TradingConfig:
     )
     execute_orders: bool = os.getenv("EXECUTE_ORDERS", "false").lower() == "true"
     allow_shorting: bool = os.getenv("ALLOW_SHORTING", "true").lower() == "true"
+    enable_live_paper_backtest_style: bool = _parse_bool_env("ENABLE_LIVE_PAPER_BACKTEST_STYLE")
+    live_paper_strategy: str = os.getenv("LIVE_PAPER_STRATEGY", "hold_tax_partial").strip().lower()
+    require_empty_paper_account: bool = _parse_bool_env("REQUIRE_EMPTY_PAPER_ACCOUNT", True)
+    allow_live_large_trade_approval: bool = _parse_bool_env("ALLOW_LIVE_LARGE_TRADE_APPROVAL")
+    live_entry_review_time_et: str = field(
+        default_factory=lambda: _parse_time_env("LIVE_ENTRY_REVIEW_TIME_ET", "09:45")
+    )
+    live_exit_review_time_et: str = field(
+        default_factory=lambda: _parse_time_env("LIVE_EXIT_REVIEW_TIME_ET", "15:45")
+    )
+    live_paper_require_bias_safe_acceptance: bool = _parse_bool_env(
+        "LIVE_PAPER_REQUIRE_BIAS_SAFE_ACCEPTANCE", True
+    )
+    live_paper_readiness_path: str = os.getenv(
+        "LIVE_PAPER_READINESS_PATH", "runs/live_paper_readiness.json"
+    ).strip()
     telegram_bot_token: str = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
     telegram_chat_id: str = os.getenv("TELEGRAM_CHAT_ID", "").strip()
     telegram_approval_timeout_seconds: int = int(

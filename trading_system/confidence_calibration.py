@@ -34,6 +34,16 @@ class HistoricalDecisionOutcome:
     forward_as_of: str
 
 
+def _parse_known_timestamp(value: str) -> datetime | None:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return None
+    if parsed.tzinfo is None:
+        return parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
+
+
 def label_decision_correctness(
     action: str,
     forward_return: float,
@@ -106,6 +116,9 @@ def build_historical_decision_outcomes(
                 raise
 
             action = str(item["action"]).lower()
+            forward_known_at = _parse_known_timestamp(str(forward_as_of))
+            if forward_known_at is None or forward_known_at >= now.astimezone(UTC):
+                continue
             raw_confidence = float(item.get("confidence", 0.0))
             forward_return = (
                 (forward_close - reference_close) / reference_close if reference_close else 0.0
@@ -148,10 +161,13 @@ class ConfidenceCalibrator:
         self._loaded = False
         self._buckets: list[ConfidenceBucket] = []
         self._global_hit_rate = 0.0
+        self.max_outcome_timestamp_used: str | None = None
 
     def calibrate(self, *, symbol: str, action: str, raw_confidence: float) -> float:
         del symbol
         del action
+        if getattr(self.config, "backtest_calibration_mode", "walk_forward") == "off":
+            return raw_confidence
         self._ensure_loaded()
         if not self._buckets:
             return raw_confidence
@@ -182,6 +198,7 @@ class ConfidenceCalibrator:
 
         self._global_hit_rate = sum(outcome.is_correct for outcome in outcomes) / len(outcomes)
         self._buckets = _build_confidence_buckets(outcomes)
+        self.max_outcome_timestamp_used = max(outcome.forward_as_of for outcome in outcomes)
 
 
 def _parse_run_started_at(run_id: str) -> datetime | None:

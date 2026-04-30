@@ -31,6 +31,12 @@ class MarketDataService:
         self.cache_dir = ensure_dir(self.config.cache_dir)
         self.universe_cache_path = self.cache_dir / "universe_top500.json"
         self.symbol_cache_dir = ensure_dir(self.cache_dir / "symbols")
+        self.last_universe_metadata: dict[str, object] = {
+            "mode": self.config.backtest_universe_mode,
+            "snapshot_date": None,
+            "symbol_count": 0,
+            "fallback_used": False,
+        }
         self.rate_limiter = RateLimiter(self.config.max_requests_per_minute, 60)
         self.session.headers.update(
             {
@@ -119,7 +125,7 @@ class MarketDataService:
         return companies
 
     def build_universe(self, include_news: bool = False, as_of_date: datetime | None = None) -> list[SymbolMarketData]:
-        companies = self._build_symbol_universe()
+        companies = self._build_symbol_universe(as_of_date=as_of_date)
         results: list[SymbolMarketData] = []
         failures: list[str] = []
         self.logger.info("Building universe for %s symbols (as_of=%s)", len(companies), as_of_date)
@@ -149,7 +155,11 @@ class MarketDataService:
         )
         return results
 
-    def _build_symbol_universe(self) -> list[dict]:
+    def _build_symbol_universe(self, as_of_date: datetime | None = None) -> list[dict]:
+        mode = getattr(self.config, "backtest_universe_mode", "current")
+        if mode == "point_in_time" and as_of_date is not None:
+            return self._build_symbol_universe_from_snapshot(as_of_date)
+
         try:
             companies = self.fetch_top_us_companies_by_market_cap()
         except Exception as exc:  # noqa: BLE001
@@ -173,6 +183,76 @@ class MarketDataService:
                 }
             )
             seen_symbols.add(normalized)
+        self.last_universe_metadata = {
+            "mode": mode,
+            "snapshot_date": None,
+            "symbol_count": len(companies),
+            "fallback_used": mode == "point_in_time",
+        }
+        return companies
+
+    def _build_symbol_universe_from_snapshot(self, as_of_date: datetime) -> list[dict]:
+        snapshot_dir = Path(getattr(self.config, "backtest_universe_snapshot_dir", "data/universe_snapshots"))
+        candidates: list[tuple[datetime, Path]] = []
+        for path in sorted(snapshot_dir.glob("*.json")):
+            try:
+                snapshot_date = datetime.strptime(path.stem, "%Y-%m-%d").replace(tzinfo=UTC)
+            except ValueError:
+                continue
+            as_of_utc = as_of_date if as_of_date.tzinfo else as_of_date.replace(tzinfo=UTC)
+            if snapshot_date <= as_of_utc.astimezone(UTC):
+                candidates.append((snapshot_date, path))
+
+        if not candidates:
+            if getattr(self.config, "allow_current_universe_fallback", False):
+                companies = self.fetch_top_us_companies_by_market_cap()
+                self.last_universe_metadata = {
+                    "mode": "point_in_time",
+                    "snapshot_date": None,
+                    "symbol_count": len(companies),
+                    "fallback_used": True,
+                }
+                return companies
+            raise DataIngestionError(
+                f"No point-in-time universe snapshot found in {snapshot_dir} for {as_of_date.date()}"
+            )
+
+        snapshot_date, snapshot_path = candidates[-1]
+        payload = read_json(snapshot_path)
+        symbols = payload.get("symbols", payload.get("payload", []))
+        if not isinstance(symbols, list) or not symbols:
+            raise DataIngestionError(f"Universe snapshot {snapshot_path} did not contain symbols.")
+
+        companies = [
+            {
+                "symbol": str(item["symbol"]).replace(".", "-").upper(),
+                "name": item.get("name", f"{item['symbol']} snapshot"),
+                "market_cap": item.get("market_cap"),
+            }
+            for item in symbols[: self.config.top_universe_size]
+            if item.get("symbol")
+        ]
+        seen_symbols = {item["symbol"] for item in companies}
+        for symbol in self.config.index_proxy_symbols:
+            normalized = symbol.replace(".", "-").upper()
+            if normalized in seen_symbols:
+                continue
+            companies.append(
+                {
+                    "symbol": normalized,
+                    "name": f"{normalized} index proxy",
+                    "market_cap": None,
+                }
+            )
+            seen_symbols.add(normalized)
+
+        self.last_universe_metadata = {
+            "mode": "point_in_time",
+            "snapshot_date": snapshot_date.date().isoformat(),
+            "symbol_count": len(companies),
+            "fallback_used": False,
+            "source": payload.get("source"),
+        }
         return companies
 
     def _build_symbol_universe_from_cache(self) -> list[dict]:

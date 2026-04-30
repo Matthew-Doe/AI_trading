@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from trading_system.data import DataIngestionError
 from trading_system.confidence_calibration import (
     ConfidenceBucket,
+    ConfidenceCalibrator,
     build_historical_decision_outcomes,
     calibrate_confidence,
     label_decision_correctness,
@@ -277,3 +278,78 @@ def test_build_historical_decision_outcomes_skips_current_backtest_day(tmp_path)
     )
 
     assert outcomes == []
+
+
+def test_build_historical_decision_outcomes_excludes_forward_outcome_not_yet_known(tmp_path):
+    run_dir = tmp_path / "backtest" / "2026-01-02"
+    run_dir.mkdir(parents=True)
+    (run_dir / "decisions.json").write_text(
+        '[{"symbol":"AAPL","action":"long","confidence":0.82,"allocation":0.4}]',
+        encoding="utf-8",
+    )
+
+    class StubMarketDataService:
+        def fetch_forward_close_window(self, symbol: str, *, as_of: datetime, trading_days_ahead: int):
+            del symbol
+            del as_of
+            del trading_days_ahead
+            return 100.0, 103.0, "2026-01-07T21:00:00+00:00"
+
+    outcomes = build_historical_decision_outcomes(
+        run_root=tmp_path / "backtest",
+        market_data_service=StubMarketDataService(),
+        actionable_move_pct=0.02,
+        now=datetime(2026, 1, 5, 14, 30, tzinfo=UTC),
+    )
+
+    assert outcomes == []
+
+
+def test_build_historical_decision_outcomes_includes_forward_outcome_after_known_time(tmp_path):
+    run_dir = tmp_path / "backtest" / "2026-01-02"
+    run_dir.mkdir(parents=True)
+    (run_dir / "decisions.json").write_text(
+        '[{"symbol":"AAPL","action":"long","confidence":0.82,"allocation":0.4}]',
+        encoding="utf-8",
+    )
+
+    class StubMarketDataService:
+        def fetch_forward_close_window(self, symbol: str, *, as_of: datetime, trading_days_ahead: int):
+            del symbol
+            del as_of
+            del trading_days_ahead
+            return 100.0, 103.0, "2026-01-07T21:00:00+00:00"
+
+    outcomes = build_historical_decision_outcomes(
+        run_root=tmp_path / "backtest",
+        market_data_service=StubMarketDataService(),
+        actionable_move_pct=0.02,
+        now=datetime(2026, 1, 8, 14, 30, tzinfo=UTC),
+    )
+
+    assert len(outcomes) == 1
+    assert outcomes[0].forward_as_of == "2026-01-07T21:00:00+00:00"
+
+
+def test_confidence_calibrator_returns_raw_when_calibration_disabled():
+    class Config:
+        confidence_actionable_move_pct = 0.02
+        backtest_calibration_mode = "off"
+        run_dir = None
+
+    class Logger:
+        def warning(self, *args, **kwargs):
+            raise AssertionError("disabled calibration should not load history")
+
+    class MarketDataService:
+        def fetch_forward_close_window(self, *args, **kwargs):
+            raise AssertionError("disabled calibration should not fetch data")
+
+    calibrator = ConfidenceCalibrator(
+        config=Config(),
+        logger=Logger(),
+        market_data_service=MarketDataService(),
+        now=datetime(2026, 1, 8, tzinfo=UTC),
+    )
+
+    assert calibrator.calibrate(symbol="AAPL", action="long", raw_confidence=0.84) == 0.84

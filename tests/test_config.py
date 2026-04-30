@@ -6,7 +6,7 @@ import pandas as pd
 
 import trading_system.config as config_module
 from trading_system.config import TradingConfig, _parse_schedule_times
-from trading_system.data import MarketDataService
+from trading_system.data import DataIngestionError, MarketDataService
 
 
 class DummyLogger:
@@ -139,6 +139,65 @@ def test_behavior_experiment_flags_read_from_environment(monkeypatch):
     assert config.enable_strict_thesis_failure_reasons is True
 
 
+def test_bias_safe_backtest_config_defaults(monkeypatch):
+    for name in (
+        "BACKTEST_BIAS_SAFE_MODE",
+        "BACKTEST_UNIVERSE_MODE",
+        "BACKTEST_UNIVERSE_SNAPSHOT_DIR",
+        "ALLOW_CURRENT_UNIVERSE_FALLBACK",
+        "BACKTEST_CALIBRATION_MODE",
+        "BACKTEST_ENTRY_TIMING_MODE",
+        "BACKTEST_ENTRY_DELAY_MINUTES",
+        "BACKTEST_INTRADAY_EXIT_MODE",
+        "BACKTEST_FRICTION_MODEL",
+        "LIVE_PAPER_REQUIRE_BIAS_SAFE_ACCEPTANCE",
+        "LIVE_PAPER_READINESS_PATH",
+    ):
+        monkeypatch.delenv(name, raising=False)
+
+    config = _fresh_trading_config()()
+
+    assert config.backtest_bias_safe_mode is False
+    assert config.backtest_universe_mode == "current"
+    assert config.backtest_universe_snapshot_dir == "data/universe_snapshots"
+    assert config.allow_current_universe_fallback is False
+    assert config.backtest_calibration_mode == "walk_forward"
+    assert config.backtest_entry_timing_mode == "previous_close_decision_next_open_fill"
+    assert config.backtest_entry_delay_minutes == 15
+    assert config.backtest_intraday_exit_mode == "daily_high_low_conservative"
+    assert config.backtest_friction_model == "basic"
+    assert config.live_paper_require_bias_safe_acceptance is True
+    assert config.live_paper_readiness_path == "runs/live_paper_readiness.json"
+
+
+def test_bias_safe_backtest_config_reads_environment(monkeypatch, tmp_path):
+    monkeypatch.setenv("BACKTEST_BIAS_SAFE_MODE", "true")
+    monkeypatch.setenv("BACKTEST_UNIVERSE_MODE", "point_in_time")
+    monkeypatch.setenv("BACKTEST_UNIVERSE_SNAPSHOT_DIR", str(tmp_path / "snapshots"))
+    monkeypatch.setenv("ALLOW_CURRENT_UNIVERSE_FALLBACK", "true")
+    monkeypatch.setenv("BACKTEST_CALIBRATION_MODE", "off")
+    monkeypatch.setenv("BACKTEST_ENTRY_TIMING_MODE", "open_plus_delay_fill")
+    monkeypatch.setenv("BACKTEST_ENTRY_DELAY_MINUTES", "30")
+    monkeypatch.setenv("BACKTEST_INTRADAY_EXIT_MODE", "intraday_bars")
+    monkeypatch.setenv("BACKTEST_FRICTION_MODEL", "realistic")
+    monkeypatch.setenv("LIVE_PAPER_REQUIRE_BIAS_SAFE_ACCEPTANCE", "false")
+    monkeypatch.setenv("LIVE_PAPER_READINESS_PATH", str(tmp_path / "readiness.json"))
+
+    config = _fresh_trading_config()()
+
+    assert config.backtest_bias_safe_mode is True
+    assert config.backtest_universe_mode == "point_in_time"
+    assert config.backtest_universe_snapshot_dir == str(tmp_path / "snapshots")
+    assert config.allow_current_universe_fallback is True
+    assert config.backtest_calibration_mode == "off"
+    assert config.backtest_entry_timing_mode == "open_plus_delay_fill"
+    assert config.backtest_entry_delay_minutes == 30
+    assert config.backtest_intraday_exit_mode == "intraday_bars"
+    assert config.backtest_friction_model == "realistic"
+    assert config.live_paper_require_bias_safe_acceptance is False
+    assert config.live_paper_readiness_path == str(tmp_path / "readiness.json")
+
+
 def test_fetch_forward_close_window_uses_next_three_trading_days():
     config = TradingConfig()
     service = MarketDataService.__new__(MarketDataService)
@@ -170,3 +229,49 @@ def test_fetch_forward_close_window_uses_next_three_trading_days():
     assert reference_close == 100.0
     assert forward_close == 104.0
     assert forward_as_of.startswith("2026-04-23")
+
+
+def test_point_in_time_universe_snapshot_selects_latest_on_or_before_date(tmp_path):
+    snapshot_dir = tmp_path / "snapshots"
+    snapshot_dir.mkdir()
+    (snapshot_dir / "2026-01-01.json").write_text(
+        '{"source":"test","symbols":[{"symbol":"AAPL","name":"Apple","market_cap":3000}]}',
+        encoding="utf-8",
+    )
+    (snapshot_dir / "2026-02-01.json").write_text(
+        '{"source":"test","symbols":[{"symbol":"MSFT","name":"Microsoft","market_cap":2900}]}',
+        encoding="utf-8",
+    )
+    config = TradingConfig(
+        backtest_universe_mode="point_in_time",
+        backtest_universe_snapshot_dir=str(snapshot_dir),
+        top_universe_size=10,
+        index_proxy_symbols=(),
+    )
+    service = MarketDataService.__new__(MarketDataService)
+    service.config = config
+    service.logger = DummyLogger()
+
+    companies = service._build_symbol_universe(as_of_date=datetime(2026, 1, 15))
+
+    assert companies == [{"symbol": "AAPL", "name": "Apple", "market_cap": 3000}]
+    assert service.last_universe_metadata["snapshot_date"] == "2026-01-01"
+    assert service.last_universe_metadata["fallback_used"] is False
+
+
+def test_point_in_time_universe_snapshot_fails_closed_without_snapshot(tmp_path):
+    config = TradingConfig(
+        backtest_universe_mode="point_in_time",
+        backtest_universe_snapshot_dir=str(tmp_path / "missing"),
+        allow_current_universe_fallback=False,
+    )
+    service = MarketDataService.__new__(MarketDataService)
+    service.config = config
+    service.logger = DummyLogger()
+
+    try:
+        service._build_symbol_universe(as_of_date=datetime(2026, 1, 15))
+    except DataIngestionError as exc:
+        assert "No point-in-time universe snapshot" in str(exc)
+    else:
+        raise AssertionError("missing snapshot should fail closed")
