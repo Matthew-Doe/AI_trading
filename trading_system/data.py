@@ -31,6 +31,7 @@ class MarketDataService:
         self.cache_dir = ensure_dir(self.config.cache_dir)
         self.universe_cache_path = self.cache_dir / "universe_top500.json"
         self.symbol_cache_dir = ensure_dir(self.cache_dir / "symbols")
+        self.daily_bar_cache_dir = ensure_dir(self.config.market_data_cache_dir / "daily")
         self.last_universe_metadata: dict[str, object] = {
             "mode": self.config.backtest_universe_mode,
             "snapshot_date": None,
@@ -375,6 +376,10 @@ class MarketDataService:
     def _fetch_daily_bars(self, symbol: str, as_of_date: datetime | None = None) -> pd.DataFrame:
         end = as_of_date or datetime.now(UTC)
         start = end - timedelta(days=365)
+
+        cached_daily = self._read_daily_bars_cache(symbol, start=start, end=end)
+        if not cached_daily.empty:
+            return cached_daily
         
         if self.config.alpaca_api_key and self.config.alpaca_secret_key:
             try:
@@ -409,6 +414,86 @@ class MarketDataService:
 
         daily = daily.dropna().tail(220)
         return daily
+
+    def _read_daily_bars_cache(self, symbol: str, start: datetime, end: datetime) -> pd.DataFrame:
+        path = self.daily_bar_cache_dir / f"{symbol.replace('.', '-').upper()}.json"
+        if not path.exists():
+            return pd.DataFrame()
+
+        payload = read_json(path)
+        bars = payload.get("bars", [])
+        if not isinstance(bars, list):
+            return pd.DataFrame()
+
+        frame = self._daily_bar_records_to_frame(bars)
+        if frame.empty:
+            return frame
+
+        start_utc = start if start.tzinfo else start.replace(tzinfo=UTC)
+        end_utc = end if end.tzinfo else end.replace(tzinfo=UTC)
+        end_exclusive = end_utc.astimezone(UTC) + timedelta(days=1)
+        filtered = frame.loc[
+            (frame.index >= start_utc.astimezone(UTC))
+            & (frame.index < end_exclusive)
+        ]
+        return filtered.dropna().tail(220)
+
+    def write_daily_bars_cache(self, symbol: str, bars: list[dict]) -> int:
+        frame = self._daily_bar_records_to_frame(bars)
+        if frame.empty:
+            return 0
+
+        normalized_bars = [
+            {
+                "timestamp": timestamp.isoformat(),
+                "open": safe_float(row["Open"]),
+                "high": safe_float(row["High"]),
+                "low": safe_float(row["Low"]),
+                "close": safe_float(row["Close"]),
+                "volume": safe_float(row["Volume"]),
+            }
+            for timestamp, row in frame.iterrows()
+        ]
+        cache_symbol = symbol.replace(".", "-").upper()
+        write_json(
+            self.daily_bar_cache_dir / f"{cache_symbol}.json",
+            {
+                "saved_at": utc_timestamp(),
+                "symbol": cache_symbol,
+                "timeframe": "1Day",
+                "bars": normalized_bars,
+            },
+        )
+        return len(normalized_bars)
+
+    @staticmethod
+    def _daily_bar_records_to_frame(bars: list[dict]) -> pd.DataFrame:
+        rows: list[dict[str, float | datetime]] = []
+        for bar in bars:
+            timestamp = bar.get("timestamp", bar.get("t"))
+            if not timestamp:
+                continue
+            try:
+                rows.append(
+                    {
+                        "Timestamp": pd.Timestamp(timestamp).to_pydatetime(),
+                        "Open": float(bar.get("open", bar.get("o"))),
+                        "High": float(bar.get("high", bar.get("h"))),
+                        "Low": float(bar.get("low", bar.get("l"))),
+                        "Close": float(bar.get("close", bar.get("c"))),
+                        "Volume": float(bar.get("volume", bar.get("v"))),
+                    }
+                )
+            except (TypeError, ValueError):
+                continue
+
+        if not rows:
+            return pd.DataFrame()
+
+        frame = pd.DataFrame(rows)
+        frame["Timestamp"] = pd.to_datetime(frame["Timestamp"], utc=True)
+        frame = frame.sort_values("Timestamp").drop_duplicates("Timestamp")
+        return frame.set_index("Timestamp")[["Open", "High", "Low", "Close", "Volume"]]
 
     def _fetch_daily_bars_alpaca(self, symbol: str, start: datetime, end: datetime) -> pd.DataFrame:
         alpaca_symbol = self._to_alpaca_symbol(symbol)
@@ -448,6 +533,56 @@ class MarketDataService:
         frame["Timestamp"] = pd.to_datetime(frame["Timestamp"], utc=True)
         frame = frame.set_index("Timestamp")[["Open", "High", "Low", "Close", "Volume"]]
         return frame
+
+    def fetch_alpaca_daily_bars_bulk(
+        self,
+        symbols: list[str],
+        *,
+        start: datetime,
+        end: datetime,
+        feed: str = "iex",
+    ) -> dict[str, list[dict]]:
+        if not self.config.alpaca_api_key or not self.config.alpaca_secret_key:
+            raise DataIngestionError("Alpaca credentials are required for bulk daily bar preload.")
+
+        alpaca_to_cache_symbol = {
+            self._to_alpaca_symbol(symbol.replace(".", "-").upper()): symbol.replace(".", "-").upper()
+            for symbol in symbols
+        }
+        results: dict[str, list[dict]] = {symbol: [] for symbol in alpaca_to_cache_symbol.values()}
+        page_token: str | None = None
+
+        while True:
+            self.rate_limiter.acquire()
+            params = {
+                "symbols": ",".join(alpaca_to_cache_symbol),
+                "timeframe": "1Day",
+                "start": start.isoformat().replace("+00:00", "Z"),
+                "end": end.isoformat().replace("+00:00", "Z"),
+                "limit": 10000,
+                "adjustment": "raw",
+                "feed": feed,
+                "sort": "asc",
+            }
+            if page_token:
+                params["page_token"] = page_token
+
+            response = self.session.get(
+                "https://data.alpaca.markets/v2/stocks/bars",
+                headers=self.alpaca_data_headers,
+                params=params,
+                timeout=self.config.request_timeout_seconds,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            for alpaca_symbol, bars in payload.get("bars", {}).items():
+                cache_symbol = alpaca_to_cache_symbol.get(alpaca_symbol)
+                if cache_symbol and isinstance(bars, list):
+                    results[cache_symbol].extend(bars)
+
+            page_token = payload.get("next_page_token")
+            if not page_token:
+                return results
 
     def _fetch_daily_bars_alpha_vantage(self, symbol: str, end: datetime) -> pd.DataFrame:
         self.alpha_vantage_rate_limiter.acquire()

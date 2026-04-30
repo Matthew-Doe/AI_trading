@@ -260,6 +260,9 @@ class TradingConfig:
     log_dir: Path = field(default_factory=lambda: Path(os.getenv("LOG_DIR", "logs")))
     run_dir: Path = field(default_factory=lambda: Path(os.getenv("RUN_DIR", "runs")))
     cache_dir: Path = field(default_factory=lambda: Path(os.getenv("CACHE_DIR", ".cache")))
+    market_data_cache_dir: Path = field(
+        default_factory=lambda: Path(os.getenv("MARKET_DATA_CACHE_DIR", "data/market_bars"))
+    )
     universe_cache_ttl_hours: int = int(os.getenv("UNIVERSE_CACHE_TTL_HOURS", "12"))
     symbol_cache_ttl_hours: int = int(os.getenv("SYMBOL_CACHE_TTL_HOURS", "6"))
     news_limit: int = int(os.getenv("NEWS_LIMIT", "5"))
