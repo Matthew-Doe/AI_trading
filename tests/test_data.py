@@ -199,7 +199,7 @@ def test_alpha_vantage_daily_bars_parse_ohlcv_response(tmp_path):
     assert captured_params == {
         "function": "TIME_SERIES_DAILY",
         "symbol": "AAPL",
-        "outputsize": "full",
+        "outputsize": "compact",
         "apikey": "demo-key",
     }
     assert list(daily.columns) == ["Open", "High", "Low", "Close", "Volume"]

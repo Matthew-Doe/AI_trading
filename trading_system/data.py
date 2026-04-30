@@ -456,7 +456,7 @@ class MarketDataService:
             params={
                 "function": "TIME_SERIES_DAILY",
                 "symbol": symbol,
-                "outputsize": "full",
+                "outputsize": self.config.alpha_vantage_outputsize,
                 "apikey": self.config.alpha_vantage_api_key,
             },
             timeout=self.config.request_timeout_seconds,
