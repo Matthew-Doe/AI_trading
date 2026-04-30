@@ -9,21 +9,50 @@ from trading_system.portfolio_summary import send_market_close_summary
 from trading_system.utils import get_logger
 
 
+def _parse_hhmm(value: str) -> tuple[int, int]:
+    hour_text, minute_text = value.split(":", maxsplit=1)
+    return int(hour_text), int(minute_text)
+
+
+def live_paper_phase_schedule(config: TradingConfig) -> dict[str, tuple[int, int]]:
+    return {
+        "entry_review": _parse_hhmm(config.live_entry_review_time_et),
+        "exit_review": _parse_hhmm(config.live_exit_review_time_et),
+    }
+
+
 def main() -> int:
     config = TradingConfig()
     args = parse_args()
     scheduler = BlockingScheduler(timezone=config.market_timezone)
-    for hour, minute in config.scheduled_times:
-        scheduler.add_job(
-            lambda: run_pipeline(config, args),
-            trigger=CronTrigger(
-                day_of_week="mon-fri",
-                hour=hour,
-                minute=minute,
-            ),
-            id=f"trading_run_{hour:02d}{minute:02d}",
-            replace_existing=True,
-        )
+    if config.enable_live_paper_backtest_style:
+        import argparse
+
+        for phase, (hour, minute) in live_paper_phase_schedule(config).items():
+            phase_args = argparse.Namespace(**vars(args))
+            phase_args.phase = phase
+            scheduler.add_job(
+                lambda phase_args=phase_args: run_pipeline(config, phase_args),
+                trigger=CronTrigger(
+                    day_of_week="mon-fri",
+                    hour=hour,
+                    minute=minute,
+                ),
+                id=f"trading_run_{phase}",
+                replace_existing=True,
+            )
+    else:
+        for hour, minute in config.scheduled_times:
+            scheduler.add_job(
+                lambda: run_pipeline(config, args),
+                trigger=CronTrigger(
+                    day_of_week="mon-fri",
+                    hour=hour,
+                    minute=minute,
+                ),
+                id=f"trading_run_{hour:02d}{minute:02d}",
+                replace_existing=True,
+            )
     scheduler.add_job(
         lambda: send_market_close_summary(
             config, get_logger(config.log_dir, "market_close_summary")

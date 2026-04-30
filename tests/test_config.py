@@ -152,6 +152,12 @@ def test_bias_safe_backtest_config_defaults(monkeypatch):
         "BACKTEST_FRICTION_MODEL",
         "LIVE_PAPER_REQUIRE_BIAS_SAFE_ACCEPTANCE",
         "LIVE_PAPER_READINESS_PATH",
+        "ENABLE_LIVE_PAPER_BACKTEST_STYLE",
+        "LIVE_PAPER_STRATEGY",
+        "REQUIRE_EMPTY_PAPER_ACCOUNT",
+        "ALLOW_LIVE_LARGE_TRADE_APPROVAL",
+        "LIVE_ENTRY_REVIEW_TIME_ET",
+        "LIVE_EXIT_REVIEW_TIME_ET",
     ):
         monkeypatch.delenv(name, raising=False)
 
@@ -168,6 +174,12 @@ def test_bias_safe_backtest_config_defaults(monkeypatch):
     assert config.backtest_friction_model == "basic"
     assert config.live_paper_require_bias_safe_acceptance is True
     assert config.live_paper_readiness_path == "runs/live_paper_readiness.json"
+    assert config.enable_live_paper_backtest_style is False
+    assert config.live_paper_strategy == "hold_tax_partial"
+    assert config.require_empty_paper_account is True
+    assert config.allow_live_large_trade_approval is False
+    assert config.live_entry_review_time_et == "09:45"
+    assert config.live_exit_review_time_et == "15:45"
 
 
 def test_bias_safe_backtest_config_reads_environment(monkeypatch, tmp_path):
@@ -182,6 +194,12 @@ def test_bias_safe_backtest_config_reads_environment(monkeypatch, tmp_path):
     monkeypatch.setenv("BACKTEST_FRICTION_MODEL", "realistic")
     monkeypatch.setenv("LIVE_PAPER_REQUIRE_BIAS_SAFE_ACCEPTANCE", "false")
     monkeypatch.setenv("LIVE_PAPER_READINESS_PATH", str(tmp_path / "readiness.json"))
+    monkeypatch.setenv("ENABLE_LIVE_PAPER_BACKTEST_STYLE", "true")
+    monkeypatch.setenv("LIVE_PAPER_STRATEGY", "hold_tax_partial")
+    monkeypatch.setenv("REQUIRE_EMPTY_PAPER_ACCOUNT", "false")
+    monkeypatch.setenv("ALLOW_LIVE_LARGE_TRADE_APPROVAL", "true")
+    monkeypatch.setenv("LIVE_ENTRY_REVIEW_TIME_ET", "10:05")
+    monkeypatch.setenv("LIVE_EXIT_REVIEW_TIME_ET", "15:30")
 
     config = _fresh_trading_config()()
 
@@ -196,6 +214,12 @@ def test_bias_safe_backtest_config_reads_environment(monkeypatch, tmp_path):
     assert config.backtest_friction_model == "realistic"
     assert config.live_paper_require_bias_safe_acceptance is False
     assert config.live_paper_readiness_path == str(tmp_path / "readiness.json")
+    assert config.enable_live_paper_backtest_style is True
+    assert config.live_paper_strategy == "hold_tax_partial"
+    assert config.require_empty_paper_account is False
+    assert config.allow_live_large_trade_approval is True
+    assert config.live_entry_review_time_et == "10:05"
+    assert config.live_exit_review_time_et == "15:30"
 
 
 def test_fetch_forward_close_window_uses_next_three_trading_days():

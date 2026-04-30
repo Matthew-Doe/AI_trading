@@ -57,6 +57,12 @@ def parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--report-run-id", type=str, help="Generate report files for a prior run.")
     parser.add_argument("--latest-report", action="store_true", help="Generate report files for the latest run.")
+    parser.add_argument(
+        "--phase",
+        choices=("entry_review", "exit_review", "full"),
+        default="full",
+        help="Run only the live entry or exit-review phase, or the full pipeline.",
+    )
     return parser.parse_args()
 
 
@@ -85,6 +91,7 @@ def run_pipeline(config: TradingConfig, args: argparse.Namespace) -> int:
     started_at = datetime.now(UTC)
     started_perf = perf_counter()
     logger.info("Starting trading run %s", run_id)
+    phase = getattr(args, "phase", "full")
 
     try:
         debate_failures: list[dict[str, str]] = []
@@ -145,11 +152,19 @@ def run_pipeline(config: TradingConfig, args: argparse.Namespace) -> int:
         if not args.mock:
             if config.alpaca_api_key and config.alpaca_secret_key:
                 execution = AlpacaExecutionEngine(config, logger, run_id=run_id)
-                pending_order_reviews = execution.review_pending_orders(universe)
-                held_position_signals = execution.evaluate_held_positions(decisions, selected_symbols)
-                order_plans = execution.build_held_position_order_plans(
-                    held_position_signals, selected_symbols
-                ) + execution.build_order_plans(decisions, selected_symbols)
+                if phase in {"entry_review", "full"}:
+                    pending_order_reviews = execution.review_pending_orders(universe)
+                if phase in {"exit_review", "full"}:
+                    held_position_signals = execution.evaluate_held_positions(decisions, selected_symbols)
+                order_plans = []
+                if phase in {"exit_review", "full"}:
+                    order_plans.extend(
+                        execution.build_held_position_order_plans(
+                            held_position_signals, selected_symbols
+                        )
+                    )
+                if phase in {"entry_review", "full"}:
+                    order_plans.extend(execution.build_order_plans(decisions, selected_symbols))
                 write_json(run_path / "pending_order_reviews.json", pending_order_reviews)
                 write_json(run_path / "held_position_signals.json", held_position_signals)
                 write_json(run_path / "order_plans.json", order_plans)
@@ -166,7 +181,11 @@ def run_pipeline(config: TradingConfig, args: argparse.Namespace) -> int:
                 write_json(run_path / "tax_loss_cooldowns.json", {"cooldowns": {}})
                 write_json(run_path / "tax_blocked_orders.json", [])
         else:
-            order_plans = build_mock_order_plans(decisions, selected_symbols)
+            order_plans = (
+                build_mock_order_plans(decisions, selected_symbols)
+                if phase in {"entry_review", "full"}
+                else []
+            )
             write_json(run_path / "pending_order_reviews.json", pending_order_reviews)
             write_json(run_path / "held_position_signals.json", held_position_signals)
             execution_results = [

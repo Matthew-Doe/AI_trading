@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from datetime import UTC, datetime, timedelta
+from pathlib import Path
 from typing import Iterable
 from zoneinfo import ZoneInfo
 
@@ -26,6 +28,8 @@ from trading_system.models import (
 )
 from trading_system.tax_state import TaxLossCooldownState
 from trading_system.telegram import TelegramNotifier
+from trading_system.utils import read_json
+from trading_system.live_strategy_state import LiveStrategyStateStore
 
 
 class ExecutionError(RuntimeError):
@@ -46,6 +50,33 @@ class AlpacaExecutionEngine:
         self.telegram = TelegramNotifier(config, logger)
         self.tax_state = TaxLossCooldownState(config.run_dir / "tax_loss_cooldowns.json")
         self.tax_blocked_orders: list[dict[str, object]] = []
+        self.state_store = LiveStrategyStateStore(config.run_dir / "live_strategy_state.json")
+        if self.config.enable_live_paper_backtest_style:
+            self.validate_live_paper_backtest_style_readiness()
+
+    def validate_live_paper_backtest_style_readiness(self) -> None:
+        if not self.config.enable_live_paper_backtest_style:
+            return
+        if "paper" not in self.config.alpaca_paper_base_url.lower():
+            raise ExecutionError("Live paper backtest-style mode requires a paper Alpaca endpoint.")
+        if self.config.live_paper_require_bias_safe_acceptance:
+            readiness_path = Path(self.config.live_paper_readiness_path)
+            if not readiness_path.exists():
+                raise ExecutionError(
+                    f"Bias-safe holdout acceptance is required before paper orders: {readiness_path}"
+                )
+            readiness = read_json(readiness_path)
+            if not readiness.get("acceptance_grade"):
+                raise ExecutionError("Bias-safe holdout acceptance did not pass.")
+        if self.config.require_empty_paper_account:
+            positions = self.client.get_all_positions()
+            orders = self.client.get_orders(
+                filter=GetOrdersRequest(status=QueryOrderStatus.OPEN, limit=500)
+            )
+            if positions or orders:
+                raise ExecutionError(
+                    "Live paper backtest-style mode requires an empty paper account."
+                )
 
     def _standard_trade_cap(
         self,
@@ -100,8 +131,13 @@ class AlpacaExecutionEngine:
             if decision.symbol in open_positions:
                 self.logger.info("Skipping %s because a position already exists.", decision.symbol)
                 continue
+            tax_reentry = False
             if decision.action == "long" and self._is_tax_loss_blocked(decision.symbol):
-                continue
+                adjusted = self._tax_adjusted_reentry_decision(decision)
+                if adjusted is None:
+                    continue
+                decision = adjusted
+                tax_reentry = True
             if decision.action == "short" and not self.config.allow_shorting:
                 self.logger.info("Skipping %s short because shorting is disabled.", decision.symbol)
                 continue
@@ -140,39 +176,47 @@ class AlpacaExecutionEngine:
                 override_notional = cash * self.config.high_confidence_trade_pct
                 override_qty = int(override_notional / market_data.close)
                 if override_qty > standard_max_trade_qty:
-                    approval_required = True
-                    approval = self.telegram.request_trade_approval(
-                        run_id=self.run_id,
-                        order_plan=OrderPlan(
-                            symbol=decision.symbol,
-                            side=decision.action,
-                            qty=override_qty,
-                            notional=override_qty * market_data.close,
-                            confidence=decision.confidence,
-                            allocation=decision.allocation,
-                            reason="telegram approval request",
-                            max_trade_pct=self.config.high_confidence_trade_pct,
-                            telegram_approval_required=True,
-                        ),
-                        standard_notional=max_single_trade_notional,
-                        requested_notional=override_notional,
-                        cash_available=cash,
-                    )
-                    approval_granted = approval.approved
-                    if approval_granted:
+                    if (
+                        self.config.enable_live_paper_backtest_style
+                        and not self.config.allow_live_large_trade_approval
+                    ):
                         max_trade_qty = override_qty
                         max_trade_pct_used = self.config.high_confidence_trade_pct
                         max_trade_cap_basis = "available cash"
-                        self.logger.info(
-                            "Telegram approval granted for %s. Raising max trade cap to %.2f%% of cash.",
-                            decision.symbol,
-                            self.config.high_confidence_trade_pct * 100,
-                        )
                     else:
-                        self.logger.info(
-                            "Telegram approval not granted for %s. Keeping standard max trade cap.",
-                            decision.symbol,
+                        approval_required = True
+                        approval = self.telegram.request_trade_approval(
+                            run_id=self.run_id,
+                            order_plan=OrderPlan(
+                                symbol=decision.symbol,
+                                side=decision.action,
+                                qty=override_qty,
+                                notional=override_qty * market_data.close,
+                                confidence=decision.confidence,
+                                allocation=decision.allocation,
+                                reason="telegram approval request",
+                                max_trade_pct=self.config.high_confidence_trade_pct,
+                                telegram_approval_required=True,
+                            ),
+                            standard_notional=max_single_trade_notional,
+                            requested_notional=override_notional,
+                            cash_available=cash,
                         )
+                        approval_granted = approval.approved
+                        if approval_granted:
+                            max_trade_qty = override_qty
+                            max_trade_pct_used = self.config.high_confidence_trade_pct
+                            max_trade_cap_basis = "available cash"
+                            self.logger.info(
+                                "Telegram approval granted for %s. Raising max trade cap to %.2f%% of cash.",
+                                decision.symbol,
+                                self.config.high_confidence_trade_pct * 100,
+                            )
+                        else:
+                            self.logger.info(
+                                "Telegram approval not granted for %s. Keeping standard max trade cap.",
+                                decision.symbol,
+                            )
             qty = min(risk_qty, alloc_qty, max_trade_qty)
             if qty <= 0:
                 self.logger.info("Skipping %s because computed quantity is zero.", decision.symbol)
@@ -201,6 +245,7 @@ class AlpacaExecutionEngine:
                         f"allocation={decision.allocation:.2f}, risk_qty={risk_qty}, "
                         f"alloc_qty={alloc_qty}, max_trade_qty={max_trade_qty}, "
                         f"cap_basis={max_trade_cap_basis}"
+                        f"{' tax_adjusted_reentry=true' if tax_reentry else ''}"
                     ),
                     max_trade_pct=max_trade_pct_used,
                     telegram_approval_required=approval_required,
@@ -507,6 +552,99 @@ class AlpacaExecutionEngine:
             )
         return plans
 
+    def review_live_backtest_style_position(
+        self,
+        symbol: str,
+        *,
+        current_price: float,
+        thesis_failed: bool = False,
+    ) -> OrderPlan | None:
+        state = self.state_store.positions.get(symbol.upper())
+        if state is None:
+            return None
+        exit_side = "sell" if state.side == "long" else "buy_more"
+        unrealized_pct = (
+            (current_price - state.entry_price) / state.entry_price
+            if state.side == "long"
+            else (state.entry_price - current_price) / state.entry_price
+        )
+
+        target_hit = (
+            state.take_profit_price is not None
+            and (
+                (state.side == "long" and current_price >= state.take_profit_price)
+                or (state.side == "short" and current_price <= state.take_profit_price)
+            )
+        )
+        if (
+            target_hit
+            and self.config.enable_partial_profit_taking
+            and not state.partial_profit_taken
+            and state.quantity > 1
+        ):
+            qty = max(1, int(state.quantity * self.config.partial_profit_take_fraction))
+            qty = min(qty, state.quantity - 1)
+            trailing_pct = max(0.0, self.config.partial_profit_trailing_stop_pct)
+            if state.side == "long":
+                new_stop = max(state.stop_price or 0.0, state.entry_price, current_price * (1 - trailing_pct))
+            else:
+                new_stop = min(state.stop_price or float("inf"), state.entry_price, current_price * (1 + trailing_pct))
+            self.state_store.mark_partial_exit(symbol, quantity=qty, new_stop_price=round(new_stop, 2))
+            return OrderPlan(
+                symbol=symbol.upper(),
+                side=exit_side,
+                qty=qty,
+                notional=qty * current_price,
+                confidence=1.0,
+                allocation=0.0,
+                reason="partial_exit=true target_hit",
+                order_style="market",
+            )
+
+        stop_hit = (
+            state.stop_price is not None
+            and (
+                (state.side == "long" and current_price <= state.stop_price)
+                or (state.side == "short" and current_price >= state.stop_price)
+            )
+        )
+        if stop_hit:
+            self.state_store.clear_position(symbol)
+            return OrderPlan(
+                symbol=symbol.upper(),
+                side=exit_side,
+                qty=state.quantity,
+                notional=state.quantity * current_price,
+                confidence=1.0,
+                allocation=0.0,
+                reason="full_exit=true stop_hit",
+                order_style="market",
+            )
+
+        if thesis_failed:
+            max_adverse_pct = abs(self.config.conditional_hold_max_adverse_pct)
+            max_deferrals = max(0, self.config.conditional_hold_extension_observations)
+            if (
+                self.config.enable_conditional_hold_extension
+                and unrealized_pct > -max_adverse_pct
+                and state.thesis_failure_deferrals < max_deferrals
+            ):
+                self.state_store.increment_thesis_deferral(symbol)
+                return None
+            self.state_store.clear_position(symbol)
+            return OrderPlan(
+                symbol=symbol.upper(),
+                side=exit_side,
+                qty=state.quantity,
+                notional=state.quantity * current_price,
+                confidence=1.0,
+                allocation=0.0,
+                reason="full_exit=true thesis_failed",
+                order_style="market",
+            )
+
+        return None
+
     def submit_orders(self, order_plans: list[OrderPlan]) -> list[dict]:
         results: list[dict] = []
         existing_orders = self.client.get_orders(
@@ -654,6 +792,21 @@ class AlpacaExecutionEngine:
             }
         )
         return True
+
+    def _tax_adjusted_reentry_decision(self, decision: TradeDecision) -> TradeDecision | None:
+        if not self.config.enable_tax_adjusted_ev_reentry:
+            return None
+        if decision.confidence < self.config.tax_reentry_min_confidence:
+            return None
+        expected_value = decision.expected_value_pct
+        if expected_value is None and decision.expected_move_pct is not None:
+            expected_value = decision.expected_move_pct * 100 if abs(decision.expected_move_pct) <= 1 else decision.expected_move_pct
+        if (expected_value or 0.0) < self.config.tax_reentry_min_expected_value_pct:
+            return None
+        multiplier = max(0.0, min(1.0, self.config.tax_reentry_size_multiplier))
+        if multiplier <= 0:
+            return None
+        return replace(decision, allocation=(decision.allocation or self.config.max_single_trade_pct) * multiplier)
 
     def get_tax_state_snapshot(self) -> dict[str, object]:
         tax_state = getattr(self, "tax_state", None)

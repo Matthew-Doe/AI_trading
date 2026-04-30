@@ -2,10 +2,12 @@ from datetime import datetime
 from types import SimpleNamespace
 
 from trading_system.config import TradingConfig
-from trading_system.execution import AlpacaExecutionEngine
+from trading_system.execution import AlpacaExecutionEngine, ExecutionError
+from trading_system.live_strategy_state import LivePositionState, LiveStrategyStateStore
 from trading_system.main import load_mock_universe
 from trading_system.models import OrderPlan, TradeDecision
 from trading_system.tax_state import TaxLossCooldownState
+from trading_system.utils import write_json
 
 
 class DummyLogger:
@@ -191,6 +193,94 @@ def test_high_confidence_long_stays_at_standard_cap_without_telegram_approval():
     assert plans[0].telegram_approval_required is True
     assert plans[0].telegram_approval_granted is False
     assert plans[0].max_trade_pct == 0.05
+
+
+def test_live_paper_backtest_style_bypasses_telegram_approval():
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        enable_live_paper_backtest_style=True,
+        allow_live_large_trade_approval=False,
+        min_confidence=0.6,
+        max_single_trade_pct=0.02,
+        cash_rich_trade_pct=0.05,
+        cash_rich_available_cash_threshold=0.20,
+        high_confidence_trade_pct=0.10,
+        high_confidence_threshold=0.95,
+    )
+    engine.logger = DummyLogger()
+    engine.client = FakeTradingClient()
+    engine.telegram = FakeTelegramNotifier(approved=False)
+    engine.run_id = "test-run"
+    selected = load_mock_universe()
+    decisions = [TradeDecision(symbol="AAPL", action="long", confidence=0.97, allocation=0.50)]
+
+    plans = engine.build_order_plans(decisions, selected)
+
+    assert len(plans) == 1
+    assert engine.telegram.messages == []
+    assert plans[0].telegram_approval_required is False
+    assert plans[0].max_trade_pct == 0.10
+
+
+def test_live_backtest_style_defers_thesis_failure_and_persists_count(tmp_path):
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        enable_live_paper_backtest_style=True,
+        enable_conditional_hold_extension=True,
+        conditional_hold_extension_observations=2,
+        conditional_hold_max_adverse_pct=0.05,
+    )
+    engine.state_store = LiveStrategyStateStore(tmp_path / "state.json")
+    engine.state_store.record_entry(
+        LivePositionState(
+            symbol="AAPL",
+            side="long",
+            quantity=10,
+            entry_price=100.0,
+            stop_price=95.0,
+            take_profit_price=110.0,
+            entry_timestamp="2026-01-02T14:30:00+00:00",
+        )
+    )
+
+    plan = engine.review_live_backtest_style_position("AAPL", current_price=98.0, thesis_failed=True)
+
+    assert plan is None
+    assert engine.state_store.positions["AAPL"].thesis_failure_deferrals == 1
+
+
+def test_live_backtest_style_partial_exit_only_once(tmp_path):
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        enable_live_paper_backtest_style=True,
+        enable_partial_profit_taking=True,
+        partial_profit_take_fraction=0.5,
+        partial_profit_trailing_stop_pct=0.05,
+    )
+    engine.state_store = LiveStrategyStateStore(tmp_path / "state.json")
+    engine.state_store.record_entry(
+        LivePositionState(
+            symbol="AAPL",
+            side="long",
+            quantity=10,
+            entry_price=100.0,
+            stop_price=95.0,
+            take_profit_price=110.0,
+            entry_timestamp="2026-01-02T14:30:00+00:00",
+        )
+    )
+
+    first = engine.review_live_backtest_style_position("AAPL", current_price=112.0)
+    reloaded = LiveStrategyStateStore(tmp_path / "state.json")
+    engine.state_store = reloaded
+    second = engine.review_live_backtest_style_position("AAPL", current_price=113.0)
+
+    assert first is not None
+    assert first.side == "sell"
+    assert first.qty == 5
+    assert "partial_exit=true" in first.reason
+    assert reloaded.positions["AAPL"].partial_profit_taken is True
+    assert second is None
 
 
 def test_buy_more_signal_uses_cash_rich_cap_when_available_cash_is_high():
@@ -383,6 +473,47 @@ def test_submit_orders_dry_run_includes_broker_lifecycle_fields():
     assert results[0]["limit_price"] == 131.0
 
 
+def test_live_paper_backtest_style_refuses_non_paper_url(tmp_path):
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        enable_live_paper_backtest_style=True,
+        alpaca_paper_base_url="https://api.alpaca.markets",
+        live_paper_readiness_path=str(tmp_path / "readiness.json"),
+    )
+    engine.client = FakeTradingClient()
+
+    try:
+        engine.validate_live_paper_backtest_style_readiness()
+    except ExecutionError as exc:
+        assert "paper Alpaca endpoint" in str(exc)
+    else:
+        raise AssertionError("non-paper URL should be refused")
+
+
+def test_live_paper_backtest_style_requires_empty_account_and_bias_readiness(tmp_path):
+    readiness = tmp_path / "readiness.json"
+    write_json(readiness, {"acceptance_grade": True, "strategy": "hold_tax_partial"})
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        enable_live_paper_backtest_style=True,
+        alpaca_paper_base_url="https://paper-api.alpaca.markets",
+        live_paper_readiness_path=str(readiness),
+        require_empty_paper_account=True,
+    )
+    engine.client = FakeTradingClient()
+
+    try:
+        engine.validate_live_paper_backtest_style_readiness()
+    except ExecutionError as exc:
+        assert "empty paper account" in str(exc)
+    else:
+        raise AssertionError("non-empty paper account should be refused")
+
+    engine.client.positions = []
+    engine.client.orders = []
+    assert engine.validate_live_paper_backtest_style_readiness() is None
+
+
 def test_live_tax_loss_cooldown_blocks_new_long_entries(tmp_path):
     engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
     engine.config = TradingConfig(
@@ -412,6 +543,44 @@ def test_live_tax_loss_cooldown_blocks_new_long_entries(tmp_path):
             "reason": "tax_loss_cooldown",
         }
     ]
+
+
+def test_live_tax_adjusted_reentry_allows_reduced_size(tmp_path):
+    engine = AlpacaExecutionEngine.__new__(AlpacaExecutionEngine)
+    engine.config = TradingConfig(
+        run_dir=tmp_path,
+        min_confidence=0.6,
+        max_single_trade_pct=0.20,
+        tax_loss_cooldown_days=31,
+        enable_tax_adjusted_ev_reentry=True,
+        tax_reentry_min_confidence=0.90,
+        tax_reentry_min_expected_value_pct=2.0,
+        tax_reentry_size_multiplier=0.50,
+    )
+    engine.logger = DummyLogger()
+    engine.client = FakeTradingClient(equity="100000", buying_power="100000", cash="100000")
+    engine.telegram = FakeTelegramNotifier(approved=False)
+    engine.run_id = "test-run"
+    engine.tax_state = TaxLossCooldownState(tmp_path / "tax_loss_cooldowns.json")
+    engine.tax_blocked_orders = []
+    engine.tax_state.record_loss_sale(symbol="AAPL", cooldown_days=31, estimated_loss=123.45)
+
+    selected = load_mock_universe()
+    decisions = [
+        TradeDecision(
+            symbol="AAPL",
+            action="long",
+            confidence=0.95,
+            allocation=0.10,
+            expected_value_pct=3.0,
+        )
+    ]
+
+    plans = engine.build_order_plans(decisions, selected)
+
+    assert len(plans) == 1
+    assert plans[0].allocation == 0.05
+    assert "tax_adjusted_reentry=true" in plans[0].reason
 
 
 def test_submit_orders_records_live_tax_loss_cooldown(tmp_path):
