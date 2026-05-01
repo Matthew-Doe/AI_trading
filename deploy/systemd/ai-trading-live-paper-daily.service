@@ -1,0 +1,12 @@
+[Unit]
+Description=AI Trading live paper daily run
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/home/matthew/devel/AI_trading-worktrees/implement-all-three-plans
+EnvironmentFile=/home/matthew/devel/AI_trading-worktrees/implement-all-three-plans/.env
+Environment=LIVE_PAPER_START_DATE=2026-05-04
+Environment=LIVE_PAPER_PHASE=full
+ExecStart=/home/matthew/devel/AI_trading/.venv/bin/python -m scripts.run_live_paper_daily
