@@ -198,6 +198,70 @@ def test_build_historical_decision_outcomes_returns_labeled_outcome(tmp_path):
     assert outcomes[0].forward_as_of == "2026-04-21T16:00:00+00:00"
 
 
+def test_build_historical_decision_outcomes_prefers_raw_confidence_for_audit_schema(tmp_path):
+    run_dir = tmp_path / "runs" / "20260415T123002Z"
+    run_dir.mkdir(parents=True)
+    (run_dir / "decisions.json").write_text(
+        (
+            '[{"symbol":"AAPL","action":"long","confidence":0.61,'
+            '"raw_confidence":0.85,"calibrated_confidence":0.61,"allocation":0.4}]'
+        ),
+        encoding="utf-8",
+    )
+
+    class StubMarketDataService:
+        def fetch_forward_close_window(self, symbol: str, *, as_of: datetime, trading_days_ahead: int):
+            del symbol
+            del as_of
+            del trading_days_ahead
+            return 100.0, 103.0, "2026-04-21T16:00:00+00:00"
+
+    outcomes = build_historical_decision_outcomes(
+        run_root=tmp_path / "runs",
+        market_data_service=StubMarketDataService(),
+        actionable_move_pct=0.02,
+        now=datetime(2026, 4, 22, tzinfo=UTC),
+    )
+
+    assert len(outcomes) == 1
+    assert outcomes[0].raw_confidence == 0.85
+
+
+def test_build_historical_decision_outcomes_skips_threshold_filtered_candidates(tmp_path):
+    run_dir = tmp_path / "runs" / "20260415T123002Z"
+    run_dir.mkdir(parents=True)
+    (run_dir / "decisions.json").write_text(
+        (
+            '[{"symbol":"AAPL","action":"skip","confidence":0.0,'
+            '"raw_confidence":0.85,"calibrated_confidence":0.58,"allocation":0.0}]'
+        ),
+        encoding="utf-8",
+    )
+
+    class StubMarketDataService:
+        def __init__(self):
+            self.calls = 0
+
+        def fetch_forward_close_window(self, symbol: str, *, as_of: datetime, trading_days_ahead: int):
+            del symbol
+            del as_of
+            del trading_days_ahead
+            self.calls += 1
+            return 100.0, 103.0, "2026-04-21T16:00:00+00:00"
+
+    market_data_service = StubMarketDataService()
+
+    outcomes = build_historical_decision_outcomes(
+        run_root=tmp_path / "runs",
+        market_data_service=market_data_service,
+        actionable_move_pct=0.02,
+        now=datetime(2026, 4, 22, tzinfo=UTC),
+    )
+
+    assert outcomes == []
+    assert market_data_service.calls == 0
+
+
 def test_build_historical_decision_outcomes_skips_future_run_ids_without_lookup(tmp_path):
     run_dir = tmp_path / "runs" / "20260425T123002Z"
     run_dir.mkdir(parents=True)

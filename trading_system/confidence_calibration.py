@@ -92,6 +92,11 @@ def build_historical_decision_outcomes(
             continue
 
         for item in decisions:
+            action = str(item["action"]).lower()
+            raw_confidence = float(item.get("raw_confidence", item.get("confidence", 0.0)))
+            final_confidence = float(item.get("confidence", 0.0))
+            if action == "skip" and raw_confidence > 0.0 and final_confidence == 0.0:
+                continue
             try:
                 reference_close, forward_close, forward_as_of = (
                     market_data_service.fetch_forward_close_window(
@@ -105,8 +110,6 @@ def build_historical_decision_outcomes(
                     continue
                 raise
 
-            action = str(item["action"]).lower()
-            raw_confidence = float(item.get("confidence", 0.0))
             forward_return = (
                 (forward_close - reference_close) / reference_close if reference_close else 0.0
             )
