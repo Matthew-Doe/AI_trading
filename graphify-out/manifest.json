@@ -1,0 +1,342 @@
+{
+  "/home/agent/devel/AI_trading/analyze_backtest_correlation.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "d98df1c47eea2e9cbb823bd1b1799dac",
+    "semantic_hash": "d98df1c47eea2e9cbb823bd1b1799dac"
+  },
+  "/home/agent/devel/AI_trading/backtest_engine.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "995f0db5a4341302e3522f73bf3f073a",
+    "semantic_hash": "995f0db5a4341302e3522f73bf3f073a"
+  },
+  "/home/agent/devel/AI_trading/rebuild_debug_logs.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "d10a2a36de54803fdc1da703766c1dc6",
+    "semantic_hash": "d10a2a36de54803fdc1da703766c1dc6"
+  },
+  "/home/agent/devel/AI_trading/verify_fix.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "d5a9fa4f5441a1c3a1b12d3b28d43b8a",
+    "semantic_hash": "d5a9fa4f5441a1c3a1b12d3b28d43b8a"
+  },
+  "/home/agent/devel/AI_trading/performance_analyzer.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "23add74eb4cfb080b330dbfc12e544c0",
+    "semantic_hash": "23add74eb4cfb080b330dbfc12e544c0"
+  },
+  "/home/agent/devel/AI_trading/preload_market_data.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "6bb4df6f0922ffcb49faec424735c036",
+    "semantic_hash": "6bb4df6f0922ffcb49faec424735c036"
+  },
+  "/home/agent/devel/AI_trading/manual_decision_check.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "2120601b7b0f892d43b9a740a8fbbe7f",
+    "semantic_hash": "2120601b7b0f892d43b9a740a8fbbe7f"
+  },
+  "/home/agent/devel/AI_trading/scripts/run_live_paper_daily.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "893c56e4535568f4a6d7358cb8ddfc12",
+    "semantic_hash": "893c56e4535568f4a6d7358cb8ddfc12"
+  },
+  "/home/agent/devel/AI_trading/scripts/weekly_trade_review.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "5d9424b6e20778c532c71bd7d5041b86",
+    "semantic_hash": "5d9424b6e20778c532c71bd7d5041b86"
+  },
+  "/home/agent/devel/AI_trading/tests/test_main_mock.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "aeb0282348f793f88d5d49dc880a9262",
+    "semantic_hash": "aeb0282348f793f88d5d49dc880a9262"
+  },
+  "/home/agent/devel/AI_trading/tests/test_portfolio_summary.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "caf26a3b76ac2d963b78bc2bb647487b",
+    "semantic_hash": "caf26a3b76ac2d963b78bc2bb647487b"
+  },
+  "/home/agent/devel/AI_trading/tests/test_debate.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "d45406522eb8e57ca7fb923205e4e462",
+    "semantic_hash": "d45406522eb8e57ca7fb923205e4e462"
+  },
+  "/home/agent/devel/AI_trading/tests/test_dashboard.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "ca8a35389c8fdf0b3eaa363b045486d2",
+    "semantic_hash": "ca8a35389c8fdf0b3eaa363b045486d2"
+  },
+  "/home/agent/devel/AI_trading/tests/test_weekly_review.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "15dd630e615db394d69023ccf2109dd7",
+    "semantic_hash": "15dd630e615db394d69023ccf2109dd7"
+  },
+  "/home/agent/devel/AI_trading/tests/test_trade_audit.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "813784db1cb1b7b3ac15cdf8bebb58da",
+    "semantic_hash": "813784db1cb1b7b3ac15cdf8bebb58da"
+  },
+  "/home/agent/devel/AI_trading/tests/test_live_strategy_state.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "a008e3901168d9a72a0487aaca87c7de",
+    "semantic_hash": "a008e3901168d9a72a0487aaca87c7de"
+  },
+  "/home/agent/devel/AI_trading/tests/test_backtest_execution.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "65d856350422e3c0e22128bba3408bfb",
+    "semantic_hash": "65d856350422e3c0e22128bba3408bfb"
+  },
+  "/home/agent/devel/AI_trading/tests/test_preload_market_data.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "ca2e6d4180538ab3bdfcb2a2eb29e71c",
+    "semantic_hash": "ca2e6d4180538ab3bdfcb2a2eb29e71c"
+  },
+  "/home/agent/devel/AI_trading/tests/test_run_live_paper_daily.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "b457dac809e13ac9580d8b049a6a2c30",
+    "semantic_hash": "b457dac809e13ac9580d8b049a6a2c30"
+  },
+  "/home/agent/devel/AI_trading/tests/test_data.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "32b876248c4f7890e1548d8a997bb43f",
+    "semantic_hash": "32b876248c4f7890e1548d8a997bb43f"
+  },
+  "/home/agent/devel/AI_trading/tests/test_backtest_engine.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "277a35919465313f36f5be78071f76b3",
+    "semantic_hash": "277a35919465313f36f5be78071f76b3"
+  },
+  "/home/agent/devel/AI_trading/tests/test_config.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "717ba2b35106503b2300c5b4a99cff60",
+    "semantic_hash": "717ba2b35106503b2300c5b4a99cff60"
+  },
+  "/home/agent/devel/AI_trading/tests/test_execution.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "85b6d9f65bc6c1f258867ece9f81f2e2",
+    "semantic_hash": "85b6d9f65bc6c1f258867ece9f81f2e2"
+  },
+  "/home/agent/devel/AI_trading/tests/test_decision.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "2a45b05d983e8b739f1afc37f70775fa",
+    "semantic_hash": "2a45b05d983e8b739f1afc37f70775fa"
+  },
+  "/home/agent/devel/AI_trading/tests/test_utils.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "09991f902e0d602009c50c4c1a4902bf",
+    "semantic_hash": "09991f902e0d602009c50c4c1a4902bf"
+  },
+  "/home/agent/devel/AI_trading/tests/test_reporting.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "801bacabc6ecda0e511389349d25da2f",
+    "semantic_hash": "801bacabc6ecda0e511389349d25da2f"
+  },
+  "/home/agent/devel/AI_trading/tests/test_confidence_calibration.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "c4920074e2632f638a87c9e56feee921",
+    "semantic_hash": "c4920074e2632f638a87c9e56feee921"
+  },
+  "/home/agent/devel/AI_trading/tests/test_selection.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "978e5dfb56544d77f59e1b81282d740d",
+    "semantic_hash": "978e5dfb56544d77f59e1b81282d740d"
+  },
+  "/home/agent/devel/AI_trading/tests/test_llm.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "06d6627d19f72da842112abe5c02a381",
+    "semantic_hash": "06d6627d19f72da842112abe5c02a381"
+  },
+  "/home/agent/devel/AI_trading/tests/test_scheduler.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "94fed8861693385ef4d2cb9fc51faf84",
+    "semantic_hash": "94fed8861693385ef4d2cb9fc51faf84"
+  },
+  "/home/agent/devel/AI_trading/tests/test_telegram.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "9b2efced6f7b4a17ccdd631eec9e8e04",
+    "semantic_hash": "9b2efced6f7b4a17ccdd631eec9e8e04"
+  },
+  "/home/agent/devel/AI_trading/trading_system/execution.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "db5ba0c93e77ad8854ad18232c7ba6e7",
+    "semantic_hash": "db5ba0c93e77ad8854ad18232c7ba6e7"
+  },
+  "/home/agent/devel/AI_trading/trading_system/selection.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "c30e15ec510ac22a6e0a736f5cac697d",
+    "semantic_hash": "c30e15ec510ac22a6e0a736f5cac697d"
+  },
+  "/home/agent/devel/AI_trading/trading_system/live_strategy_state.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "9bd8899e5dba428e95a41971b252dfda",
+    "semantic_hash": "9bd8899e5dba428e95a41971b252dfda"
+  },
+  "/home/agent/devel/AI_trading/trading_system/models.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "db9afa987ac955c3fa5e912a9b09d643",
+    "semantic_hash": "db9afa987ac955c3fa5e912a9b09d643"
+  },
+  "/home/agent/devel/AI_trading/trading_system/llm.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "211a2ee07490e3124adce5152fba520d",
+    "semantic_hash": "211a2ee07490e3124adce5152fba520d"
+  },
+  "/home/agent/devel/AI_trading/trading_system/weekly_review.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "31b5b3b206486e4ef2771a5030bf9d4c",
+    "semantic_hash": "31b5b3b206486e4ef2771a5030bf9d4c"
+  },
+  "/home/agent/devel/AI_trading/trading_system/trade_audit.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "6e1d1863ef658382f5b906843f3db0f6",
+    "semantic_hash": "6e1d1863ef658382f5b906843f3db0f6"
+  },
+  "/home/agent/devel/AI_trading/trading_system/decision.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "ebf9c464c0c99363232923f220afde69",
+    "semantic_hash": "ebf9c464c0c99363232923f220afde69"
+  },
+  "/home/agent/devel/AI_trading/trading_system/__init__.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "25cbceb9ec62b0ee213897967589769e",
+    "semantic_hash": "25cbceb9ec62b0ee213897967589769e"
+  },
+  "/home/agent/devel/AI_trading/trading_system/reporting.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "a197176a4a84a36f88716cd26f387a18",
+    "semantic_hash": "a197176a4a84a36f88716cd26f387a18"
+  },
+  "/home/agent/devel/AI_trading/trading_system/data.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "6fa6be9b075d1f0faabf386f2b13b485",
+    "semantic_hash": "6fa6be9b075d1f0faabf386f2b13b485"
+  },
+  "/home/agent/devel/AI_trading/trading_system/scheduler.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "acf60921e551ce6a9953120a065fe415",
+    "semantic_hash": "acf60921e551ce6a9953120a065fe415"
+  },
+  "/home/agent/devel/AI_trading/trading_system/backtest_execution.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "9ea4dc587d09d7837e80648968a32fd4",
+    "semantic_hash": "9ea4dc587d09d7837e80648968a32fd4"
+  },
+  "/home/agent/devel/AI_trading/trading_system/portfolio_summary.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "9ca3ac29939467e279742f4d0f28bf3d",
+    "semantic_hash": "9ca3ac29939467e279742f4d0f28bf3d"
+  },
+  "/home/agent/devel/AI_trading/trading_system/tax_state.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "188204f8eccfc4ab9827924d5840afbc",
+    "semantic_hash": "188204f8eccfc4ab9827924d5840afbc"
+  },
+  "/home/agent/devel/AI_trading/trading_system/config.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "83158198fd40dc2ff5084feafb4c323e",
+    "semantic_hash": "83158198fd40dc2ff5084feafb4c323e"
+  },
+  "/home/agent/devel/AI_trading/trading_system/dashboard.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "6cae7a5d0073d2bd9ecb27e70f2ff0a9",
+    "semantic_hash": "6cae7a5d0073d2bd9ecb27e70f2ff0a9"
+  },
+  "/home/agent/devel/AI_trading/trading_system/telegram.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "84d3abcc60ce46c6375f76437b9cb43f",
+    "semantic_hash": "84d3abcc60ce46c6375f76437b9cb43f"
+  },
+  "/home/agent/devel/AI_trading/trading_system/utils.py": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "d5b0796d8b233bc3044072ae3a182a93",
+    "semantic_hash": "d5b0796d8b233bc3044072ae3a182a93"
+  },
+  "/home/agent/devel/AI_trading/trading_system/main.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "70daba4f4909ebce87ade2a65c693c03",
+    "semantic_hash": "70daba4f4909ebce87ade2a65c693c03"
+  },
+  "/home/agent/devel/AI_trading/trading_system/confidence_calibration.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "6f311952efcbeedf900ee61b7a9e42b0",
+    "semantic_hash": "6f311952efcbeedf900ee61b7a9e42b0"
+  },
+  "/home/agent/devel/AI_trading/trading_system/debate.py": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "69f611cbee4d154398be90ca832e3ca9",
+    "semantic_hash": "69f611cbee4d154398be90ca832e3ca9"
+  },
+  "/home/agent/devel/AI_trading/profitability_improvement_review.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "8bf346f80b263c15aba06f7e5cacc49a",
+    "semantic_hash": "8bf346f80b263c15aba06f7e5cacc49a"
+  },
+  "/home/agent/devel/AI_trading/README.md": {
+    "mtime": 1779251046.4130597,
+    "ast_hash": "46cd465372065853e372d67756609774",
+    "semantic_hash": "46cd465372065853e372d67756609774"
+  },
+  "/home/agent/devel/AI_trading/requirements.txt": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "c16db372af5e0d040af358473e1e268f",
+    "semantic_hash": "c16db372af5e0d040af358473e1e268f"
+  },
+  "/home/agent/devel/AI_trading/external_review/request.md": {
+    "mtime": 1779251046.4330602,
+    "ast_hash": "c1738c7dc15267504766b43254286f54",
+    "semantic_hash": "c1738c7dc15267504766b43254286f54"
+  },
+  "/home/agent/devel/AI_trading/docs/superpowers/plans/2026-04-29-live-paper-hold-tax-partial.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "dfed07e10b2bbbcc20598f5752fa82f4",
+    "semantic_hash": "dfed07e10b2bbbcc20598f5752fa82f4"
+  },
+  "/home/agent/devel/AI_trading/docs/superpowers/plans/2026-05-01-live-paper-daily-rollout.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "9395f20c9741d35945d9dd25a6cc96d5",
+    "semantic_hash": "9395f20c9741d35945d9dd25a6cc96d5"
+  },
+  "/home/agent/devel/AI_trading/docs/superpowers/plans/2026-04-30-backtest-bias-fixes.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "a115df73dae8312539b92c38d11c1db8",
+    "semantic_hash": "a115df73dae8312539b92c38d11c1db8"
+  },
+  "/home/agent/devel/AI_trading/docs/superpowers/plans/2026-04-29-weekly-trade-logging.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "2fa2f5dec7395ddeae64e1be8c20a364",
+    "semantic_hash": "2fa2f5dec7395ddeae64e1be8c20a364"
+  },
+  "/home/agent/devel/AI_trading/docs/superpowers/plans/2026-04-28-january-profit-experiments.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "312966fadf6ecd4aee5a16ec26ced8c9",
+    "semantic_hash": "312966fadf6ecd4aee5a16ec26ced8c9"
+  },
+  "/home/agent/devel/AI_trading/docs/superpowers/specs/2026-05-01-live-paper-daily-rollout-design.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "17e08a92d64aa20266dae5bce07f5316",
+    "semantic_hash": "17e08a92d64aa20266dae5bce07f5316"
+  },
+  "/home/agent/devel/AI_trading/confidence_review/confidence_correlation_strategies.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "d1b858a4af1908112828445195ec141f",
+    "semantic_hash": "d1b858a4af1908112828445195ec141f"
+  },
+  "/home/agent/devel/AI_trading/confidence_review/exit_logic_review.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "fbd9067bfe52fbedaa3790eb5979fbfc",
+    "semantic_hash": "fbd9067bfe52fbedaa3790eb5979fbfc"
+  },
+  "/home/agent/devel/AI_trading/confidence_review/implementation_plan.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "b636aff9a928271b2c9866cf132c140e",
+    "semantic_hash": "b636aff9a928271b2c9866cf132c140e"
+  },
+  "/home/agent/devel/AI_trading/confidence_review/tax_strategy_review.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "c0d5bf75cfd88afd6a3130bc26484654",
+    "semantic_hash": "c0d5bf75cfd88afd6a3130bc26484654"
+  },
+  "/home/agent/devel/AI_trading/confidence_review/exploratory_january_results.md": {
+    "mtime": 1779329912.232535,
+    "ast_hash": "6765c57a1ccbdfd7460b58a7aaf42c53",
+    "semantic_hash": "6765c57a1ccbdfd7460b58a7aaf42c53"
+  }
+}
